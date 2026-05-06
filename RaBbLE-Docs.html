@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RaBbLE — Technical Documentation</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Exo+2:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0010;--surface:#12132a;--raised:#1a1b2e;--border:#2a2840;
+  --magenta:#ff2d78;--cyan:#00f5ff;--violet:#bf5fff;--pink:#ff79c6;
+  --green:#39ff14;
+  --text:#e8e0f0;--text-dim:#7870a0;--text-dimmer:#3d3860;
+  --font-mono:'Space Mono',monospace;--font-ui:'Exo 2',sans-serif;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--font-ui);line-height:1.7;min-height:100vh}
+
+/* Outrun grid background */
+body::before{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    repeating-linear-gradient(90deg,rgba(191,95,255,0.03) 0px,transparent 1px,transparent 60px),
+    repeating-linear-gradient(0deg,rgba(191,95,255,0.03) 0px,transparent 1px,transparent 60px);
+}
+
+.layout{position:relative;z-index:1;display:flex;min-height:100vh}
+
+/* Sidebar TOC */
+.toc{
+  width:240px;min-width:240px;position:sticky;top:0;height:100vh;overflow-y:auto;
+  padding:32px 16px;border-right:1px solid var(--border);
+  background:rgba(10,0,16,0.95);backdrop-filter:blur(12px);
+  display:flex;flex-direction:column;gap:4px;
+}
+.toc-brand{
+  font-family:var(--font-mono);font-size:18px;font-weight:700;
+  letter-spacing:0.14em;margin-bottom:20px;
+  background:linear-gradient(90deg,var(--magenta),var(--cyan));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.toc-section{font-size:9px;font-family:var(--font-mono);color:var(--text-dimmer);
+  letter-spacing:0.14em;text-transform:uppercase;padding:12px 8px 4px;margin-top:4px}
+.toc-link{
+  display:block;padding:6px 10px;border-radius:6px;font-size:12px;
+  color:var(--text-dim);text-decoration:none;transition:all 0.15s;
+  letter-spacing:0.02em;
+}
+.toc-link:hover{color:var(--text);background:rgba(191,95,255,0.08)}
+.toc-link.active{color:var(--violet);background:rgba(191,95,255,0.1)}
+
+/* Main content */
+.content{flex:1;padding:56px 64px 80px;max-width:860px}
+
+h1{font-size:38px;font-weight:800;letter-spacing:0.06em;margin-bottom:8px;
+  background:linear-gradient(90deg,var(--magenta),var(--cyan),var(--violet));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+h2{font-size:22px;font-weight:700;letter-spacing:0.05em;margin-top:52px;margin-bottom:16px;
+  color:var(--text);border-bottom:1px solid var(--border);padding-bottom:10px;
+  scroll-margin-top:24px}
+h2::before{content:'›  ';color:var(--magenta);font-family:var(--font-mono)}
+h3{font-size:15px;font-weight:600;letter-spacing:0.04em;margin-top:28px;margin-bottom:10px;
+  color:var(--cyan)}
+p{color:var(--text-dim);font-size:14px;margin-bottom:12px;max-width:680px}
+strong{color:var(--text);font-weight:600}
+code{font-family:var(--font-mono);font-size:11px;background:rgba(191,95,255,0.1);
+  border:1px solid rgba(191,95,255,0.2);padding:1px 6px;border-radius:4px;color:var(--violet)}
+pre{background:var(--surface);border:1px solid var(--border);border-radius:10px;
+  padding:16px 18px;font-family:var(--font-mono);font-size:11px;line-height:1.8;
+  overflow-x:auto;margin:12px 0 18px}
+pre code{background:none;border:none;padding:0;color:var(--text-dim)}
+.kw{color:var(--magenta)}
+.fn{color:var(--cyan)}
+.str{color:var(--violet)}
+.cm{color:var(--text-dimmer)}
+
+/* Lead text */
+.lead{font-size:15px;color:var(--text-dim);margin-bottom:32px;max-width:620px;line-height:1.8;font-weight:300}
+
+/* Button reference table */
+.btn-table{width:100%;border-collapse:collapse;margin:16px 0 24px;font-size:13px}
+.btn-table th{text-align:left;font-family:var(--font-mono);font-size:9px;letter-spacing:0.12em;
+  text-transform:uppercase;color:var(--text-dimmer);padding:8px 12px;
+  border-bottom:1px solid var(--border)}
+.btn-table td{padding:10px 12px;border-bottom:1px solid rgba(42,40,64,0.5);vertical-align:top}
+.btn-table tr:hover td{background:rgba(191,95,255,0.04)}
+.btn-name{font-family:var(--font-mono);font-size:11px;color:var(--cyan);white-space:nowrap}
+.btn-loc{font-size:11px;color:var(--text-dimmer)}
+.btn-desc{font-size:13px;color:var(--text-dim)}
+.btn-state{display:inline-block;padding:2px 8px;border-radius:10px;font-size:9px;
+  font-family:var(--font-mono);letter-spacing:0.08em;text-transform:uppercase;margin-top:3px}
+.state-react{background:rgba(0,245,255,0.1);border:1px solid rgba(0,245,255,0.25);color:var(--cyan)}
+.state-audio{background:rgba(57,255,20,0.1);border:1px solid rgba(57,255,20,0.25);color:var(--green)}
+.state-canvas{background:rgba(191,95,255,0.1);border:1px solid rgba(191,95,255,0.25);color:var(--violet)}
+.state-nav{background:rgba(255,45,120,0.1);border:1px solid rgba(255,45,120,0.25);color:var(--magenta)}
+
+/* Hookup diagram */
+.hookup{background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  padding:20px 24px;margin:16px 0 24px;font-family:var(--font-mono);font-size:11px;line-height:2.2}
+.arrow{color:var(--violet)}
+.node-ui{color:var(--cyan)}
+.node-state{color:var(--magenta)}
+.node-canvas{color:var(--violet)}
+.node-audio{color:var(--green)}
+
+/* Callout */
+.callout{border-left:3px solid var(--magenta);background:rgba(255,45,120,0.06);
+  border-radius:0 8px 8px 0;padding:12px 16px;margin:16px 0;font-size:13px;color:var(--text-dim)}
+.callout.cyan{border-color:var(--cyan);background:rgba(0,245,255,0.06)}
+.callout.violet{border-color:var(--violet);background:rgba(191,95,255,0.06)}
+
+/* Tag pills */
+.tag{display:inline-block;padding:2px 8px;border-radius:10px;font-size:9px;
+  font-family:var(--font-mono);letter-spacing:0.1em;text-transform:uppercase;margin-right:4px}
+.tag-m{background:rgba(255,45,120,0.12);border:1px solid rgba(255,45,120,0.25);color:var(--magenta)}
+.tag-c{background:rgba(0,245,255,0.1);border:1px solid rgba(0,245,255,0.25);color:var(--cyan)}
+.tag-v{background:rgba(191,95,255,0.1);border:1px solid rgba(191,95,255,0.25);color:var(--violet)}
+
+.version{font-size:11px;font-family:var(--font-mono);color:var(--text-dimmer);margin-bottom:28px;letter-spacing:0.06em}
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- TOC Sidebar -->
+  <nav class="toc">
+    <div class="toc-brand">RaBbLE</div>
+    <div class="toc-section">Overview</div>
+    <a class="toc-link" href="#what-is-rabble">What is RaBbLE</a>
+    <a class="toc-link" href="#architecture">Architecture</a>
+    <div class="toc-section">Interface</div>
+    <a class="toc-link" href="#boot-sequence">Boot Sequence</a>
+    <a class="toc-link" href="#sidebar">Sidebar & Entity</a>
+    <a class="toc-link" href="#main-panel">Main Panel</a>
+    <a class="toc-link" href="#screens">Screens</a>
+    <div class="toc-section">Controls</div>
+    <a class="toc-link" href="#buttons">Button Reference</a>
+    <a class="toc-link" href="#hookups">State Hookups</a>
+    <div class="toc-section">Extension</div>
+    <a class="toc-link" href="#ai-hookup">Wiring Real AI</a>
+    <a class="toc-link" href="#mic-hookup">Mic & Audio</a>
+    <a class="toc-link" href="#artifacts">Artifact Renderer</a>
+  </nav>
+
+  <!-- Content -->
+  <main class="content">
+
+    <h1>RaBbLE Documentation</h1>
+    <div class="version">v0.4.7 · RaBbLE-WebChat · April 2026</div>
+    <p class="lead">
+      Technical reference for the RaBbLE frontend — a single-file HTML prototype for the
+      <strong>RaBbLE a Boundless Behavioral Learning Engine</strong> interface. Covers every
+      interactive element, its React state hookup, and how to connect it to a real AI backend.
+    </p>
+
+    <!-- ── What is RaBbLE ── -->
+    <h2 id="what-is-rabble">What is RaBbLE</h2>
+    <p>
+      RaBbLE is a <strong>Collaborative Substrate</strong> — an AI-ambient environment that inhabits
+      the machine alongside the user as a peer. The <em>B</em> in the acronym is a floating slot:
+      <em>Boundless</em> is canonical, but <em>Becoming</em>, <em>Brilliant</em>, <em>Behavioral</em>
+      are all valid states.
+    </p>
+    <p>
+      The frontend renders RaBbLE as a living entity: a particle nebula with two eyes (magenta left,
+      cyan right), a dual-wave waveform mouth that responds to microphone input, and a theatrical
+      boot sequence on first load.
+    </p>
+    <div class="callout violet">
+      The visual language is not decoration — it is character made visible. Every state change
+      (idle → thinking → speaking) is expressed through the entity's appearance.
+    </div>
+
+    <!-- ── Architecture ── -->
+    <h2 id="architecture">Architecture</h2>
+    <p>
+      The entire frontend lives in a <strong>single HTML file</strong> (<code>RaBbLE.html</code>).
+      It uses React 18 + Babel (loaded from CDN) with all JSX inlined. No build step required.
+    </p>
+    <h3>Key React components</h3>
+    <table class="btn-table">
+      <tr><th>Component</th><th>Role</th></tr>
+      <tr><td class="btn-name">App</td><td class="btn-desc">Root. Owns all global state: screen, rabbleState, mic, messages, boot flag.</td></tr>
+      <tr><td class="btn-name">BootSequence</td><td class="btn-desc">Full-screen overlay shown on first load. Particle convergence + terminal log + entity reveal.</td></tr>
+      <tr><td class="btn-name">RaBbLEAvatar</td><td class="btn-desc">Canvas renderer for the entity: particles, eyes, portals, waveform mouth.</td></tr>
+      <tr><td class="btn-name">Sidebar</td><td class="btn-desc">Left panel. Contains avatar, brand, status pill, navigation.</td></tr>
+      <tr><td class="btn-name">RendersView</td><td class="btn-desc">Artifact card stage. Supports stack, fan, and carousel layout.</td></tr>
+      <tr><td class="btn-name">ConvoView</td><td class="btn-desc">Ambient chat transcript. Messages drift in with animation.</td></tr>
+      <tr><td class="btn-name">LibraryScreen</td><td class="btn-desc">Grid of all past artifacts with filter pills.</td></tr>
+      <tr><td class="btn-name">MemoryScreen</td><td class="btn-desc">Animated knowledge graph + behavioral insight bars.</td></tr>
+      <tr><td class="btn-name">SettingsScreen</td><td class="btn-desc">Toggle switches for companion behavior configuration.</td></tr>
+      <tr><td class="btn-name">OnboardingScreen</td><td class="btn-desc">3-step intro sequence.</td></tr>
+      <tr><td class="btn-name">TweaksPanel</td><td class="btn-desc">Floating dev panel for design variant switching (card layout, ambient toggles).</td></tr>
+    </table>
+
+    <!-- ── Boot Sequence ── -->
+    <h2 id="boot-sequence">Boot Sequence</h2>
+    <p>
+      On first render, <code>booting</code> state is <code>true</code>. The <code>BootSequence</code>
+      component mounts as a fixed full-screen overlay at <code>z-index: 9999</code>.
+    </p>
+    <p>The sequence runs on a timer cascade:</p>
+    <div class="hookup">
+      <span class="node-state">500ms</span> <span class="arrow">→</span> RaBbLE title fades in<br>
+      <span class="node-state">850ms</span> <span class="arrow">→</span> Boot line 1 appears<br>
+      <span class="node-state">1080ms</span> <span class="arrow">→</span> Boot line 2<br>
+      <span class="node-state">1340ms</span> <span class="arrow">→</span> Boot line 3<br>
+      <span class="node-state">1620ms</span> <span class="arrow">→</span> Boot line 4<br>
+      <span class="node-state">1900ms</span> <span class="arrow">→</span> Boot line 5<br>
+      <span class="node-state">2150ms</span> <span class="arrow">→</span> Boot line 6 (USER PROFILE: FOUND)<br>
+      <span class="node-state">2500ms</span> <span class="arrow">→</span> Entity avatar fades in<br>
+      <span class="node-state">4400ms</span> <span class="arrow">→</span> Overlay begins fade-out (opacity → 0)<br>
+      <span class="node-state">5200ms</span> <span class="arrow">→</span> <code>onDone()</code> called → <code>setBooting(false)</code><br>
+    </div>
+    <p>
+      The main UI is always mounted but at <code>opacity: 0</code> while booting.
+      When <code>setBooting(false)</code> fires, it transitions to <code>opacity: 1</code>
+      over 0.6s — eliminating any pop between states.
+    </p>
+    <h3>Skip button</h3>
+    <p>Positioned bottom-right of the boot overlay. Calls <code>onDone()</code> immediately.</p>
+
+    <!-- ── Sidebar ── -->
+    <h2 id="sidebar">Sidebar &amp; Entity</h2>
+    <p>
+      The sidebar is a fixed-width (<code>260px</code>) column on the left. It contains the
+      RaBbLE entity avatar, brand name, dynamic status, and navigation.
+    </p>
+
+    <h3>Entity Avatar — canvas renderer</h3>
+    <p>
+      The avatar is a <code>&lt;canvas&gt;</code> element rendered by <code>RaBbLEAvatar</code>.
+      It runs a continuous <code>requestAnimationFrame</code> loop drawing three layers:
+    </p>
+    <table class="btn-table">
+      <tr><th>Layer</th><th>Description</th><th>Driven by</th></tr>
+      <tr><td class="btn-name">Particles</td><td class="btn-desc">320 particles in a gaussian cluster. Blues, cyans, purples, whites. Drift with Lissajous phase.</td><td class="btn-loc"><span class="tag tag-c">rabbleState</span></td></tr>
+      <tr><td class="btn-name">Eyes</td><td class="btn-desc">Two white oval orbs. Left = magenta outline, right = cyan. Each floats above/below its portal disc.</td><td class="btn-loc"><span class="tag tag-c">mouse position</span></td></tr>
+      <tr><td class="btn-name">Portals</td><td class="btn-desc">Dark flat disc behind each eye. Left portal below orb. Right portal above orb. Fixed position.</td><td class="btn-loc"><span class="tag tag-v">static</span></td></tr>
+      <tr><td class="btn-name">Waveform</td><td class="btn-desc">Dual braided waves — magenta + cyan, phase offset by π. Only rendered when mic is active.</td><td class="btn-loc"><span class="tag tag-c">micActive</span> <span class="tag tag-m">micLevel</span></td></tr>
+    </table>
+
+    <h3>Eye tracking</h3>
+    <p>
+      A <code>mousemove</code> listener on <code>window</code> populates <code>mouseRef</code>.
+      Each frame, the orb X/Y is offset toward the cursor proportional to distance
+      (capped at 9px X, 6px Y). Portals remain fixed. Effect: RaBbLE watches you.
+    </p>
+
+    <h3>Status pill</h3>
+    <p>
+      Displays current <code>rabbleState</code>: <code>idle</code>, <code>thinking</code>,
+      or <code>speaking</code>. The dot color changes: cyan for idle/speaking, violet for thinking.
+      The "B" word in the subtitle also shifts: <em>Boundless / Becoming / Brilliant</em>.
+    </p>
+
+    <!-- ── Main Panel ── -->
+    <h2 id="main-panel">Main Panel</h2>
+
+    <h3>Convo / Renders toggle</h3>
+    <p>
+      Two-button segmented control at the top of the main area. Controls
+      the <code>contentMode</code> state: <code>'convo'</code> or <code>'renders'</code>.
+    </p>
+    <div class="hookup">
+      <span class="node-ui">Toggle → Convo</span> <span class="arrow">→</span> <span class="node-state">setContentMode('convo')</span> <span class="arrow">→</span> <span class="node-canvas">renders ConvoView</span><br>
+      <span class="node-ui">Toggle → Renders</span> <span class="arrow">→</span> <span class="node-state">setContentMode('renders')</span> <span class="arrow">→</span> <span class="node-canvas">renders RendersView</span>
+    </div>
+
+    <h3>Artifact cards (Renders view)</h3>
+    <p>Three sample cards: Visualization, Code, Analysis. Layout is controlled by the Tweaks panel.</p>
+    <table class="btn-table">
+      <tr><th>Layout</th><th>Behaviour</th></tr>
+      <tr><td class="btn-name">Stack</td><td class="btn-desc">Cards stacked with offset. Click any card to bring it forward (changes <code>active</code> index).</td></tr>
+      <tr><td class="btn-name">Fan</td><td class="btn-desc">Cards fanned out with rotation. Click to focus.</td></tr>
+      <tr><td class="btn-name">Carousel</td><td class="btn-desc">Cards slide horizontally. Off-screen cards shown at 90% scale.</td></tr>
+    </table>
+    <p>Dot indicators at the bottom of the stage reflect the active card index and are clickable.</p>
+
+    <h3>Chat (Convo view)</h3>
+    <p>
+      Messages are stored in the <code>msgs</code> array. Each message has a
+      <code>role</code> (<code>'rabble'</code>, <code>'user'</code>, <code>'system'</code>)
+      which controls alignment and color. Messages drift in via CSS <code>msgDrift</code> keyframe.
+    </p>
+    <p>
+      When a message is sent, RaBbLE enters <code>thinking</code> state for 1800ms,
+      then transitions to <code>speaking</code> and appends a reply, then returns to
+      <code>idle</code> after 3000ms. Replace the <code>setTimeout</code> mock with a real
+      <code>window.claude</code> call to get live responses.
+    </p>
+
+    <!-- ── Buttons reference ── -->
+    <h2 id="buttons">Button Reference</h2>
+
+    <h3>Input bar</h3>
+    <table class="btn-table">
+      <tr><th>Element</th><th>Location</th><th>Action</th><th>Hookup</th></tr>
+      <tr>
+        <td class="btn-name">🎙 / 🎛 Mic toggle</td>
+        <td class="btn-loc">Input bar, left</td>
+        <td class="btn-desc">Requests <code>getUserMedia({audio:true})</code>. Creates Web Audio analyser. Streams amplitude to <code>micLevel</code>. Waveform mouth appears on avatar.</td>
+        <td><span class="btn-state state-audio">Web Audio API</span></td>
+      </tr>
+      <tr>
+        <td class="btn-name">→ Send</td>
+        <td class="btn-loc">Input bar, right</td>
+        <td class="btn-desc">Appends user message to <code>msgs</code>. Triggers <code>rabbleState='thinking'</code>. Fires mock response after 1800ms.</td>
+        <td><span class="btn-state state-react">React state</span></td>
+      </tr>
+      <tr>
+        <td class="btn-name">↵ Enter key</td>
+        <td class="btn-loc">Input field</td>
+        <td class="btn-desc">Same as Send button. <code>onKeyDown</code> handler, blocked on Shift+Enter.</td>
+        <td><span class="btn-state state-react">React state</span></td>
+      </tr>
+    </table>
+
+    <h3>Navigation (sidebar)</h3>
+    <table class="btn-table">
+      <tr><th>Nav item</th><th>Icon</th><th>Sets screen</th><th>Renders</th></tr>
+      <tr><td class="btn-name">Chat</td><td>◈</td><td class="btn-loc"><code>'main'</code></td><td class="btn-desc">ConvoView + RendersView toggle + input bar</td></tr>
+      <tr><td class="btn-name">Library</td><td>⊞</td><td class="btn-loc"><code>'library'</code></td><td class="btn-desc">Artifact grid with filter pills</td></tr>
+      <tr><td class="btn-name">Memory</td><td>◎</td><td class="btn-loc"><code>'memory'</code></td><td class="btn-desc">Animated knowledge graph + insight bars</td></tr>
+      <tr><td class="btn-name">Settings</td><td>⊛</td><td class="btn-loc"><code>'settings'</code></td><td class="btn-desc">Companion behavior toggles</td></tr>
+      <tr><td class="btn-name">Intro</td><td>✦</td><td class="btn-loc"><code>'onboarding'</code></td><td class="btn-desc">3-step onboarding sequence</td></tr>
+    </table>
+
+    <h3>Onboarding buttons</h3>
+    <table class="btn-table">
+      <tr><th>Button</th><th>Action</th></tr>
+      <tr><td class="btn-name">Continue / Interesting / Let's go</td><td class="btn-desc">Advances <code>step</code> state (0→1→2). On final step calls <code>onDone()</code> → <code>setScreen('main')</code>.</td></tr>
+      <tr><td class="btn-name">Skip intro</td><td class="btn-desc">Only on step 0. Calls <code>onDone()</code> immediately.</td></tr>
+    </table>
+
+    <h3>Artifact card buttons</h3>
+    <table class="btn-table">
+      <tr><th>Button</th><th>Current hookup</th><th>Intended hookup</th></tr>
+      <tr><td class="btn-name">Expand</td><td class="btn-desc">No-op (placeholder)</td><td class="btn-desc">Open artifact in fullscreen modal</td></tr>
+      <tr><td class="btn-name">Fork</td><td class="btn-desc">No-op (placeholder)</td><td class="btn-desc">Clone artifact and open in editor</td></tr>
+      <tr><td class="btn-name">Export</td><td class="btn-desc">No-op (placeholder)</td><td class="btn-desc">Download artifact as file</td></tr>
+    </table>
+
+    <h3>Boot sequence</h3>
+    <table class="btn-table">
+      <tr><th>Button</th><th>Action</th></tr>
+      <tr><td class="btn-name">SKIP</td><td class="btn-desc">Calls <code>onDone()</code> → <code>setBooting(false)</code>. Bypasses timer sequence.</td></tr>
+    </table>
+
+    <h3>Tweaks panel</h3>
+    <table class="btn-table">
+      <tr><th>Control</th><th>Key</th><th>Effect</th></tr>
+      <tr><td class="btn-name">Card Layout</td><td class="btn-loc"><code>cardVariant</code></td><td class="btn-desc">Switches RendersView between <code>stack</code>, <code>fan</code>, <code>carousel</code>.</td></tr>
+      <tr><td class="btn-name">Avatar Glow</td><td class="btn-loc"><code>avatarGlow</code></td><td class="btn-desc">Reserved for future use — controls particle glow intensity.</td></tr>
+      <tr><td class="btn-name">Ambient Drift</td><td class="btn-loc"><code>ambientDrift</code></td><td class="btn-desc">Reserved for future use — controls particle drift speed.</td></tr>
+    </table>
+
+    <!-- ── Hookups ── -->
+    <h2 id="hookups">State Hookups</h2>
+    <p>All global state lives in the <code>App</code> component and flows down via props.</p>
+    <div class="hookup">
+<span class="cm">// Global state (App)</span><br>
+<span class="kw">const</span> [booting, setBooting]         <span class="cm">// boot overlay visible</span><br>
+<span class="kw">const</span> [screen, setScreen]           <span class="cm">// active screen ID</span><br>
+<span class="kw">const</span> [contentMode, setContentMode] <span class="cm">// 'convo' | 'renders'</span><br>
+<span class="kw">const</span> [rabbleState, setRabbleState] <span class="cm">// 'idle' | 'thinking' | 'speaking'</span><br>
+<span class="kw">const</span> [msgs, setMsgs]               <span class="cm">// message array</span><br>
+<span class="kw">const</span> [input, setInput]             <span class="cm">// text input value</span><br>
+<span class="kw">const</span> [micActive, setMicActive]     <span class="cm">// mic enabled</span><br>
+<span class="kw">const</span> [micLevel, setMicLevel]       <span class="cm">// 0–1 amplitude from analyser</span><br>
+<span class="kw">const</span> [tweaks, setTweak]            <span class="cm">// design tweaks (cardVariant, etc.)</span>
+    </div>
+
+    <h3>rabbleState flow</h3>
+    <div class="hookup">
+<span class="node-ui">User sends message</span><br>
+<span class="arrow">→</span> <span class="node-state">setRabbleState('thinking')</span>  <span class="cm">// eyes shift violet, particles accelerate</span><br>
+<span class="arrow">→</span> <span class="cm">await AI response (1800ms mock / real claude call)</span><br>
+<span class="arrow">→</span> <span class="node-state">setRabbleState('speaking')</span> <span class="cm">// waveform amplitude up</span><br>
+<span class="arrow">→</span> <span class="cm">append reply to msgs</span><br>
+<span class="arrow">→</span> <span class="node-state">setRabbleState('idle')</span>    <span class="cm">// 3000ms later</span>
+    </div>
+
+    <!-- ── AI Hookup ── -->
+    <h2 id="ai-hookup">Wiring Real AI</h2>
+    <p>
+      The mock response in <code>sendMsg</code> uses a <code>setTimeout</code>.
+      Replace it with a <code>window.claude.complete()</code> call (available in-environment)
+      or a direct Anthropic API call for local use.
+    </p>
+    <pre><code><span class="cm">// Current mock (in sendMsg):</span>
+<span class="fn">setTimeout</span>(() => {
+  <span class="fn">setRabbleState</span>(<span class="str">'speaking'</span>);
+  <span class="fn">setMsgs</span>(m => [...m, { id: uid+1, role: <span class="str">'rabble'</span>, text: <span class="str">"…"</span> }]);
+  <span class="fn">setTimeout</span>(() => <span class="fn">setRabbleState</span>(<span class="str">'idle'</span>), 3000);
+}, 1800);
+
+<span class="cm">// Replace with (in-environment):</span>
+<span class="kw">const</span> reply = <span class="kw">await</span> window.claude.<span class="fn">complete</span>({
+  messages: [
+    { role: <span class="str">'system'</span>, content: <span class="str">'You are RaBbLE, a Boundless Behavioral Learning Engine…'</span> },
+    ...msgs.<span class="fn">map</span>(m => ({ role: m.role === <span class="str">'user'</span> ? <span class="str">'user'</span> : <span class="str">'assistant'</span>, content: m.text })),
+    { role: <span class="str">'user'</span>, content: input }
+  ]
+});
+<span class="fn">setMsgs</span>(m => [...m, { id: uid+1, role: <span class="str">'rabble'</span>, text: reply }]);
+<span class="fn">setRabbleState</span>(<span class="str">'speaking'</span>);
+<span class="fn">setTimeout</span>(() => <span class="fn">setRabbleState</span>(<span class="str">'idle'</span>), 3000);</code></pre>
+    <div class="callout cyan">
+      For local use outside this environment, replace <code>window.claude.complete</code>
+      with a <code>fetch</code> call to <code>https://api.anthropic.com/v1/messages</code>
+      with your API key in the header. Never hardcode API keys in client-side HTML for production.
+    </div>
+
+    <!-- ── Mic ── -->
+    <h2 id="mic-hookup">Mic &amp; Audio</h2>
+    <p>
+      The mic button calls <code>navigator.mediaDevices.getUserMedia({audio:true})</code>.
+      On success, it creates a Web Audio <code>AnalyserNode</code>, reads
+      <code>getByteFrequencyData</code> every frame, and sets <code>micLevel</code>
+      (0–1 normalised) which drives waveform amplitude in the avatar canvas.
+    </p>
+    <div class="hookup">
+<span class="node-ui">Mic button click</span><br>
+<span class="arrow">→</span> <span class="node-audio">getUserMedia({ audio: true })</span><br>
+<span class="arrow">→</span> <span class="node-audio">AudioContext → MediaStreamSource → AnalyserNode</span><br>
+<span class="arrow">→</span> <span class="node-audio">rAF loop → getByteFrequencyData → avg / 128</span><br>
+<span class="arrow">→</span> <span class="node-state">setMicLevel(0–1)</span><br>
+<span class="arrow">→</span> <span class="node-canvas">RaBbLEAvatar: drawWaveform amplitude = base + level × 18</span>
+    </div>
+    <p>
+      The waveform is <strong>only rendered when <code>micActive</code> is true</strong>.
+      When mic is off, <code>drawWaveform</code> is not called and the mouth is invisible.
+    </p>
+
+    <!-- ── Artifact Renderer ── -->
+    <h2 id="artifacts">Artifact Renderer</h2>
+    <p>
+      Current artifact cards contain static mock content (chart, code, analysis text).
+      To render live applets, replace the <code>card-body</code> content with a sandboxed
+      <code>&lt;iframe&gt;</code>:
+    </p>
+    <pre><code><span class="cm">// Inside a card's body:</span>
+&lt;<span class="kw">iframe</span>
+  <span class="fn">src</span>=<span class="str">"data:text/html;charset=utf-8,…"</span>
+  <span class="fn">sandbox</span>=<span class="str">"allow-scripts"</span>
+  <span class="fn">style</span>=<span class="str">"width:100%;height:200px;border:none;border-radius:8px"</span>
+/&gt;</code></pre>
+    <p>
+      Pass the artifact's HTML content as a <code>data:</code> URL or <code>srcdoc</code>
+      attribute. The <code>sandbox="allow-scripts"</code> attribute lets JavaScript run
+      inside the frame while blocking navigation and cross-origin access.
+    </p>
+
+  </main>
+</div>
+</body>
+</html>

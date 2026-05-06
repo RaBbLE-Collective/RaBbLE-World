@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RaBbLE — Boundless Behavioral Learning Engine</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Exo+2:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="rabble-theme.css">
+  <link rel="stylesheet" href="chat.css">
+</head>
+<body class="chat-entry">
+
+  <canvas id="bgCanvas"></canvas>
+
+  <div class="rabble-scanlines"></div>
+  <div class="rabble-vignette"></div>
+  <div class="rabble-chromatic"></div>
+
+  <div id="root">
+    <div class="top-panel">
+      <div class="brand-text">RaBbLE</div>
+      <div class="brand-sub">RaBbLE · a Boundless Behavioral Learning Engine</div>
+      <div class="entity-container">
+        <rabble-entity id="entityHost" class="chat-entity" mode="idle" particle-count="480" overscan="2.55"></rabble-entity>
+      </div>
+    </div>
+
+    <div class="chat-container"></div>
+
+    <div class="input-bar">
+      <div class="input-wrap">
+        <input type="text" class="input-field" placeholder="Type your message..." autocomplete="off" spellcheck="false">
+        <button class="send-btn" aria-label="Send">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M2 14L14 8 2 2v4l8 2-8 2v4z" fill="currentColor"/>
+          </svg>
+        </button>
+      </div>
+      <div class="input-hint">Press Enter to send · Shift+Enter for new line</div>
+    </div>
+  </div>
+
+  <script src="rabble-bg.js"></script>
+  <script src="rabble-entity.js"></script>
+  <script src="chat.js"></script>
+
+</body>
+</html>

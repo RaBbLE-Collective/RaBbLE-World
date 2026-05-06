@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>RaBbLE-OS · Boot</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Exo+2:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="rabble-theme.css">
+<link rel="stylesheet" href="boot.css">
+</head>
+<body>
+
+<!-- Overlays -->
+<div class="rabble-scanlines"></div>
+<div class="rabble-vignette"></div>
+<div class="rabble-chromatic"></div>
+
+<div id="stage">
+
+  <!-- ── Entity column ── -->
+  <div id="entity-col">
+    <rabble-entity id="entityHost" class="boot-entity" mode="boot" particle-count="480" overscan="2.55"></rabble-entity>
+
+    <!-- Portrait brand: always visible on portrait, lives here so it's
+         right below the entity canvas with no layout gap between columns. -->
+    <div id="ecb">
+      <div class="ecb-name rabble-brand-text">RaBbLE</div>
+      <div class="ecb-sub">RaBbLE · a Boundless Behavioral Learning Engine</div>
+    </div>
+
+  </div>
+
+  <!-- ── Info column ── -->
+  <div id="info-col">
+
+    <!-- Landscape brand: stable above panels-wrap, never fades during transition.
+         Hidden on portrait (ecb brand handles it there). -->
+    <div id="brand">
+      <div id="brand-name" class="rabble-brand-text">RaBbLE</div>
+      <div id="brand-sub">RaBbLE · a Boundless Behavioral Learning Engine</div>
+    </div>
+
+    <!-- CSS grid stacks both panels at the same position; they crossfade.
+         Brand is outside so it never moves or resizes during the transition. -->
+    <div id="panels-wrap">
+
+      <!-- ── Boot panel: progress bar + log + ready ── -->
+      <div id="boot-panel">
+        <div id="progress-wrap">
+          <svg id="arc-svg" width="360" height="32" viewBox="0 0 360 32">
+            <defs>
+              <linearGradient id="bargrad" x1="0" x2="1" y1="0" y2="0">
+                <stop offset="0%"   stop-color="#ff2d78"/>
+                <stop offset="50%"  stop-color="#bf5fff"/>
+                <stop offset="100%" stop-color="#00f5ff"/>
+              </linearGradient>
+              <filter id="barglow">
+                <feGaussianBlur stdDeviation="3" result="blur"/>
+                <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+              </filter>
+            </defs>
+            <rect x="0" y="12" width="360" height="6" rx="3" fill="rgba(42,40,64,0.55)"/>
+            <rect id="arc-glow" x="0" y="10" width="0" height="10" rx="5"
+              fill="url(#bargrad)" opacity="0.3"/>
+            <rect id="arc-fill" x="0" y="12" width="0" height="6" rx="3"
+              fill="url(#bargrad)" filter="url(#barglow)"/>
+            <circle id="arc-dot" cx="0" cy="15" r="5" fill="#fff" opacity="0"/>
+          </svg>
+          <div id="pct-label">0%</div>
+        </div>
+        <div id="log-wrap"><div id="log"></div></div>
+        <div id="ready"></div>
+      </div><!-- /boot-panel -->
+
+      <!-- ── Login panel: form fields appear where the log was ── -->
+      <div id="login-panel">
+        <div class="form-title">Welcome back.</div>
+        <div class="form-sub">RaBbLE recognises you.</div>
+        <div id="reaction"></div>
+        <div class="field-group">
+          <label class="field-label" for="user-input">Identity</label>
+          <input class="field-input" id="user-input" type="text"
+            placeholder="username or email" autocomplete="off" spellcheck="false">
+        </div>
+        <div class="field-group">
+          <label class="field-label" for="pass-input">Passphrase</label>
+          <input class="field-input" id="pass-input" type="password"
+            placeholder="••••••••••••" autocomplete="off">
+        </div>
+        <button class="submit-btn" id="login-btn">Enter</button>
+        <div class="form-footer">
+          No account? <a href="#">Request access</a>
+        </div>
+      </div><!-- /login-panel -->
+
+    </div><!-- /panels-wrap -->
+  </div><!-- /info-col -->
+
+</div><!-- /stage -->
+
+<!-- Modules -->
+<script src="rabble-bg.js"></script>
+<script src="rabble-entity.js"></script>
+<script src="boot.js"></script>
+</body>
+</html>
