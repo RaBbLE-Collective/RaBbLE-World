@@ -266,7 +266,7 @@ body.boot-exit {
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
-    padding: max(env(safe-area-inset-top), clamp(16px, 4vh, 40px)) 16px max(env(safe-area-inset-bottom), 12px);
+    padding: max(env(safe-area-inset-top), clamp(80px, 16vh, 130px)) 16px max(env(safe-area-inset-bottom), 12px);
     gap: clamp(6px, 1.4vh, 18px);
     overflow: hidden;       /* no internal scroll */
     touch-action: none;     /* block all drag-repositioning gestures */
