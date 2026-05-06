@@ -78,7 +78,10 @@
       interactive:  true,
       showWaveform: false,
       onReady:      null,
+      dpr:          1,
     }, opts || {});
+
+    var dpr = opts.dpr || 1;
 
     var ctx = cv.getContext('2d');
     var t   = 0;
@@ -87,12 +90,13 @@
     var readyCalled = false;
 
     // ── canvas-derived centre — updated on resize ─────────────────────
-    var cx = cv.width / 2;
-    var cy = cv.height * 0.47;   // STABLE uses 0.47, not 0.46
+    // Divide by dpr: cv.width/height are device pixels; drawing coords are CSS pixels
+    var cx = cv.width / (2 * dpr);
+    var cy = cv.height * 0.47 / dpr;
 
     function updateCentre() {
-      cx = cv.width / 2;
-      cy = cv.height * 0.47;
+      cx = cv.width / (2 * dpr);
+      cy = cv.height * 0.47 / dpr;
     }
 
     // ── mutable state ─────────────────────────────────────────────────
@@ -435,7 +439,11 @@
 
     // ── main render loop ──────────────────────────────────────────────
     function frame() {
+      // Reset transform to clear in raw device pixels, then re-apply dpr scale
+      // so all drawing coordinates are CSS pixels regardless of screen density.
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.clearRect(0, 0, cv.width, cv.height);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       t++;
 
       var convProg    = opts.mode === 'boot' ? clamp01(t / T_CONVERGE_END)                       : 1;
@@ -627,12 +635,17 @@
           var hostW = rect.width || this.offsetWidth || fallbackW;
           var hostH = rect.height || this.offsetHeight || fallbackH;
           var overscan = parseFloat(this.getAttribute('overscan') || '2.35');
-          var w = Math.max(1, Math.round(hostW * overscan));
-          var h = Math.max(1, Math.round(hostH * overscan));
-          if (this._canvas.width !== w) this._canvas.width = w;
-          if (this._canvas.height !== h) this._canvas.height = h;
-          this._canvas.style.width = w + 'px';
-          this._canvas.style.height = h + 'px';
+          var dpr = window.devicePixelRatio || 1;
+          var cssW = Math.max(1, Math.round(hostW * overscan));
+          var cssH = Math.max(1, Math.round(hostH * overscan));
+          // Size canvas at device-pixel resolution so it's crisp on HiDPI/Retina screens
+          var devW = Math.round(cssW * dpr);
+          var devH = Math.round(cssH * dpr);
+          if (this._canvas.width !== devW) this._canvas.width = devW;
+          if (this._canvas.height !== devH) this._canvas.height = devH;
+          this._canvas.style.width = cssW + 'px';
+          this._canvas.style.height = cssH + 'px';
+          this._dpr = dpr;
           if (this._entity && this._entity.resize) this._entity.resize();
         };
 
@@ -649,6 +662,7 @@
           particleCount: parseInt(this.getAttribute('particle-count') || '480', 10),
           interactive: parseBool(this.getAttribute('interactive'), true),
           showWaveform: parseBool(this.getAttribute('show-waveform'), false),
+          dpr: window.devicePixelRatio || 1,
           onReady: () => {
             this.dispatchEvent(new CustomEvent('entity-ready'));
           }
