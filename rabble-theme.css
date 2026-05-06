@@ -42,6 +42,18 @@ html, body {
   font-family: var(--font-ui);
 }
 
+/* ── iOS / Mobile hardening ─────────────────────────────────────── */
+/* Prevent elastic bounce scroll and touch-drag page repositioning  */
+html {
+  overscroll-behavior: none;
+  touch-action: manipulation;        /* disables double-tap zoom     */
+  -webkit-tap-highlight-color: transparent;
+}
+body {
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: auto;  /* kills momentum bounce        */
+}
+
 /* ── Scrollbars ─────────────────────────────────────────────────── */
 ::-webkit-scrollbar           { width: 4px; }
 ::-webkit-scrollbar-track     { background: var(--bg-surface); }
