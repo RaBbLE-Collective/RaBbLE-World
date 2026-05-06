@@ -91,6 +91,8 @@ function bootTransitionToLogin() {
     logWrap.classList.add('show');
   }, 120);
 
+  // Line indices → entity states. Tied to the LINES array above: 16=behavioral core START,
+  // 18=behavioral core RUNNING, 27=entity materialising START, 28=materialised, 33=last line.
   var stateAt = { 16:'thinking', 18:'speaking', 27:'thinking', 28:'speaking', 33:'idle' };
 
   LINES.forEach(function (l, i) {

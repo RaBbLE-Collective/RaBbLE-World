@@ -136,6 +136,8 @@
         rabbleMsg.typing = false;
         renderMessages();
 
+        // speaking fires after the stream ends, not during it — the waveform pulse
+        // reads as the entity presenting its finished reply, not generating it.
         if (state.entity) state.entity.setEntityState('speaking');
         setTimeout(function () {
           if (state.entity) state.entity.setEntityState('idle');
@@ -169,6 +171,8 @@
 
     renderMessages();
 
+    // Two frames: the first rAF fires before paint, so opacity:0 hasn't rendered yet.
+    // The second guarantees the browser has committed the initial state before we fade in.
     window.requestAnimationFrame(function () {
       window.requestAnimationFrame(function () {
         document.body.classList.add('chat-ready');

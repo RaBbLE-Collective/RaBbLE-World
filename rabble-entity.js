@@ -92,7 +92,7 @@
     // ── canvas-derived centre — updated on resize ─────────────────────
     // Divide by dpr: cv.width/height are device pixels; drawing coords are CSS pixels
     var cx = cv.width / (2 * dpr);
-    var cy = cv.height * 0.47 / dpr;
+    var cy = cv.height * 0.47 / dpr;  // 0.47 not 0.5 — eyes sit above centre; particle cloud fills below
 
     function updateCentre() {
       cx = cv.width / (2 * dpr);
@@ -152,6 +152,8 @@
       for (var i = 0; i < N; i++) parts.push(makeParticle(false));
     }
 
+    // Translate existing particles rather than reinitialising them so the
+    // cloud doesn't pop/scatter during resize or orientation changes.
     function preserveParticlesOnResize() {
       var oldCx = cx;
       var oldCy = cy;
