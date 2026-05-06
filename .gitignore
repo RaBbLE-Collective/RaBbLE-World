@@ -1,0 +1,52 @@
+# ── Dependencies ──────────────────────────────────────────────────────
+node_modules/
+.pnp
+.pnp.js
+.yarn/install-state.gz
+
+# ── Build output ───────────────────────────────────────────────────────
+dist/
+build/
+out/
+.next/
+.nuxt/
+.output/
+.parcel-cache/
+.cache/
+*.min.js
+*.min.css
+*.bundle.js
+*.chunk.js
+
+# ── Environment ────────────────────────────────────────────────────────
+.env
+.env.local
+.env.*.local
+.secrets
+
+# ── Logs ───────────────────────────────────────────────────────────────
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ── Testing / coverage ─────────────────────────────────────────────────
+coverage/
+.nyc_output/
+
+# ── Tooling ────────────────────────────────────────────────────────────
+.eslintcache
+.stylelintcache
+*.tsbuildinfo
+
+# ── OS / editor noise ──────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.idea/
+.vscode/settings.json
+
+# ── Reference file — not part of the app ──────────────────────────────
+RaBbLE-Boot-Integrated_STABLE.html
