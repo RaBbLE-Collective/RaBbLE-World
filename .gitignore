@@ -50,3 +50,9 @@ Thumbs.db
 
 # ── Reference file — not part of the app ──────────────────────────────
 RaBbLE-Boot-Integrated_STABLE.html
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+!.env.example
