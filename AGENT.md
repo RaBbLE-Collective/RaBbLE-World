@@ -9,17 +9,39 @@ RaBbLE-World is the public-facing web presence and entity chat surface for the C
 
 ## Where Things Are
 
+**Root** — only `index.html` and config live here
 | Path | What |
 |---|---|
-| `CONTEXT.md` | Current state, reading order |
-| `RaBbLE-Boot.html` | Cinematic boot sequence and login surface — entry point |
-| `RaBbLE.html` | Main chat surface — entity header, conversation panel, input |
-| `RaBbLE-Docs.html` | Technical documentation viewer |
-| `rabble-theme.css` | Shared identity layer — palette vars, typography, overlays |
-| `rabble-entity.js` | Entity canvas layer (`<rabble-entity>` custom element) |
-| `rabble-bg.js` | Ambient canvas layer — particles, grid, cursor effects |
-| `chat.js` / `chat.css` | Chat surface behavior and layout |
-| `boot.js` / `boot.css` | Boot sequence behavior and layout |
+| `index.html` | Landing page — entry point for joinrabble.world |
+| `manifest.json` | PWA manifest |
+| `wrangler.jsonc` | Cloudflare Workers deployment config |
+
+**`world/` — all site source**
+| Path | What |
+|---|---|
+| `world/RaBbLE-Boot.html` | Cinematic boot sequence and login surface |
+| `world/RaBbLE-Chat.html` | Main chat surface |
+| `world/RaBbLE-Docs.html` | Technical documentation viewer |
+| `world/RaBbLE-OS.html` | RaBbLE-OS intro, bootstrap, and expansion cards |
+
+**`world/css/`**
+| Path | What |
+|---|---|
+| `world/css/RaBbLE-theme.css` | Shared identity layer — palette vars, typography, overlays |
+| `world/css/RaBbLE-landing.css` | Landing page styles and CSS custom properties |
+| `world/css/RaBbLE-boot.css` | Boot sequence layout |
+| `world/css/RaBbLE-chat.css` | Chat surface layout |
+| `world/css/RaBbLE-OS.css` | OS page styles |
+
+**`world/js/`**
+| Path | What |
+|---|---|
+| `world/js/RaBbLE-entity.js` | `<rabble-entity>` custom element — shared across all pages |
+| `world/js/RaBbLE-bg.js` | Ambient background — particles, grid, cursor effects |
+| `world/js/RaBbLE-landing.js` | Alpine.js component for landing (wakeup sequence, boot, OS nav) |
+| `world/js/RaBbLE-boot.js` | Boot sequence behavior and login |
+| `world/js/RaBbLE-chat.js` | Chat surface behavior |
+| `world/js/RaBbLE-ios-install.js` | iOS PWA install prompt |
 
 ## Pulse Protocol — Commits
 

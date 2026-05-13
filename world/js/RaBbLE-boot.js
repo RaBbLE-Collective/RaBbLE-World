@@ -187,7 +187,7 @@ function bootTransitionToLogin() {
     showReaction('◈  Boundless mode engaged · entering substrate…');
     setTimeout(function () {
       document.body.classList.add('boot-exit');
-      setTimeout(function () { window.location.href = 'RaBbLE.html'; }, 900);
+      setTimeout(function () { window.location.href = 'RaBbLE-Chat.html'; }, 900);
     }, 1200);
   });
 })();

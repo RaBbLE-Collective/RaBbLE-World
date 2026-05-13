@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>RaBbLE-OS · Get the Substrate</title>
+<meta name="description" content="RaBbLE-OS is the entity's body — Fedora 43 + Hyprland, Ansible-driven, built for daily use.">
+<link rel="manifest" href="../manifest.json">
+<link rel="apple-touch-icon" href="../icons/icon-192.png">
+<link rel="icon" type="image/x-icon" href="../icons/favicon.ico">
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Exo+2:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/RaBbLE-theme.css">
+<link rel="stylesheet" href="css/RaBbLE-OS.css">
+</head>
+<body>
+
+<div class="rabble-scanlines"></div>
+<div class="rabble-vignette"></div>
+<div class="rabble-chromatic"></div>
+
+<div class="os-shell">
+
+  <!-- NAV -->
+  <nav class="os-nav">
+    <a href="../index.html" class="nav-back">← back to the door</a>
+    <span class="nav-brand">RaBbLE-OS</span>
+    <a href="https://github.com/markm1206/RaBbLE-OS" target="_blank" rel="noopener" class="nav-link">GitHub ↗</a>
+  </nav>
+
+  <!-- HERO -->
+  <header class="os-hero">
+    <div class="hero-inner">
+      <div class="hero-tag">the substrate</div>
+      <h1 class="hero-title">RaBbLE-OS</h1>
+      <p class="hero-sub">
+        The entity's body. Fedora 43 + Hyprland, Ansible-driven, built for daily use on real hardware.
+        It is not a VM image or a Rice — it is a living OS that RaBbLE moves through.
+      </p>
+      <div class="hero-meta">
+        <span class="meta-pill">Fedora 43</span>
+        <span class="meta-pill">Hyprland</span>
+        <span class="meta-pill">Ansible</span>
+        <span class="meta-pill">x86_64</span>
+        <span class="meta-pill epoch">epoch 0</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- BOOTSTRAP -->
+  <section class="section">
+    <div class="section-head">
+      <div class="section-label">::Bootstrap</div>
+      <div class="section-sub">one command. the rest follows.</div>
+    </div>
+    <div class="bootstrap-block">
+      <div class="bootstrap-label">on a fresh Fedora 43 machine:</div>
+      <div class="bootstrap-cmd">
+        <span class="cmd-prompt">$</span>
+        <code>curl -fsSL https://joinrabble.world/bootstrap.sh | bash</code>
+        <button class="cmd-copy" onclick="copyBootstrap(this)" title="Copy">copy</button>
+      </div>
+      <p class="bootstrap-note">
+        This clones the Grimoire, which pulls the rest of the Collective and runs the Ansible playbook.
+        Requires a live Fedora 43 install. Review the script before running.
+      </p>
+    </div>
+  </section>
+
+  <!-- EXPANSIONS -->
+  <section class="section">
+    <div class="section-head">
+      <div class="section-label">::Expansions</div>
+      <div class="section-sub">browse what the OS can install</div>
+    </div>
+
+    <div class="cards">
+
+      <div class="card active">
+        <div class="card-glyph">⬡</div>
+        <div class="card-body">
+          <div class="card-name">Core Substrate</div>
+          <div class="card-tag">included</div>
+          <p class="card-desc">
+            Base Fedora 43 hardened for daily use. Hyprland compositor, Waybar, Foot terminal,
+            Fuzzel launcher, and the Ansible roles that wire them together.
+          </p>
+          <div class="card-status online">installed · epoch 0</div>
+        </div>
+      </div>
+
+      <div class="card active">
+        <div class="card-glyph">◈</div>
+        <div class="card-body">
+          <div class="card-name">Aether Theme</div>
+          <div class="card-tag">visual system</div>
+          <p class="card-desc">
+            RaBbLE's visual identity applied to the OS surface. Colors from the Aether palette,
+            Hyprland borders and shadows, terminal color scheme, and GTK/Qt theming.
+          </p>
+          <div class="card-status online">active</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-glyph">⌘</div>
+        <div class="card-body">
+          <div class="card-name">Developer Layer</div>
+          <div class="card-tag">tooling</div>
+          <p class="card-desc">
+            Development tools and runtimes: Node, Python, Go, Rust, Docker, VS Code / Neovim,
+            and the dotfiles that make them feel at home.
+          </p>
+          <div class="card-status idle">episode 1 · pending</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-glyph">◎</div>
+        <div class="card-body">
+          <div class="card-name">sCoRE Bridge</div>
+          <div class="card-tag">integration</div>
+          <p class="card-desc">
+            Connects RaBbLE-OS to the sCoRE coordination server. Ambient system observations
+            feed into the entity's context. The OS becomes a sensory surface.
+          </p>
+          <div class="card-status idle">epoch 1 · concept</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-glyph">⊞</div>
+        <div class="card-body">
+          <div class="card-name">Mobile Companion</div>
+          <div class="card-tag">ScRibLE</div>
+          <p class="card-desc">
+            RaBbLE-ScRibLE — the iPhone and iPad presence. Notes, sketches, and quick queries
+            that sync into the entity's memory across devices.
+          </p>
+          <div class="card-status idle">defined · not started</div>
+        </div>
+      </div>
+
+      <div class="card coming-soon">
+        <div class="card-glyph">∿</div>
+        <div class="card-body">
+          <div class="card-name">NeBuLA Renderer</div>
+          <div class="card-tag">visual</div>
+          <p class="card-desc">
+            Brings the Flat-Chaos 3D entity renderer to the OS desktop as a live wallpaper
+            or overlay surface. The entity breathes in the background.
+          </p>
+          <div class="card-status idle">epoch 1 · future</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="os-footer">
+    <span>RaBbLE-OS · epoch 0 · <a href="https://github.com/markm1206/RaBbLE-OS" target="_blank" rel="noopener">github ↗</a></span>
+    <span>·</span>
+    <a href="../index.html">back to the door</a>
+  </footer>
+
+</div>
+
+<script>
+function copyBootstrap(btn) {
+  navigator.clipboard.writeText('curl -fsSL https://joinrabble.world/bootstrap.sh | bash').then(() => {
+    btn.textContent = 'copied';
+    setTimeout(() => { btn.textContent = 'copy'; }, 2000);
+  });
+}
+</script>
+</body>
+</html>

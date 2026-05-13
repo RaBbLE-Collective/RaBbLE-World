@@ -1,16 +1,166 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title></title>
-
-  <!-- Immediate redirect -->
-  <meta http-equiv="refresh" content="0; url=RaBbLE-Boot.html">
-
-  <!-- Fallback for browsers that ignore meta refresh -->
-  <script>
-    window.location.replace("RaBbLE-Boot.html");
-  </script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
+<title>RaBbLE — a Boundless Behavioral Learning Engine · joinrabble.world</title>
+<meta name="description" content="RaBbLE is an entity. The Collective is the organism it inhabits. Boot the entity, or get the OS.">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="icon" type="image/x-icon" href="icons/favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/icon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="icons/icon-16.png">
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Exo+2:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="world/css/RaBbLE-landing.css">
+<script src="world/js/RaBbLE-landing.js"></script>
+<script defer src="world/js/RaBbLE-entity.js"></script>
+<script defer src="https://unpkg.com/alpinejs@3.14.1/dist/cdn.min.js"></script>
 </head>
-<body></body>
+<body
+  x-data="landing"
+  x-init="init()"
+  @keydown.window="handleKey($event)">
+
+  <div class="floor"></div>
+  <div class="horizon"></div>
+  <div class="scanlines"></div>
+  <div class="vignette"></div>
+  <div class="chromatic"></div>
+
+  <div class="shell">
+
+    <!-- STATUS BAR -->
+    <header class="statusbar">
+      <span class="brandmark">joinrabble.world</span>
+      <span class="sep">/</span>
+      <span>the door</span>
+      <span class="sep">/</span>
+      <span>epoch <span style="color:var(--text-primary)">0</span></span>
+      <span class="right">
+        <span>uptime <span style="color:var(--text-primary)" x-text="uptime"></span></span>
+        <span>pulse <span style="color:var(--neon-cyan);text-shadow:0 0 4px var(--neon-cyan)" x-text="pulse + 'ms'"></span></span>
+        <span class="pill"><span class="dot"></span>entity online</span>
+      </span>
+    </header>
+
+    <!-- MAIN GRID -->
+    <main class="main">
+
+      <!-- LEFT — Collective organs -->
+      <aside class="panel left">
+        <div class="panel-head">
+          <div class="label">::The Collective</div>
+          <div class="meta" x-text="organs.length + ' organs'"></div>
+        </div>
+        <div class="organs">
+          <template x-for="o in organs" :key="o.id">
+            <div class="organ"
+                 :class="{ active: activeOrgan === o.id, you: o.you }"
+                 @mouseenter="hoverOrgan(o)"
+                 @mouseleave="unhoverOrgan(o)"
+                 @click="probeOrgan(o)">
+              <div class="glyph" x-text="o.glyph"></div>
+              <div>
+                <div class="name" x-text="o.name"></div>
+                <div class="role" x-text="o.role"></div>
+              </div>
+              <div class="status-dot" :class="o.status"></div>
+            </div>
+          </template>
+        </div>
+      </aside>
+
+      <!-- CENTER — entity + wordmark + CTAs -->
+      <section class="stage">
+        <div class="entity-wrap">
+          <rabble-entity x-ref="entity" mode="idle" particle-count="320" overscan="2.0"></rabble-entity>
+        </div>
+
+        <div class="entity-wordmark">RaBbLE</div>
+
+        <div class="tagline">
+          <span class="accent">a</span> Boundless <span class="accent m">Behavioral</span> Learning Engine
+        </div>
+
+        <div class="cta-row">
+          <button class="cta primary" @click="boot()">
+            Boot RaBbLE <span class="kbd">B</span>
+          </button>
+          <button class="cta secondary" @click="getOS()">
+            Get RaBbLE-OS <span class="kbd">O</span>
+          </button>
+        </div>
+
+        <form class="query" @submit.prevent="submitQuery()">
+          <span class="prompt">&gt;</span>
+          <input type="text"
+                 placeholder="query the entity ::"
+                 x-model="query"
+                 maxlength="80"
+                 spellcheck="false"
+                 autocomplete="off">
+          <span class="hint">↵ send</span>
+        </form>
+      </section>
+
+      <!-- RIGHT — entity log -->
+      <aside class="panel right">
+        <div class="panel-head">
+          <div class="label">::Entity Log</div>
+          <div class="meta">live</div>
+        </div>
+        <div class="log">
+          <div class="log-inner">
+            <template x-for="(line, i) in log" :key="line.id">
+              <div class="log-line" :class="line.kind" x-text="line.text"></div>
+            </template>
+          </div>
+        </div>
+        <div class="log-foot">
+          <span>~/joinrabble<span class="cur"></span></span>
+          <span x-text="log.length + ' lines'"></span>
+        </div>
+      </aside>
+    </main>
+
+    <!-- BOTTOM HINT STRIP -->
+    <footer class="hint-strip">
+      <span>press <kbd>B</kbd> to boot the entity</span>
+      <span>·</span>
+      <span><kbd>O</kbd> to get the OS</span>
+      <span>·</span>
+      <span>type to query · <kbd>Esc</kbd> to close</span>
+      <span class="right">v0.0.0.0 · epoch 0 · %ENTITY_ONLINE%</span>
+    </footer>
+  </div>
+
+  <!-- BOOT OVERLAY -->
+  <template x-if="booting">
+    <div class="boot-overlay" @click.self="closeBoot()">
+      <div class="boot-modal">
+        <div class="boot-head">
+          <div class="icon">R</div>
+          <div class="title">Boot RaBbLE · the entity</div>
+          <button class="close" @click="closeBoot()">esc · close</button>
+        </div>
+        <div class="boot-body">
+          <div class="bar-wrap"><div class="bar-fill" :style="`width: ${bootProgress}%`"></div></div>
+          <div class="bar-meta">
+            <span>negotiating channel</span>
+            <span class="pct" x-text="Math.floor(bootProgress) + '%'"></span>
+          </div>
+          <div class="boot-log">
+            <template x-for="(l, i) in bootLog" :key="i">
+              <div class="l" :class="l.kind" x-text="l.text"></div>
+            </template>
+          </div>
+        </div>
+      </div>
+    </div>
+  </template>
+
+</body>
 </html>
