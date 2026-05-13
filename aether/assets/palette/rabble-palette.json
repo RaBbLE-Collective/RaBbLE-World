@@ -1,0 +1,165 @@
+{
+  "$schema": "https://design-tokens.github.io/community-group/format/",
+  "$metadata": {
+    "name": "RaBbLE Design Tokens",
+    "source": "RaBbLE-Grimoire/common/RaBbLE-Palette.md",
+    "aesthetic": "Synthwave Outrun",
+    "version": "0.0.0.1"
+  },
+
+  "color": {
+    "neon": {
+      "magenta": {
+        "$value": "#ff2d78",
+        "$type": "color",
+        "$description": "Hot Magenta — primary RaBbLE signature. Borders, highlights, active elements, prompt accent."
+      },
+      "cyan": {
+        "$value": "#00f5ff",
+        "$type": "color",
+        "$description": "Electric Cyan — secondary neon. Links, git status, info, secondary highlights."
+      },
+      "violet": {
+        "$value": "#bf5fff",
+        "$type": "color",
+        "$description": "Soft Violet — tertiary neon. Taglines, decorative elements, mild accents."
+      },
+      "pink": {
+        "$value": "#ff79c6",
+        "$type": "color",
+        "$description": "Outrun Pink — grid/horizon color. Untracked files, warnings, soft highlights."
+      }
+    },
+    "background": {
+      "void": {
+        "$value": "#03000b",
+        "$type": "color",
+        "$description": "Deepest void — for boot screens and full-bleed backgrounds."
+      },
+      "bg": {
+        "$value": "#0a0010",
+        "$type": "color",
+        "$description": "Primary background — near-black with deep purple tint."
+      },
+      "surface": {
+        "$value": "#12132a",
+        "$type": "color",
+        "$description": "Elevated surface — panels, sidebars, inactive areas."
+      },
+      "raised": {
+        "$value": "#1a1b2e",
+        "$type": "color",
+        "$description": "Raised surface — input fields, cards, popups."
+      },
+      "border": {
+        "$value": "#2a2840",
+        "$type": "color",
+        "$description": "Inactive borders and dividers."
+      }
+    },
+    "text": {
+      "primary": {
+        "$value": "#e8e6f0",
+        "$type": "color",
+        "$description": "Primary readable text — bright off-white, slight cool tint."
+      },
+      "muted": {
+        "$value": "#6b6880",
+        "$type": "color",
+        "$description": "Secondary, dimmed, comments. Readable but recedes."
+      },
+      "dimmer": {
+        "$value": "#3d3860",
+        "$type": "color",
+        "$description": "Tertiary — barely visible. Timestamps, decorative."
+      }
+    },
+    "semantic": {
+      "error": {
+        "$value": "#e05c6f",
+        "$type": "color",
+        "$description": "Error / urgent — errors, destructive actions, critical alerts."
+      },
+      "success": {
+        "$value": "#50fa7b",
+        "$type": "color",
+        "$description": "Success / clean — success states, clean diff, OK status."
+      },
+      "warning": {
+        "$value": "#f1fa8c",
+        "$type": "color",
+        "$description": "Warning / staged — warnings, caution states."
+      }
+    }
+  },
+
+  "font": {
+    "mono": {
+      "$value": "'Share Tech Mono', 'Space Mono', monospace",
+      "$type": "fontFamily",
+      "$description": "Monospaced — terminal text, code, timestamps, system output."
+    },
+    "ui": {
+      "$value": "'Exo 2', 'Rajdhani', sans-serif",
+      "$type": "fontFamily",
+      "$description": "Display/UI — headings, brand text, navigation."
+    }
+  },
+
+  "spacing": {
+    "1": { "$value": "4px", "$type": "dimension" },
+    "2": { "$value": "8px", "$type": "dimension" },
+    "3": { "$value": "12px", "$type": "dimension" },
+    "4": { "$value": "16px", "$type": "dimension" },
+    "5": { "$value": "24px", "$type": "dimension" },
+    "6": { "$value": "32px", "$type": "dimension" },
+    "7": { "$value": "48px", "$type": "dimension" },
+    "8": { "$value": "64px", "$type": "dimension" }
+  },
+
+  "borderRadius": {
+    "sm":   { "$value": "4px",    "$type": "dimension" },
+    "md":   { "$value": "8px",    "$type": "dimension" },
+    "lg":   { "$value": "12px",   "$type": "dimension" },
+    "xl":   { "$value": "20px",   "$type": "dimension" },
+    "pill": { "$value": "9999px", "$type": "dimension" }
+  },
+
+  "motion": {
+    "ease": {
+      "fast":   { "$value": "0.15s ease", "$type": "duration" },
+      "std":    { "$value": "0.25s ease", "$type": "duration" },
+      "slow":   { "$value": "0.4s ease",  "$type": "duration" },
+      "reveal": { "$value": "1.1s cubic-bezier(0.16, 1, 0.3, 1)", "$type": "duration" }
+    }
+  },
+
+  "effect": {
+    "glow": {
+      "magenta-sm": { "$value": "0 0 6px #ff2d78",  "$type": "shadow" },
+      "magenta-md": { "$value": "0 0 14px #ff2d78", "$type": "shadow" },
+      "magenta-lg": { "$value": "0 0 28px #ff2d78", "$type": "shadow" },
+      "cyan-sm":    { "$value": "0 0 6px #00f5ff",  "$type": "shadow" },
+      "cyan-md":    { "$value": "0 0 14px #00f5ff", "$type": "shadow" },
+      "violet-sm":  { "$value": "0 0 6px #bf5fff",  "$type": "shadow" },
+      "violet-md":  { "$value": "0 0 14px #bf5fff", "$type": "shadow" }
+    },
+    "gradient": {
+      "primary": {
+        "$value": "linear-gradient(135deg, #ff2d78, #bf5fff)",
+        "$type": "string",
+        "$description": "Primary brand gradient — magenta to violet."
+      },
+      "scan": {
+        "$value": "linear-gradient(90deg, #ff2d78, #00f5ff)",
+        "$type": "string",
+        "$description": "Scan-line gradient — magenta to cyan."
+      },
+      "holo": {
+        "$value": "linear-gradient(90deg, #ff2d78, #00f5ff, #bf5fff, #ff2d78)",
+        "$type": "string",
+        "$description": "Holographic gradient — animated via background-size 300%."
+      }
+    }
+  }
+}

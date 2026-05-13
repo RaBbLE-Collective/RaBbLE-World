@@ -1,0 +1,100 @@
+/**
+ * rabble-palette.css — RaBbLE Canonical Design Tokens
+ *
+ * Published from RaBbLE-Grimoire/common/RaBbLE-Palette.md
+ * Single source: https://grimoire/common/RaBbLE-Palette.md
+ *
+ * Usage: <link rel="stylesheet" href="path/to/RaBbLE-Aether/assets/palette/rabble-palette.css">
+ * All member repos must reference this file — never re-declare these values.
+ */
+
+:root {
+  /* ── Core Neons (Primary Identity) ───────────────────────────── */
+  --rabble-magenta:  #ff2d78;   /* Hot Magenta — primary signature */
+  --rabble-cyan:     #00f5ff;   /* Electric Cyan — secondary neon */
+  --rabble-violet:   #bf5fff;   /* Soft Violet — tertiary accent */
+  --rabble-pink:     #ff79c6;   /* Outrun Pink — grid/horizon */
+
+  /* ── Backgrounds (The Void) ──────────────────────────────────── */
+  --rabble-void:     #03000b;   /* Deepest void — boot, full-bleed */
+  --rabble-bg:       #0a0010;   /* Primary background */
+  --rabble-surface:  #12132a;   /* Elevated surface — panels, sidebars */
+  --rabble-raised:   #1a1b2e;   /* Cards, inputs, popups */
+  --rabble-border:   #2a2840;   /* Inactive borders, dividers */
+
+  /* ── Text (The Signal) ───────────────────────────────────────── */
+  --rabble-text:     #e8e6f0;   /* Primary readable text */
+  --rabble-muted:    #6b6880;   /* Secondary, dimmed, comments */
+  --rabble-dimmer:   #3d3860;   /* Tertiary — barely visible */
+
+  /* ── Semantic ────────────────────────────────────────────────── */
+  --rabble-red:      #e05c6f;   /* Error / urgent */
+  --rabble-green:    #50fa7b;   /* Success / clean */
+  --rabble-yellow:   #f1fa8c;   /* Warning / staged */
+
+  /* ── Typography ──────────────────────────────────────────────── */
+  --rabble-font-mono: 'Share Tech Mono', 'Space Mono', monospace;
+  --rabble-font-ui:   'Exo 2', 'Rajdhani', sans-serif;
+
+  /* ── Pre-computed glow shadows (use directly in box-shadow / text-shadow) ── */
+  --rabble-glow-magenta-sm:  0 0 6px #ff2d78;
+  --rabble-glow-magenta-md:  0 0 14px #ff2d78;
+  --rabble-glow-magenta-lg:  0 0 28px #ff2d78;
+  --rabble-glow-cyan-sm:     0 0 6px #00f5ff;
+  --rabble-glow-cyan-md:     0 0 14px #00f5ff;
+  --rabble-glow-cyan-lg:     0 0 28px #00f5ff;
+  --rabble-glow-violet-sm:   0 0 6px #bf5fff;
+  --rabble-glow-violet-md:   0 0 14px #bf5fff;
+
+  /* ── Glow offsets (composable: var(--rabble-glow-md) var(--rabble-magenta)) ── */
+  --rabble-glow-sm:  0 0 6px;
+  --rabble-glow-md:  0 0 14px;
+  --rabble-glow-lg:  0 0 28px;
+  --rabble-glow-xl:  0 0 48px;
+
+  /* ── Elevation (background fill for layered surfaces) ───────── */
+  --rabble-elevation-0: var(--rabble-bg);
+  --rabble-elevation-1: var(--rabble-surface);
+  --rabble-elevation-2: var(--rabble-raised);
+  --rabble-elevation-3: #222340;
+
+  /* ── Spacing scale ───────────────────────────────────────────── */
+  --rabble-space-1:  4px;
+  --rabble-space-2:  8px;
+  --rabble-space-3:  12px;
+  --rabble-space-4:  16px;
+  --rabble-space-5:  24px;
+  --rabble-space-6:  32px;
+  --rabble-space-7:  48px;
+  --rabble-space-8:  64px;
+
+  /* ── Border radius ───────────────────────────────────────────── */
+  --rabble-radius-sm:  4px;
+  --rabble-radius-md:  8px;
+  --rabble-radius-lg:  12px;
+  --rabble-radius-xl:  20px;
+  --rabble-radius-pill: 9999px;
+
+  /* ── Transition timing ───────────────────────────────────────── */
+  --rabble-ease-fast:   0.15s ease;
+  --rabble-ease-std:    0.25s ease;
+  --rabble-ease-slow:   0.4s ease;
+  --rabble-ease-reveal: 1.1s cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* ── Gradient shortcuts ──────────────────────────────────────── */
+  --rabble-gradient-primary: linear-gradient(135deg, var(--rabble-magenta), var(--rabble-violet));
+  --rabble-gradient-scan:    linear-gradient(90deg, var(--rabble-magenta), var(--rabble-cyan));
+  --rabble-gradient-holo:    linear-gradient(90deg, var(--rabble-magenta), var(--rabble-cyan), var(--rabble-violet), var(--rabble-magenta));
+
+  /* ── Pre-computed alpha variants (rgba — use directly, not with hex vars) ── */
+  --rabble-magenta-10: rgba(255, 45, 120, 0.10);
+  --rabble-magenta-20: rgba(255, 45, 120, 0.20);
+  --rabble-magenta-35: rgba(255, 45, 120, 0.35);
+  --rabble-cyan-10:    rgba(0, 245, 255, 0.10);
+  --rabble-cyan-20:    rgba(0, 245, 255, 0.20);
+  --rabble-cyan-35:    rgba(0, 245, 255, 0.35);
+  --rabble-violet-10:  rgba(191, 95, 255, 0.10);
+  --rabble-violet-20:  rgba(191, 95, 255, 0.20);
+  --rabble-surface-70: rgba(18, 19, 42, 0.70);   /* glass surface */
+  --rabble-surface-85: rgba(10, 0, 16, 0.85);    /* heavy glass / nav */
+}

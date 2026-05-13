@@ -1,0 +1,503 @@
+/**
+ * rabble-components.css — RaBbLE Unified Component Library
+ *
+ * Canonical UI components for the Collective.
+ * Requires: rabble-palette.css, rabble-motion.css
+ *
+ * Sections:
+ *   1. Resets & Base
+ *   2. Screen Overlays (scanlines, vignette, chromatic)
+ *   3. Brand & Typography
+ *   4. Buttons
+ *   5. Cards
+ *   6. Status Indicators
+ *   7. Form Elements
+ *   8. Glass Surfaces
+ *   9. Navigation / Header
+ *  10. Terminal / Log
+ *  11. Layout Utilities
+ *  12. Scrollbars
+ */
+
+/* ═══════════════════════════════════════════════════════════════
+   1. RESETS & BASE
+   ═══════════════════════════════════════════════════════════════ */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  overscroll-behavior: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  background: var(--rabble-bg);
+  color: var(--rabble-text);
+  font-family: var(--rabble-font-ui);
+  -webkit-overflow-scrolling: auto;
+  overscroll-behavior: none;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   2. SCREEN OVERLAYS
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Fine horizontal scanlines — CRT texture */
+.rabble-scanlines {
+  position: fixed; inset: 0; z-index: 10; pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0,0,0,0.05) 0px, rgba(0,0,0,0.05) 1px,
+    transparent 1px, transparent 3px
+  );
+}
+
+/* Edge darkening */
+.rabble-vignette {
+  position: fixed; inset: 0; z-index: 9; pointer-events: none;
+  background: radial-gradient(ellipse at 50% 50%, transparent 50%, rgba(0,0,0,0.82) 100%);
+}
+
+/* Subtle magenta-cyan color bleed */
+.rabble-chromatic {
+  position: fixed; inset: 0; z-index: 11; pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    rgba(255,45,120,0.015) 0%,
+    transparent 30%,
+    transparent 70%,
+    rgba(0,245,255,0.015) 100%
+  );
+}
+
+/* Full CRT scanline sweep — heavier, animated */
+.rabble-crt-sweep::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(rgba(255,255,255,0.03) 50%, transparent 50%);
+  background-size: 100% 4px;
+  animation: rabble-scanline-travel 8s linear infinite;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Animated outrun grid background */
+.rabble-grid-bg {
+  background-image:
+    linear-gradient(rgba(191,95,255,0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(191,95,255,0.08) 1px, transparent 1px);
+  background-size: 50px 50px;
+  animation: rabble-grid-advance 20s linear infinite;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   3. BRAND & TYPOGRAPHY
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Animated holographic gradient text */
+.rabble-brand-text {
+  background: var(--rabble-gradient-holo, linear-gradient(90deg, #ff2d78, #00f5ff, #bf5fff, #ff2d78));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  background-size: 300%;
+  animation: rabble-holo 6s ease infinite;
+  font-family: var(--rabble-font-ui);
+  font-weight: 800;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  filter: drop-shadow(0 0 18px rgba(255,45,120,0.3));
+}
+
+/* Static two-color gradient text */
+.rabble-brand-text-2 {
+  background: var(--rabble-gradient-scan, linear-gradient(90deg, #ff2d78, #00f5ff));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-family: var(--rabble-font-ui);
+  font-weight: 700;
+  letter-spacing: 0.18em;
+}
+
+.rabble-tagline {
+  font-family: var(--rabble-font-mono);
+  font-size: 10.5px;
+  color: var(--rabble-violet);
+  letter-spacing: 0.2em;
+  opacity: 0.78;
+  text-transform: uppercase;
+}
+
+.rabble-mono {
+  font-family: var(--rabble-font-mono);
+  letter-spacing: 0.04em;
+}
+
+/* Blinking terminal cursor */
+.rabble-cursor {
+  display: inline-block; width: 6px; height: 1em;
+  background: var(--rabble-violet);
+  margin-left: 3px; vertical-align: middle;
+  animation: rabble-blink 1.1s step-end infinite;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   4. BUTTONS
+   ═══════════════════════════════════════════════════════════════ */
+
+.rabble-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 12px 24px;
+  background: var(--rabble-gradient-primary, linear-gradient(135deg, #ff2d78, #bf5fff));
+  color: #fff;
+  border: none;
+  border-radius: var(--rabble-radius-md, 8px);
+  cursor: pointer;
+  font-family: var(--rabble-font-ui);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+  box-shadow: 0 0 20px rgba(255,45,120,0.25);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.rabble-btn::before {
+  content: '';
+  position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+  transition: left 0.5s ease;
+}
+
+.rabble-btn:hover {
+  box-shadow: 0 0 32px rgba(255,45,120,0.45), 0 0 60px rgba(191,95,255,0.2);
+  transform: translateY(-2px);
+}
+
+.rabble-btn:hover::before { left: 100%; }
+
+.rabble-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 0 12px rgba(255,45,120,0.3);
+}
+
+.rabble-btn:focus-visible {
+  outline: 2px solid var(--rabble-cyan);
+  outline-offset: 3px;
+}
+
+/* Ghost variant */
+.rabble-btn-ghost {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid var(--rabble-border);
+  color: var(--rabble-text);
+  box-shadow: none;
+}
+
+.rabble-btn-ghost:hover {
+  background: rgba(191,95,255,0.12);
+  border-color: rgba(191,95,255,0.4);
+  box-shadow: 0 0 14px rgba(191,95,255,0.2);
+  transform: translateY(-1px);
+}
+
+/* Cyan variant */
+.rabble-btn-cyan {
+  background: linear-gradient(135deg, var(--rabble-cyan, #00f5ff), var(--rabble-violet, #bf5fff));
+  box-shadow: 0 0 20px rgba(0,245,255,0.2);
+}
+
+.rabble-btn-cyan:hover {
+  box-shadow: 0 0 32px rgba(0,245,255,0.45);
+}
+
+/* Size modifiers */
+.rabble-btn-sm { padding: 8px 16px; font-size: 12px; }
+.rabble-btn-lg { padding: 16px 32px; font-size: 16px; }
+
+/* ═══════════════════════════════════════════════════════════════
+   5. CARDS
+   ═══════════════════════════════════════════════════════════════ */
+
+.rabble-card {
+  background: var(--rabble-raised);
+  border: 1px solid var(--rabble-border);
+  border-radius: var(--rabble-radius-lg, 12px);
+  padding: 28px;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.rabble-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: var(--rabble-gradient-scan, linear-gradient(90deg, #ff2d78, #00f5ff));
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s ease;
+}
+
+.rabble-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(191,95,255,0.3);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.4), 0 0 20px rgba(191,95,255,0.1);
+}
+
+.rabble-card:hover::before { transform: scaleX(1); }
+
+.rabble-card-title {
+  font-family: var(--rabble-font-ui);
+  font-size: 18px; font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--rabble-text);
+  margin-bottom: 10px;
+}
+
+.rabble-card-body {
+  font-family: var(--rabble-font-ui);
+  font-size: 14px; line-height: 1.6;
+  color: var(--rabble-muted);
+}
+
+/* Card with neon border accent */
+.rabble-card-magenta { border-left: 3px solid var(--rabble-magenta); }
+.rabble-card-cyan    { border-left: 3px solid var(--rabble-cyan); }
+.rabble-card-violet  { border-left: 3px solid var(--rabble-violet); }
+
+/* ═══════════════════════════════════════════════════════════════
+   6. STATUS INDICATORS
+   ═══════════════════════════════════════════════════════════════ */
+
+.rabble-status-pill {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 3px 12px; border-radius: var(--rabble-radius-pill, 9999px);
+  background: rgba(0,245,255,0.07); border: 1px solid rgba(0,245,255,0.18);
+  font-size: 9px; font-family: var(--rabble-font-mono); letter-spacing: 0.1em;
+  color: var(--rabble-cyan); text-transform: uppercase;
+}
+
+.rabble-status-dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--rabble-cyan);
+  box-shadow: 0 0 6px var(--rabble-cyan);
+  animation: rabble-status-pulse 2s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+.rabble-status-dot.magenta {
+  background: var(--rabble-magenta);
+  box-shadow: 0 0 6px var(--rabble-magenta);
+}
+
+.rabble-status-dot.violet {
+  background: var(--rabble-violet);
+  box-shadow: 0 0 6px var(--rabble-violet);
+}
+
+.rabble-status-dot.offline {
+  background: var(--rabble-border);
+  box-shadow: none;
+  animation: none;
+}
+
+/* Tag badges */
+.rabble-tag {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: var(--rabble-radius-sm, 4px);
+  font-size: 9px; font-family: var(--rabble-font-mono);
+  letter-spacing: 0.08em; text-transform: uppercase;
+  background: rgba(255,45,120,0.1); color: var(--rabble-magenta);
+  border: 1px solid rgba(255,45,120,0.2);
+}
+
+.rabble-tag-cyan   { background: rgba(0,245,255,0.08); color: var(--rabble-cyan);   border-color: rgba(0,245,255,0.2); }
+.rabble-tag-violet { background: rgba(191,95,255,0.08); color: var(--rabble-violet); border-color: rgba(191,95,255,0.2); }
+.rabble-tag-green  { background: rgba(80,250,123,0.08); color: var(--rabble-green);  border-color: rgba(80,250,123,0.2); }
+
+/* Progress bar */
+.rabble-progress {
+  height: 2px;
+  background: var(--rabble-border);
+  border-radius: var(--rabble-radius-pill);
+  overflow: hidden;
+}
+
+.rabble-progress-fill {
+  height: 100%;
+  background: var(--rabble-gradient-primary, linear-gradient(90deg, #ff2d78, #bf5fff));
+  border-radius: var(--rabble-radius-pill);
+  transition: width 0.4s ease;
+  box-shadow: 0 0 8px rgba(255,45,120,0.5);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   7. FORM ELEMENTS
+   ═══════════════════════════════════════════════════════════════ */
+
+.rabble-input {
+  width: 100%; padding: 12px 14px;
+  background: rgba(26,27,46,0.85);
+  border: 1px solid var(--rabble-border);
+  border-radius: var(--rabble-radius-md, 8px);
+  color: var(--rabble-text);
+  font-family: var(--rabble-font-mono); font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  letter-spacing: 0.04em;
+  caret-color: var(--rabble-violet);
+}
+
+.rabble-input::placeholder { color: var(--rabble-dimmer); }
+
+.rabble-input:focus {
+  border-color: rgba(191,95,255,0.45);
+  box-shadow: 0 0 18px rgba(191,95,255,0.12);
+}
+
+.rabble-input.typing {
+  border-color: rgba(0,245,255,0.4);
+  box-shadow: 0 0 18px rgba(0,245,255,0.1);
+}
+
+.rabble-field-label {
+  display: block;
+  font-size: 10px; font-family: var(--rabble-font-mono);
+  color: var(--rabble-muted); letter-spacing: 0.12em;
+  text-transform: uppercase; margin-bottom: 6px;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   8. GLASS SURFACES
+   ═══════════════════════════════════════════════════════════════ */
+
+.rabble-glass {
+  background: rgba(18,19,42,0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--rabble-border);
+}
+
+.rabble-glass-heavy {
+  background: rgba(10,0,16,0.88);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(42,40,64,0.6);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   9. NAVIGATION / HEADER
+   ═══════════════════════════════════════════════════════════════ */
+
+.rabble-nav {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 24px;
+  background: rgba(10,0,16,0.85);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--rabble-border);
+  position: relative;
+}
+
+.rabble-nav::after {
+  content: '';
+  position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
+  background: var(--rabble-gradient-scan, linear-gradient(90deg, #ff2d78, #00f5ff));
+  opacity: 0.4;
+}
+
+.rabble-nav-links {
+  display: flex; align-items: center; gap: 24px;
+  list-style: none;
+}
+
+.rabble-nav-links a {
+  font-family: var(--rabble-font-mono);
+  font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--rabble-muted); text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.rabble-nav-links a:hover { color: var(--rabble-cyan); }
+.rabble-nav-links a.active { color: var(--rabble-magenta); }
+
+/* ═══════════════════════════════════════════════════════════════
+   10. TERMINAL / LOG
+   ═══════════════════════════════════════════════════════════════ */
+
+.rabble-terminal {
+  font-family: var(--rabble-font-mono);
+  font-size: 12px; line-height: 1.8;
+  color: var(--rabble-text);
+  background: var(--rabble-void, #03000b);
+  padding: 16px;
+  border: 1px solid var(--rabble-border);
+  border-radius: var(--rabble-radius-md, 8px);
+  overflow-y: auto;
+}
+
+.rabble-log-line {
+  display: flex; gap: 10px; align-items: baseline;
+  opacity: 0;
+  animation: rabble-log-in 0.15s ease forwards;
+}
+
+.rabble-log-ts {
+  flex-shrink: 0; width: 76px;
+  font-size: 9.5px; letter-spacing: 0.04em;
+  color: var(--rabble-dimmer);
+  text-align: right;
+}
+
+.rabble-log-tag {
+  flex-shrink: 0; width: 52px; text-align: center;
+  font-size: 9.5px; letter-spacing: 0.07em; text-transform: uppercase;
+}
+
+.rabble-log-tag.ok   { color: var(--rabble-green); }
+.rabble-log-tag.warn { color: var(--rabble-yellow); }
+.rabble-log-tag.err  { color: var(--rabble-magenta); }
+.rabble-log-tag.info { color: var(--rabble-cyan); }
+.rabble-log-tag.rbl  { color: var(--rabble-violet); }
+.rabble-log-tag.sys  { color: var(--rabble-muted); }
+
+.rabble-log-msg {
+  color: var(--rabble-muted); font-size: 10.5px;
+  letter-spacing: 0.02em; flex: 1;
+}
+
+.rabble-log-msg .hi-m { color: var(--rabble-magenta); }
+.rabble-log-msg .hi-c { color: var(--rabble-cyan); }
+.rabble-log-msg .hi-v { color: var(--rabble-violet); }
+.rabble-log-msg .hi-g { color: var(--rabble-green); }
+.rabble-log-msg .hi-y { color: var(--rabble-yellow); }
+
+/* ═══════════════════════════════════════════════════════════════
+   11. LAYOUT UTILITIES
+   ═══════════════════════════════════════════════════════════════ */
+
+.rabble-page {
+  min-height: 100vh;
+  background: var(--rabble-bg);
+  color: var(--rabble-text);
+  font-family: var(--rabble-font-ui);
+}
+
+.rabble-sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   12. SCROLLBARS
+   ═══════════════════════════════════════════════════════════════ */
+
+::-webkit-scrollbar           { width: 4px; height: 4px; }
+::-webkit-scrollbar-track     { background: var(--rabble-bg); }
+::-webkit-scrollbar-thumb     { background: var(--rabble-border); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: var(--rabble-violet); }

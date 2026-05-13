@@ -1,0 +1,27 @@
+/**
+ * rabble.css — RaBbLE Design System Entry Point
+ *
+ * Single import for the complete RaBbLE visual identity.
+ *
+ * Usage:
+ *   HTML:  <link rel="stylesheet" href="path/to/RaBbLE-Aether/rabble.css">
+ *   CSS:   @import url('path/to/RaBbLE-Aether/rabble.css');
+ *
+ * Loads (in order):
+ *   1. Google Fonts — Exo 2, Share Tech Mono
+ *   2. rabble-palette.css — all design tokens (colors, spacing, type, gradients)
+ *   3. rabble-motion.css  — all @keyframes and animation utility classes
+ *   4. rabble-components.css — UI components (requires palette + motion)
+ */
+
+/* ── 1. Fonts ─────────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,400;0,600;0,700;0,800;0,900;1,400&family=Share+Tech+Mono&display=swap');
+
+/* ── 2. Palette tokens ───────────────────────────────────────── */
+@import url('assets/palette/rabble-palette.css');
+
+/* ── 3. Motion / keyframes ───────────────────────────────────── */
+@import url('assets/motion/rabble-motion.css');
+
+/* ── 4. Components ───────────────────────────────────────────── */
+@import url('assets/components/rabble-components.css');
