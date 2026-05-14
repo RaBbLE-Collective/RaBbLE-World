@@ -92,6 +92,9 @@
       showWaveform: false,
       onReady:      null,
       dpr:          1,
+      // glowScale: 0–1. Controls shadowBlur intensity.
+      // Full glow (1.0) on desktop; reduced on mobile to recover frame rate.
+      glowScale:    1,
     }, opts || {});
 
     var dpr = opts.dpr || 1;
@@ -281,7 +284,7 @@
           s === 0 ? ctx.moveTo(ex, ey) : ctx.lineTo(ex, ey);
         }
         ctx.strokeStyle = col; ctx.lineWidth = 1.8;
-        ctx.shadowColor = col; ctx.shadowBlur = glowBase;
+        ctx.shadowColor = col; ctx.shadowBlur = glowBase * opts.glowScale;
         ctx.stroke(); ctx.shadowBlur = 0;
 
         if (frac < 1) {
@@ -345,9 +348,9 @@
         ctx.save(); ctx.translate(ox, oy); ctx.scale(1, bs);
         ctx.beginPath(); ctx.ellipse(0, 0, eW2, eH2, 0, 0, Math.PI * 2);
         ctx.fillStyle = '#f8faff';
-        ctx.shadowColor = 'rgba(220,235,255,0.85)'; ctx.shadowBlur = 22;
+        ctx.shadowColor = 'rgba(220,235,255,0.85)'; ctx.shadowBlur = 22 * opts.glowScale;
         ctx.fill(); ctx.shadowBlur = 0;
-        var glowPulse = 18 + 10 * Math.sin(t * 0.028 + (ox - cx) * 0.05);
+        var glowPulse = (18 + 10 * Math.sin(t * 0.028 + (ox - cx) * 0.05)) * opts.glowScale;
         ctx.strokeStyle = col; ctx.lineWidth = 2;
         ctx.shadowColor = col; ctx.shadowBlur = glowPulse;
         ctx.stroke(); ctx.shadowBlur = 0;
@@ -413,10 +416,14 @@
         var vis     = opts.mode === 'boot' ? Math.min(1, convProg * 3) : 1;
         var a       = p.alpha * falloff * pulse * vis;
 
-        if (p.glow) {
-          ctx.shadowColor = p.color; ctx.shadowBlur = 20 + settleBlend * 14 + 7 * Math.sin(p.phase + t * 0.02);
-        } else {
-          ctx.shadowColor = p.color; ctx.shadowBlur = settleBlend * 4;
+        if (opts.glowScale > 0) {
+          if (p.glow) {
+            ctx.shadowColor = p.color;
+            ctx.shadowBlur = (20 + settleBlend * 14 + 7 * Math.sin(p.phase + t * 0.02)) * opts.glowScale;
+          } else {
+            ctx.shadowColor = p.color;
+            ctx.shadowBlur = settleBlend * 4 * opts.glowScale;
+          }
         }
         ctx.beginPath(); ctx.arc(p.x + driftX, p.y + driftY, p.r, 0, Math.PI * 2);
         ctx.fillStyle = p.color; ctx.globalAlpha = a; ctx.fill();
@@ -544,14 +551,26 @@
         this.style.overflow = 'visible';
 
         this._canvas = document.createElement('canvas');
-        this._canvas.className      = 'rabble-entity-canvas';
-        this._canvas.style.position = 'absolute';
-        this._canvas.style.left     = '50%';
-        this._canvas.style.top      = '50%';
-        this._canvas.style.transform    = 'translate(-50%, -50%)';
+        this._canvas.className           = 'rabble-entity-canvas';
+        this._canvas.style.position      = 'absolute';
+        this._canvas.style.left          = '50%';
+        this._canvas.style.top           = '50%';
+        this._canvas.style.transform     = 'translate(-50%, -50%)';
         this._canvas.style.pointerEvents = 'none';
-        this._canvas.style.zIndex       = '0';
+        this._canvas.style.zIndex        = '0';
+        // Explicit transparent background — prevents white-flash before first rAF
+        // and ensures canvas bounds don't show as a visible box at small sizes.
+        this._canvas.style.background    = 'transparent';
         this.appendChild(this._canvas);
+
+        // ── Mobile performance profile ────────────────────────────────────
+        // Canvas2D shadowBlur is the primary frame-rate killer on iOS Metal.
+        // Retina DPR on iPhone 14 Pro = 3 → canvas pixels = 9× CSS pixels.
+        // Capping DPR at 1.5 and halving particle count keeps rAF near 16ms.
+        var rawDpr   = window.devicePixelRatio || 1;
+        var isMobile = rawDpr > 1.5 && (window.innerWidth < 800 || window.innerHeight < 600);
+        var perfDpr  = isMobile ? Math.min(1.5, rawDpr) : rawDpr;
+        var glowScale = isMobile ? 0.35 : 1.0;
 
         this._resize = () => {
           var rect = this.getBoundingClientRect();
@@ -559,17 +578,21 @@
           var fallbackH = parseFloat(this.getAttribute('fallback-height') || '320');
           var hostW = rect.width  || this.offsetWidth  || fallbackW;
           var hostH = rect.height || this.offsetHeight || fallbackH;
-          var overscan = parseFloat(this.getAttribute('overscan') || '2.35');
-          var dpr  = window.devicePixelRatio || 1;
+
+          // Cap overscan on small viewports — large overscan at small host sizes
+          // creates a canvas whose clear-rect boundaries are visually obvious.
+          var rawOverscan = parseFloat(this.getAttribute('overscan') || '2.35');
+          var overscan = (hostW < 220 || hostH < 160) ? Math.min(1.8, rawOverscan) : rawOverscan;
+
           var cssW = Math.max(1, Math.round(hostW * overscan));
           var cssH = Math.max(1, Math.round(hostH * overscan));
-          var devW = Math.round(cssW * dpr);
-          var devH = Math.round(cssH * dpr);
+          var devW = Math.round(cssW * perfDpr);
+          var devH = Math.round(cssH * perfDpr);
           if (this._canvas.width  !== devW) this._canvas.width  = devW;
           if (this._canvas.height !== devH) this._canvas.height = devH;
           this._canvas.style.width  = cssW + 'px';
           this._canvas.style.height = cssH + 'px';
-          this._dpr = dpr;
+          this._dpr = perfDpr;
           if (this._entity && this._entity.resize) this._entity.resize();
         };
 
@@ -580,20 +603,26 @@
         this._resize();
         requestAnimationFrame(this._resize);
 
+        var requestedParticles = parseInt(this.getAttribute('particle-count') || '480', 10);
+
         this._entity = new RaBbLEEntity(this._canvas, {
           mode:          this.getAttribute('mode') || 'idle',
-          particleCount: parseInt(this.getAttribute('particle-count') || '480', 10),
+          particleCount: isMobile ? Math.min(220, requestedParticles) : requestedParticles,
           interactive:   parseBool(this.getAttribute('interactive'), true),
           showWaveform:  parseBool(this.getAttribute('show-waveform'), false),
-          dpr:           window.devicePixelRatio || 1,
+          dpr:           perfDpr,
+          glowScale:     glowScale,
           onReady: () => {
             this.dispatchEvent(new CustomEvent('entity-ready', { bubbles: true }));
             global.dispatchEvent(new CustomEvent('rabble:entity-ready'));
           },
         });
 
-        // Register with NeBuLA module namespace
-        global.NeBuLA._instance = this._entity;
+        // Register with NeBuLA module namespace + expose actual perf config
+        global.NeBuLA._instance    = this._entity;
+        global.NeBuLA.particleCount = isMobile ? Math.min(220, requestedParticles) : requestedParticles;
+        global.NeBuLA.glowScale     = glowScale;
+        global.NeBuLA.renderDpr     = perfDpr;
 
         requestAnimationFrame(this._resize);
       }

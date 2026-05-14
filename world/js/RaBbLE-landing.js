@@ -270,8 +270,10 @@ document.addEventListener('alpine:init', () => {
     // iOS non-PWA entry prompt
     showIosEntry: false,
 
-    // matchMedia-based mobile flag — consistent across Firefox, Chrome, Safari resize events
-    isMobile: false,
+    // matchMedia breakpoint flags — all use matchMedia for consistency across browsers
+    isMobile:       false,  // ≤600px — floating nav/collective button
+    isTablet:       false,  // ≤900px — log panel hidden, log button needed
+    isLandscapePhone: false, // landscape + ≤500px height — all panels hidden
 
     // Waybar center zone — real rAF-measured pulse + expandable entity metrics
     pulse:         16,       // ms — real rAF frame delta, EMA-smoothed
@@ -350,20 +352,26 @@ document.addEventListener('alpine:init', () => {
         this.showIosEntry = true;
       }
 
-      // matchMedia for isMobile — reliable across Firefox, Safari, Chrome + resize
-      // window.innerWidth at Alpine init time is unreliable in some browsers
-      const mql = window.matchMedia('(max-width: 600px)');
-      this.isMobile = mql.matches;
-      mql.addEventListener('change', (e) => { this.isMobile = e.matches; });
+      // matchMedia breakpoints — all use the API directly, never window.innerWidth
+      const mqlMobile  = window.matchMedia('(max-width: 600px)');
+      const mqlTablet  = window.matchMedia('(max-width: 900px)');
+      const mqlLandPh  = window.matchMedia('(orientation: landscape) and (max-height: 500px)');
+      this.isMobile       = mqlMobile.matches;
+      this.isTablet       = mqlTablet.matches;
+      this.isLandscapePhone = mqlLandPh.matches;
+      mqlMobile.addEventListener('change', (e) => { this.isMobile       = e.matches; });
+      mqlTablet.addEventListener('change', (e) => { this.isTablet       = e.matches; });
+      mqlLandPh.addEventListener('change', (e) => { this.isLandscapePhone = e.matches; });
 
       // Substrate detection — device/OS type in entity language
       this.substrate = this._detectSubstrate();
 
-      // NeBuLA metrics — populated once the entity element is ready
+      // NeBuLA metrics — read actual runtime values (may differ from HTML attrs on mobile)
       window.addEventListener('rabble:entity-ready', () => {
-        if (window.NeBuLA) this.renderBackend = window.NeBuLA.backend || 'Canvas2D';
-        const el = this.$refs.entity;
-        if (el) this.particleCount = parseInt(el.getAttribute('particle-count') || '480', 10);
+        if (window.NeBuLA) {
+          this.renderBackend = window.NeBuLA.backend || 'Canvas2D';
+          this.particleCount = window.NeBuLA.particleCount || this.particleCount;
+        }
       });
 
       // Close metrics panel on Escape

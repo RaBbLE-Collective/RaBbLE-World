@@ -323,11 +323,13 @@
     <span class="dot"></span> collective
   </button>
 
-  <!-- ═══ MOBILE LOG TOGGLE BUTTON ══════════════════════════════════════
-       isMobile gates show/hide so resize can't strand the button.        -->
+  <!-- ═══ LOG TOGGLE BUTTON ══════════════════════════════════════════════
+       Visible whenever the log panel is hidden: mobile, tablet, landscape.
+       isTablet covers ≤900px (log panel hidden at tablet).
+       isLandscapePhone covers landscape phones where all panels hide.    -->
   <button class="log-toggle"
           @click="logOpen = true"
-          x-show="isMobile && !logOpen && !panelOpen"
+          x-show="(isTablet || isLandscapePhone) && !logOpen && !panelOpen"
           aria-label="Open entity log">
     <span class="dot"></span> log
   </button>
