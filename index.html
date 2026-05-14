@@ -48,17 +48,41 @@
 
   <div class="shell">
 
-    <!-- ═══ STATUS BAR ══════════════════════════════════════════════════
-         Edit statusbar content here — data comes from landing.js init()  -->
+    <!-- ═══ STATUS BAR — Waybar-style three-zone layout ════════════════
+         Left: workspace/branding  ·  Center: entity state  ·  Right: metrics
+         Data: landing.js init() — entityState reactive on _setEntityState()  -->
     <header class="statusbar">
-      <span class="brandmark">joinrabble.world</span>
-      <span class="sep">/</span>
-      <span>echo <span style="color:var(--text-primary)">0</span></span>
-      <span class="right">
-        <span class="hide-xs">uptime <span style="color:var(--text-primary)" x-text="uptime"></span></span>
-        <span>pulse <span style="color:var(--neon-cyan);text-shadow:0 0 4px var(--neon-cyan)" x-text="pulse + 'ms'"></span></span>
-        <span class="pill"><span class="dot"></span>entity online</span>
-      </span>
+
+      <!-- ── Left zone: workspace identity ─────────────────────────── -->
+      <div class="sb-left">
+        <span class="brandmark">RW</span>
+        <span class="sb-sep">/</span>
+        <span class="sb-workspace">joinrabble.world</span>
+        <span class="sb-sep sb-hide-sm">·</span>
+        <span class="sb-hide-sm">echo <span class="sb-val">0</span></span>
+      </div>
+
+      <!-- ── Center zone: entity state (the "Waybar center module") ── -->
+      <div class="sb-center">
+        <span class="sb-glyph" aria-hidden="true">◈</span>
+        <span class="sb-entity-state"
+              x-text="{ idle: 'online', thinking: 'processing', speaking: 'speaking' }[entityState] || 'online'">
+        </span>
+        <span class="sb-sep">·</span>
+        <span class="sb-pulse">
+          <span class="sb-hide-sm">pulse </span><span class="sb-val" x-text="pulse + 'ms'"></span>
+        </span>
+      </div>
+
+      <!-- ── Right zone: system metrics ────────────────────────────── -->
+      <div class="sb-right">
+        <span class="sb-uptime sb-hide-sm">uptime <span class="sb-val" x-text="uptime"></span></span>
+        <span class="pill">
+          <span class="dot"></span>
+          <span class="sb-hide-xs">entity </span>online
+        </span>
+      </div>
+
     </header>
 
     <!-- ═══ MAIN GRID ═══════════════════════════════════════════════════
@@ -356,6 +380,27 @@
         <a :href="navDetailOrgan?.url" class="op-link">Open full page →</a>
       </div>
 
+    </div>
+  </div>
+
+
+  <!-- ═══ iOS NON-PWA ENTRY PROMPT ═══════════════════════════════════════
+       Shown in mobile Safari (not standalone PWA). Tapping dismisses the
+       overlay and nudges iOS to hide the browser chrome via scroll trick.
+       Not shown in PWA mode (navigator.standalone) or on desktop.        -->
+  <div class="ios-entry"
+       x-show="showIosEntry"
+       :style="showIosEntry ? 'display:flex' : ''"
+       @click="dismissIosEntry()"
+       @touchend.prevent="dismissIosEntry()"
+       role="button"
+       tabindex="0"
+       aria-label="Tap to enter RaBbLE">
+    <div class="ios-entry-body">
+      <div class="ios-entry-glyph" aria-hidden="true">◈</div>
+      <div class="ios-entry-title">RaBbLE</div>
+      <div class="ios-entry-cta">tap to enter the channel</div>
+      <div class="ios-entry-sub">add to Home Screen for the full experience</div>
     </div>
   </div>
 

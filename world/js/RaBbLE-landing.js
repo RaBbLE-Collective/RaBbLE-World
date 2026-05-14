@@ -264,6 +264,12 @@ document.addEventListener('alpine:init', () => {
     bWordFading: false,       // drives CSS fade transition
 
     // ── Status bar ────────────────────────────────────────────
+    // entity state drives the Waybar center zone label
+    entityState: 'idle',
+
+    // iOS non-PWA entry prompt
+    showIosEntry: false,
+
     pulse: 14,
     uptime: '0d 00h 00m 00s',
     startedAt: Date.now(),
@@ -320,6 +326,28 @@ document.addEventListener('alpine:init', () => {
         if (!this._bootDone) return;
         this.push(AMBIENT_MESSAGES[Math.floor(Math.random() * AMBIENT_MESSAGES.length)]);
       }, 14000);
+
+      // iOS non-PWA entry prompt — show in mobile Safari, not in PWA or desktop
+      const isIOS = /iP(hone|ad|od)/.test(navigator.userAgent);
+      const isStandalone = navigator.standalone ||
+        window.matchMedia('(display-mode: standalone)').matches;
+      if (isIOS && !isStandalone && window.innerWidth < 1024) {
+        this.showIosEntry = true;
+      }
+    },
+
+    dismissIosEntry() {
+      this.showIosEntry = false;
+      // Nudge iOS Safari to auto-hide browser chrome:
+      // Temporarily unlock scroll, jump 1px, re-lock.
+      try {
+        document.documentElement.style.setProperty('overflow', 'auto');
+        window.scrollTo({ top: 1, behavior: 'instant' });
+        setTimeout(() => {
+          document.documentElement.style.removeProperty('overflow');
+          window.scrollTo({ top: 0, behavior: 'instant' });
+        }, 80);
+      } catch (e) { /* noop */ }
     },
 
 
@@ -350,6 +378,7 @@ document.addEventListener('alpine:init', () => {
     },
 
     _setEntityState(state) {
+      this.entityState = state;
       if (this.entityEl && typeof this.entityEl.setEntityState === 'function') {
         this.entityEl.setEntityState(state);
       }

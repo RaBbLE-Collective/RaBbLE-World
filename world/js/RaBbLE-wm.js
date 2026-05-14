@@ -77,9 +77,40 @@
         stage.dataset.entityState = e.detail.state;
       });
 
+      // Orientation-aware layout: switch to left-focus on phone landscape
+      global.addEventListener('orientationchange', function () {
+        setTimeout(function () { WM._onViewportChange(); }, 350);
+      });
+      global.addEventListener('resize', function () {
+        clearTimeout(WM._resizeTimer);
+        WM._resizeTimer = setTimeout(function () { WM._onViewportChange(); }, 180);
+      });
+      this._onViewportChange();
+
       global.dispatchEvent(new CustomEvent('rabble:wm-ready', {
         detail: { layouts: Object.keys(this.layouts), applets: Object.keys(this.slots) },
       }));
+    },
+
+    // ── Viewport-aware layout ───────────────────────────────────────────────
+    _resizeTimer: null,
+    _userLayout: false,  // true once the user manually switches layout
+
+    _onViewportChange() {
+      // Only auto-switch when the user hasn't chosen a layout manually
+      if (WM._userLayout) return;
+      var w = global.innerWidth;
+      var h = global.innerHeight;
+      // CSS handles the column sizing at all breakpoints; the WM only needs to
+      // reset any previously-applied layout class so CSS breakpoints take over.
+      // Below 900px, force no WM layout class — CSS responsive rules win.
+      if (w <= 900 && WM.currentLayout !== 'default') {
+        // Remove layout classes, let CSS media queries drive column layout
+        Object.keys(WM.layouts).forEach(function (l) {
+          if (WM._mainEl) WM._mainEl.classList.remove('wm-layout-' + l);
+        });
+        WM.currentLayout = 'default';
+      }
     },
 
     // ── Focus ───────────────────────────────────────────────────────────────
@@ -146,12 +177,13 @@
         return;
       }
 
-      // Ctrl+1–4: layout presets
+      // Ctrl+1–4: layout presets (marks as user-chosen)
       if (e.ctrlKey && !e.shiftKey && !e.altKey && !e.metaKey) {
         var layoutKeys = Object.keys(WM.layouts);
         var idx = parseInt(e.key, 10) - 1;
         if (!isNaN(idx) && idx >= 0 && idx < layoutKeys.length) {
           e.preventDefault();
+          WM._userLayout = true;
           WM.setLayout(layoutKeys[idx]);
         }
       }
