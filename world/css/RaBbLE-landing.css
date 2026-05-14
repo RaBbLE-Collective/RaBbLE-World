@@ -1201,6 +1201,9 @@ body.boot-departing { animation: page-fade-out 0.55s ease forwards; }
   .nav-toggle { bottom: calc(20px + env(safe-area-inset-bottom, 0px)); }
   .log-toggle { bottom: calc(20px + env(safe-area-inset-bottom, 0px)); }
 
+  /* Keep ask-box above the fixed toggle buttons — 36px button + 20px bottom + 8px gap */
+  .stage { padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px)); }
+
   .entity-wrap { width: clamp(180px, 52vw, 280px); }
   .entity-wordmark { font-size: clamp(32px, 10vw, 54px); }
   .tagline { font-size: 10px; }
@@ -1277,12 +1280,41 @@ body.boot-departing { animation: page-fade-out 0.55s ease forwards; }
   .nav-toggle  { display: none; } /* collective panel is already visible */
   .hint-strip  { display: none; }
 
-  /* Compact collective panel */
+  /* Compact collective panel list */
   .panel-head  { padding: 6px 10px 5px; }
   .panel-explore { padding: 3px 10px 4px; font-size: 8px; }
   .organ       { padding: 6px 8px; }
   .organ .name { font-size: 11px; }
   .organ .role { font-size: 9px;  }
+
+  /* ── Organ detail panel: expand to readable width over the stage ─
+   * The 180px collective column is too narrow for detail text (28px
+   * padding each side leaves ~124px). Break out of the column with
+   * position:fixed and expand to 300px — glass drawer over the stage.
+   * z-index:20 sits above the stage (z:5) but below system overlays.  */
+  .organ-panel {
+    position: fixed;
+    left: 0;
+    top: var(--sb-height);
+    bottom: 0;
+    width: min(300px, 75vw);
+    z-index: 20;
+    background: transparent;  /* scrim is on op-inner */
+  }
+  .op-inner {
+    border-right: 1px solid rgba(191, 95, 255, 0.20);
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.5);
+  }
+  .op-head { padding: 10px 14px; gap: 10px; }
+  .op-icon { width: 32px; height: 32px; font-size: 13px; }
+  .op-name { font-size: 14px; }
+  .op-role { font-size: 10px; margin-top: 1px; }
+  .op-status-badge { display: none; }
+  .op-body { padding: 14px 16px; font-size: 12px; line-height: 1.6; }
+  .op-body p { margin-bottom: 10px; }
+  .op-dl { font-size: 11px; gap: 6px 12px; margin-top: 12px; padding-top: 10px; }
+  .op-foot { padding: 10px 16px; }
+  .op-link { font-size: 11px; padding: 7px 12px; }
 
   /* ── Stage: entity as ambient background, content floats above ─── */
   /*
