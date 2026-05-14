@@ -91,7 +91,7 @@ body.boot-departing { animation: page-fade-out 0.55s ease forwards; }
    ═══════════════════════════════════════════════════════════════ */
 .shell {
   position: relative; z-index: 5;
-  height: 100vh;
+  height: 100vh; overflow: hidden;
   display: grid; grid-template-rows: 32px 1fr 28px;
 }
 
@@ -140,7 +140,7 @@ body.boot-departing { animation: page-fade-out 0.55s ease forwards; }
 .main {
   display: grid;
   grid-template-columns: 340px 1fr 340px;
-  min-height: 0;
+  min-height: 0; overflow: hidden;
 }
 
 
@@ -256,13 +256,14 @@ body.boot-departing { animation: page-fade-out 0.55s ease forwards; }
 
 /* ═══════════════════════════════════════════════════════════════
    CENTER STAGE — entity + wordmark + CTAs
+   Stage must never scroll — content is sized to fit the viewport.
    ═══════════════════════════════════════════════════════════════ */
 .stage {
   position: relative;
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
   padding: 10px 24px 14px;
-  overflow-y: auto; text-align: center; gap: 9px;
+  overflow: hidden; text-align: center; gap: 9px;
 }
 
 /* Entity canvas host — sized for 460×320 internal coordinates */
@@ -288,10 +289,10 @@ body.boot-departing { animation: page-fade-out 0.55s ease forwards; }
 }
 @keyframes brand-flow { 0%, 100% { background-position: 0%; } 50% { background-position: 100%; } }
 
-/* Tagline */
+/* Tagline — NO text-transform: organ names and "Behavioral Learning Engine" need correct mixed case */
 .tagline {
   font-family: var(--font-mono); font-size: 12px;
-  letter-spacing: 0.16em; text-transform: lowercase;
+  letter-spacing: 0.16em;
   color: var(--text-primary); flex-shrink: 0;
 }
 .tagline .accent   { color: var(--neon-cyan);    text-shadow: 0 0 6px var(--neon-cyan); }
@@ -645,22 +646,36 @@ body.boot-departing { animation: page-fade-out 0.55s ease forwards; }
   .main { grid-template-columns: 240px 1fr 240px; }
 }
 
-/* Tablet — one panel, log toggle shown */
+/* Tablet — one panel, log toggle shown, stage tightened to prevent scroll */
 @media (max-width: 900px) {
   .main { grid-template-columns: 200px 1fr; }
   .panel.right { display: none; }
-  .log-overlay { display: flex; } /* allow overlay to show on tablet too */
-  .stage { padding: 14px 18px; }
+  .log-overlay { display: flex; }
+  .stage { padding: 8px 18px; gap: 6px; }
+  .entity-wrap { width: clamp(160px, 24vw, 260px); }
+  .entity-wordmark { font-size: clamp(28px, 4.5vw, 52px); }
+  .tagline { font-size: 10px; letter-spacing: 0.12em; }
+  .mission { font-size: 10px; max-width: 300px; }
+  .cta-row { gap: 10px; }
+  .cta { padding: 10px 16px; font-size: 12px; }
+  .query { padding: 8px 14px; font-size: 12px; }
 }
 
 /* Mobile — single column, both panels hidden, log toggle + overlay */
 @media (max-width: 600px) {
   .main { grid-template-columns: 1fr; }
   .panel.left, .panel.right { display: none; }
-  .log-toggle { display: flex; } /* show mobile log toggle */
-  .shell { grid-template-rows: 28px 1fr 24px; }
-  .statusbar { font-size: 9px; gap: 10px; padding: 0 12px; }
-  .statusbar .right { gap: 10px; }
+  .log-toggle { display: flex; }
+  /* Statusbar: two-line layout on mobile — brand/nav top row, status bottom row */
+  .shell { grid-template-rows: auto 1fr 24px; }
+  .statusbar {
+    font-size: 9px; gap: 5px 10px; padding: 5px 12px;
+    flex-wrap: wrap; height: auto;
+  }
+  .statusbar .right {
+    width: 100%; margin-left: 0; gap: 8px;
+    justify-content: flex-start; padding-bottom: 1px;
+  }
   .entity-wrap { width: clamp(180px, 52vw, 280px); }
   .entity-wordmark { font-size: clamp(32px, 10vw, 54px); }
   .tagline { font-size: 10px; }
@@ -669,7 +684,7 @@ body.boot-departing { animation: page-fade-out 0.55s ease forwards; }
   .cta { padding: 11px 16px; font-size: 12px; }
   .query { width: 94%; }
   .hint-strip { font-size: 9px; gap: 8px; padding: 0 10px; }
-  /* Hide some hint-strip separators on mobile to save space */
+  /* Hide hint-strip separators on mobile */
   .hint-strip > span:nth-child(2),
   .hint-strip > span:nth-child(4),
   .hint-strip > span:nth-child(6),
