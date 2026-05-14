@@ -263,19 +263,20 @@
   </div><!-- /.shell -->
 
 
-  <!-- ═══ MOBILE NAV TOGGLE — bottom-left, opens Collective nav overlay ══ -->
+  <!-- ═══ MOBILE NAV TOGGLE — bottom-left, opens Collective nav overlay ══
+       isMobile gates show/hide so CSS ↔ Alpine x-show don't conflict on resize -->
   <button class="nav-toggle"
           @click="navOpen = true; navDetailOrgan = null"
-          x-show="!navOpen && !panelOpen"
+          x-show="isMobile && !navOpen && !panelOpen"
           aria-label="Open Collective nav">
     <span class="dot"></span> collective
   </button>
 
   <!-- ═══ MOBILE LOG TOGGLE BUTTON ══════════════════════════════════════
-       Visible only on mobile (CSS shows/hides). Opens the log overlay.  -->
+       isMobile gates show/hide so resize can't strand the button.        -->
   <button class="log-toggle"
           @click="logOpen = true"
-          x-show="!logOpen && !panelOpen"
+          x-show="isMobile && !logOpen && !panelOpen"
           aria-label="Open entity log">
     <span class="dot"></span> log
   </button>

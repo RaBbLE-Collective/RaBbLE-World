@@ -805,14 +805,18 @@ body.boot-departing { animation: page-fade-out 0.55s ease forwards; }
    ═══════════════════════════════════════════════════════════════ */
 .nav-overlay {
   display: none;
-  position: fixed; inset: 0; z-index: 150;
+  position: fixed;
+  /* Start below the statusbar — never cover the Waybar */
+  top: calc(32px + env(safe-area-inset-top, 0px));
+  left: 0; right: 0; bottom: 0;
+  z-index: 150;
   background: rgba(3,0,11,0.94);
   backdrop-filter: blur(16px);
   flex-direction: column;
 }
 .nav-overlay-panel {
   display: flex; flex-direction: column;
-  height: 100%; max-height: 100dvh;
+  height: 100%; max-height: 100%;
 }
 .nav-overlay-head {
   display: flex; align-items: center; justify-content: space-between;
@@ -903,8 +907,12 @@ body.boot-departing { animation: page-fade-out 0.55s ease forwards; }
    MOBILE LOG OVERLAY — full-screen pop-out log panel
    ═══════════════════════════════════════════════════════════════ */
 .log-overlay {
-  display: none; /* shown at ≤900px via media query below */
-  position: fixed; inset: 0; z-index: 150;
+  display: none; /* shown at ≤900px via media query */
+  position: fixed;
+  /* Start below the statusbar — never cover the Waybar */
+  top: calc(32px + env(safe-area-inset-top, 0px));
+  left: 0; right: 0; bottom: 0;
+  z-index: 150;
   background: rgba(3,0,11,0.94);
   backdrop-filter: blur(16px);
   flex-direction: column;
@@ -912,7 +920,7 @@ body.boot-departing { animation: page-fade-out 0.55s ease forwards; }
 }
 .log-overlay-panel {
   display: flex; flex-direction: column;
-  height: 100%; max-height: 100dvh;
+  height: 100%; max-height: 100%;
 }
 .log-overlay-head {
   display: flex; align-items: center; justify-content: space-between;

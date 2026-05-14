@@ -270,6 +270,9 @@ document.addEventListener('alpine:init', () => {
     // iOS non-PWA entry prompt
     showIosEntry: false,
 
+    // Mobile state — reactive so resize doesn't strand buttons in wrong display state
+    isMobile: false,
+
     pulse: 14,
     uptime: '0d 00h 00m 00s',
     startedAt: Date.now(),
@@ -334,6 +337,11 @@ document.addEventListener('alpine:init', () => {
       if (isIOS && !isStandalone && window.innerWidth < 1024) {
         this.showIosEntry = true;
       }
+
+      // Reactive mobile flag — prevents Alpine x-show / CSS media query conflicts on resize
+      const updateMobile = () => { this.isMobile = window.innerWidth <= 600; };
+      updateMobile();
+      window.addEventListener('resize', updateMobile);
     },
 
     dismissIosEntry() {
