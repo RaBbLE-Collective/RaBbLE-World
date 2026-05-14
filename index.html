@@ -24,6 +24,7 @@
 
 <!-- landing.js must load before Alpine (defines Alpine.data('landing')) -->
 <script src="world/js/RaBbLE-landing.js"></script>
+<script defer src="world/js/RaBbLE-bg.js"></script>
 <script defer src="world/js/RaBbLE-entity.js"></script>
 <script defer src="https://unpkg.com/alpinejs@3.14.1/dist/cdn.min.js"></script>
 </head>
@@ -114,7 +115,9 @@
         <h1 class="entity-wordmark" aria-label="RaBbLE">RaBbLE</h1>
 
         <p class="tagline">
-          <span class="accent">a</span> Boundless <span class="accent m">Behavioral</span> Learning Engine
+          <span class="accent">a</span>
+          <span class="b-word" :class="{ fading: bWordFading }" x-text="bWord"></span>
+          <span class="accent m">Behavioral</span> Learning Engine
         </p>
 
         <p class="mission">

@@ -36,8 +36,8 @@
   z-index: 99999;
   box-shadow: 0 0 28px rgba(191, 95, 255, 0.18), 0 8px 32px rgba(0,0,0,0.6);
   transition: transform 0.42s cubic-bezier(0.34, 1.56, 0.64, 1);
-  font-family: 'Exo 2', 'Segoe UI', sans-serif;
-  color: #e8e0f0;
+  font-family: var(--font-ui, 'Exo 2', sans-serif);
+  color: var(--rabble-text, #e8e6f0);
   -webkit-user-select: none;
   user-select: none;
 }
@@ -72,7 +72,7 @@
 }
 #rabble-ios-banner .rib-text {
   font-size: 12px;
-  color: #a098c0;
+  color: var(--rabble-muted, #6b6880);
   line-height: 1.45;
 }
 #rabble-ios-banner .rib-text strong {
@@ -89,7 +89,7 @@
   flex-shrink: 0;
   background: none;
   border: none;
-  color: #7870a0;
+  color: var(--rabble-muted, #6b6880);
   font-size: 18px;
   line-height: 1;
   cursor: pointer;
@@ -97,7 +97,7 @@
   margin-top: -2px;
   transition: color 0.2s;
 }
-#rabble-ios-banner .rib-close:hover { color: #e8e0f0; }
+#rabble-ios-banner .rib-close:hover { color: var(--rabble-text, #e8e6f0); }
   `;
 
   const shareIcon = `<svg class="rib-share" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">

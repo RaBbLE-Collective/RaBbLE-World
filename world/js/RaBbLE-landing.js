@@ -148,6 +148,20 @@ const QUERY_RESPONSES = [
   { kind: 'rbl', html: '<span class="hi-v">◈</span> pattern recognised · catalogued' },
 ];
 
+/**
+ * B_WORDS — The "B" slot in "a [B] Behavioral Learning Engine".
+ * Canonical is "Boundless". Cycles every 4 seconds on the landing tagline.
+ * Add new adjectives here — they must start with B and describe the entity.
+ */
+const B_WORDS = [
+  'Boundless',     // canonical — no limits on creativity or scope
+  'Becoming',      // always transforming, never finished
+  'Brilliant',     // luminous intelligence
+  'Bold',          // courageous initiative
+  'Bespoke',       // built around you, not the crowd
+  'Boundaryless',  // refuses artificial constraints
+];
+
 /** LOGIN_REACTIONS — micro-feedback as user types identity / passphrase */
 const LOGIN_REACTIONS = {
   user: [
@@ -199,6 +213,10 @@ document.addEventListener('alpine:init', () => {
     loginReaction: '',
     _reactionTimer: null,
 
+    // ── Tagline B-adjective ────────────────────────────────────
+    bWord: B_WORDS[0],        // displayed B-word ('Boundless' on load)
+    bWordFading: false,       // drives CSS fade transition
+
     // ── Status bar ────────────────────────────────────────────
     pulse: 14,
     uptime: '0d 00h 00m 00s',
@@ -213,7 +231,28 @@ document.addEventListener('alpine:init', () => {
     init() {
       this.$nextTick(() => {
         this.entityEl = this.$refs.entity || null;
+
+        // Ambient background: particles + cursor trail
+        if (window.RaBbLEBackground) {
+          window.bg = new window.RaBbLEBackground({
+            particles:    true,
+            grid:         false, // landing has its own CSS floor grid
+            cursorTrail:  true,
+            clickRipples: true,
+          });
+        }
       });
+
+      // Cycle B-adjective in tagline (every 4s, fade out → swap → fade in)
+      let _bIdx = 0;
+      setInterval(() => {
+        this.bWordFading = true;
+        setTimeout(() => {
+          _bIdx = (_bIdx + 1) % B_WORDS.length;
+          this.bWord = B_WORDS[_bIdx];
+          this.bWordFading = false;
+        }, 280);
+      }, 4000);
 
       // Start boot log sequence
       this._playBootLog();

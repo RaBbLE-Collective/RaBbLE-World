@@ -89,6 +89,7 @@ body.chat-entry.chat-ready { opacity: 1; }
 .brand-sub {
   font-family: var(--font-mono);
   font-size: 0.6rem; color: var(--violet);
+  transition: opacity 0.28s ease;
   letter-spacing: 0.2em; opacity: 0.78;
   margin-top: 0.1rem; margin-bottom: 0.2rem;
   position: relative; z-index: 3;

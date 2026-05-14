@@ -110,10 +110,10 @@ hr {
   );
 }
 
-/* Edge darkening */
+/* Edge darkening — gentle, preserves background particle visibility */
 .rabble-vignette {
   position: fixed; inset: 0; z-index: 9; pointer-events: none;
-  background: radial-gradient(ellipse at 50% 50%, transparent 50%, rgba(0,0,0,0.82) 100%);
+  background: radial-gradient(ellipse at 50% 50%, transparent 55%, rgba(0,0,0,0.70) 100%);
 }
 
 /* Subtle magenta-cyan color bleed */

@@ -44,7 +44,7 @@
         <span class="meta-pill">Hyprland</span>
         <span class="meta-pill">Ansible</span>
         <span class="meta-pill">x86_64</span>
-        <span class="meta-pill epoch">epoch 0</span>
+        <span class="meta-pill epoch">echo 0</span>
       </div>
     </div>
   </header>
@@ -87,7 +87,7 @@
             Base Fedora 43 hardened for daily use. Hyprland compositor, Waybar, Foot terminal,
             Fuzzel launcher, and the Ansible roles that wire them together.
           </p>
-          <div class="card-status online">installed · epoch 0</div>
+          <div class="card-status online">installed · echo 0</div>
         </div>
       </div>
 
@@ -126,7 +126,7 @@
             Connects RaBbLE-OS to the sCoRE coordination server. Ambient system observations
             feed into the entity's context. The OS becomes a sensory surface.
           </p>
-          <div class="card-status idle">epoch 1 · concept</div>
+          <div class="card-status idle">echo 1 · concept</div>
         </div>
       </div>
 
@@ -152,7 +152,7 @@
             Brings the Flat-Chaos 3D entity renderer to the OS desktop as a live wallpaper
             or overlay surface. The entity breathes in the background.
           </p>
-          <div class="card-status idle">epoch 1 · future</div>
+          <div class="card-status idle">echo 1 · future</div>
         </div>
       </div>
 
@@ -161,14 +161,18 @@
 
   <!-- FOOTER -->
   <footer class="os-footer">
-    <span>RaBbLE-OS · epoch 0 · <a href="https://github.com/markm1206/RaBbLE-OS" target="_blank" rel="noopener">github ↗</a></span>
+    <span>RaBbLE-OS · echo 0 · <a href="https://github.com/markm1206/RaBbLE-OS" target="_blank" rel="noopener">github ↗</a></span>
     <span>·</span>
     <a href="../index.html" onclick="if(history.length>1){history.back();return false;}">back to the door</a>
   </footer>
 
 </div>
 
+<script src="js/RaBbLE-bg.js"></script>
 <script>
+if (window.RaBbLEBackground) {
+  window.bg = new window.RaBbLEBackground({ particles: true, grid: true, cursorTrail: false, clickRipples: false });
+}
 function copyBootstrap(btn) {
   navigator.clipboard.writeText('curl -fsSL https://joinrabble.world/bootstrap.sh | bash').then(() => {
     btn.textContent = 'copied';

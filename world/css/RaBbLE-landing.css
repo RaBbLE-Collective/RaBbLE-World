@@ -50,7 +50,7 @@ body.boot-departing { animation: page-fade-out 0.55s ease forwards; }
   opacity: 0.9;
 }
 .vignette {
-  background: radial-gradient(ellipse at 50% 50%, transparent 40%, rgba(0,0,0,0.85) 100%);
+  background: radial-gradient(ellipse at 50% 50%, transparent 55%, rgba(0,0,0,0.72) 100%);
 }
 .chromatic {
   background: linear-gradient(180deg,
@@ -68,12 +68,12 @@ body.boot-departing { animation: page-fade-out 0.55s ease forwards; }
   content: "";
   position: absolute; left: -50%; right: -50%; top: 0; bottom: -20%;
   background-image:
-    linear-gradient(var(--rabble-grid-line) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,121,198,0.14) 1px, transparent 1px);
+    linear-gradient(rgba(255,121,198,0.32) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,121,198,0.24) 1px, transparent 1px);
   background-size: 70px 50px;
   transform: rotateX(62deg); transform-origin: top center;
   animation: floor-drift 18s linear infinite;
-  filter: drop-shadow(0 0 4px var(--rabble-pink));
+  filter: drop-shadow(0 0 8px rgba(255,121,198,0.65));
   mask-image: radial-gradient(ellipse at 50% 0%, black 35%, transparent 80%);
 }
 @keyframes floor-drift { from { background-position: 0 0; } to { background-position: 0 50px; } }
@@ -220,7 +220,8 @@ body.boot-departing { animation: page-fade-out 0.55s ease forwards; }
 
 .organ .name {
   font-family: var(--font-display); font-weight: 700;
-  font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase;
+  font-size: 12px; letter-spacing: 0.10em;
+  /* NO text-transform: organ names have intentional mixed case (sCoRE, NeBuLA, ScRibLE) */
   color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .organ.you .name::after {
@@ -295,6 +296,15 @@ body.boot-departing { animation: page-fade-out 0.55s ease forwards; }
 }
 .tagline .accent   { color: var(--neon-cyan);    text-shadow: 0 0 6px var(--neon-cyan); }
 .tagline .accent.m { color: var(--neon-magenta); text-shadow: 0 0 6px var(--neon-magenta); }
+
+/* Cycling B-adjective — violet marks it as the "floating slot" */
+.b-word {
+  display: inline-block;
+  color: var(--neon-violet);
+  text-shadow: 0 0 8px var(--neon-violet);
+  transition: opacity 0.28s ease;
+}
+.b-word.fading { opacity: 0; }
 
 /* Mission statement */
 .mission {

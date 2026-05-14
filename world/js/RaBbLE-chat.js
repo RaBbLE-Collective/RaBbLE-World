@@ -1,4 +1,8 @@
 /* RaBbLE Chat - Vanilla JS */
+
+/** B_WORDS — floating B-adjective slot. Keep in sync with RaBbLE-landing.js. */
+var CHAT_B_WORDS = ['Boundless', 'Becoming', 'Brilliant', 'Bold', 'Bespoke', 'Boundaryless'];
+
 (function () {
   'use strict';
 
@@ -178,6 +182,21 @@
         document.body.classList.add('chat-ready');
       });
     });
+
+    // Cycle B-adjective in the brand-sub tagline (every 4s)
+    var bSub = document.querySelector('.brand-sub');
+    if (bSub) {
+      var bIdx = 0;
+      var bBase = bSub.textContent.replace(/\w+(?= Behavioral)/, '').trim(); // strip old word
+      setInterval(function () {
+        bSub.style.opacity = '0';
+        setTimeout(function () {
+          bIdx = (bIdx + 1) % CHAT_B_WORDS.length;
+          bSub.textContent = 'RaBbLE · a ' + CHAT_B_WORDS[bIdx] + ' Behavioral Learning Engine';
+          bSub.style.opacity = '';
+        }, 280);
+      }, 4000);
+    }
 
     if (sendBtn) sendBtn.addEventListener('click', sendMessage);
     if (messageInput) {
