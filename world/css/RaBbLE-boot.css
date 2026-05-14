@@ -1,6 +1,6 @@
 /* ── Exit / back button ──────────────────────────────────────────────── */
 .exit-btn {
-  position: fixed; top: 16px; left: 16px; z-index: 50;
+  position: fixed; top: max(16px, calc(env(safe-area-inset-top, 0px) + 8px)); left: 16px; z-index: 50;
   font-family: var(--font-mono); font-size: 10px;
   color: var(--text-dim); text-decoration: none;
   letter-spacing: 0.12em; text-transform: uppercase;
@@ -58,6 +58,9 @@ body.boot-exit {
   overflow: visible;
 }
 
+/* Shared animated gradient for brand wordmarks — matches landing .entity-wordmark */
+@keyframes brand-flow { 0%, 100% { background-position: 0%; } 50% { background-position: 100%; } }
+
 /* ── Brand (info-col — landscape only) ── */
 #brand {
   width: 100%; text-align: center; margin-bottom: 0;
@@ -66,12 +69,17 @@ body.boot-exit {
 }
 #brand.show { opacity: 1; transform: translateY(0); }
 #brand-name {
-  font-family: var(--font-hero, var(--font-ui)); font-size: 54px; font-weight: 800; letter-spacing: 0.26em;
-  filter: drop-shadow(0 0 18px rgba(255,45,120,0.3));
+  font-family: var(--font-hero, var(--font-ui)); font-size: 54px; font-weight: 800;
+  letter-spacing: 0.18em; line-height: 1;
+  background: linear-gradient(90deg, var(--magenta), var(--cyan), var(--violet), var(--magenta));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; background-size: 300%;
+  animation: brand-flow 6s ease infinite;
 }
 #brand-sub {
   font-family: var(--font-mono); font-size: 10.5px; color: var(--violet);
-  letter-spacing: 0.2em; margin-top: 7px; opacity: 0.78;
+  letter-spacing: 0.18em; margin-top: 7px; opacity: 0.78;
+  /* NO text-transform — "behavioral" must stay lowercase */
 }
 
 /* ── Entity-col brand (portrait only — always visible, close to canvas) ── */
@@ -87,12 +95,17 @@ body.boot-exit {
 #ecb.hide { opacity: 0; pointer-events: none; transition: opacity 0.9s ease; }
 #ecb.show { opacity: 1; transform: translateY(0); }
 .ecb-name {
-  font-family: var(--font-hero, var(--font-ui)); font-size: 32px; font-weight: 800; letter-spacing: 0.26em;
-  filter: drop-shadow(0 0 14px rgba(255,45,120,0.28));
+  font-family: var(--font-hero, var(--font-ui)); font-size: 32px; font-weight: 800;
+  letter-spacing: 0.18em; line-height: 1;
+  background: linear-gradient(90deg, var(--magenta), var(--cyan), var(--violet), var(--magenta));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; background-size: 300%;
+  animation: brand-flow 6s ease infinite;
 }
 .ecb-sub {
   font-family: var(--font-mono); font-size: 9.5px; color: var(--violet);
   letter-spacing: 0.18em; opacity: 0.78;
+  /* NO text-transform — "behavioral" must stay lowercase */
 }
 
 /* ── Progress bar ── */

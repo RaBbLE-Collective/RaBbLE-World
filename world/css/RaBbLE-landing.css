@@ -26,6 +26,8 @@
 /* ── Base ────────────────────────────────────────────────────────────────── */
 html, body {
   height: 100vh; width: 100vw; overflow: hidden;
+  /* Hard fallback before CSS vars resolve — prevents iOS PWA white flash */
+  background-color: #03000b;
   background: var(--void-deepest);
   color: var(--text-primary);
   font-family: var(--font-body);
@@ -91,14 +93,21 @@ body.boot-departing { animation: page-fade-out 0.55s ease forwards; }
    ═══════════════════════════════════════════════════════════════ */
 .shell {
   position: relative; z-index: 5;
-  height: 100vh; overflow: hidden;
-  display: grid; grid-template-rows: 32px 1fr 28px;
+  height: 100vh; height: 100dvh; /* dvh tracks browser UI show/hide on iOS */
+  overflow: hidden;
+  display: grid;
+  grid-template-rows:
+    calc(32px + env(safe-area-inset-top, 0px))
+    1fr
+    calc(28px + env(safe-area-inset-bottom, 0px));
 }
 
 
 /* ── Status bar ──────────────────────────────────────────────────────────── */
 .statusbar {
-  display: flex; align-items: center; gap: 18px; padding: 0 18px;
+  display: flex; align-items: flex-end; gap: 18px;
+  padding: env(safe-area-inset-top, 0px) 18px 6px;
+  min-height: calc(32px + env(safe-area-inset-top, 0px));
   background: rgba(3,0,11,0.85); backdrop-filter: blur(8px);
   border-bottom: 1px solid var(--border);
   font-family: var(--font-mono); font-size: 11px; color: var(--text-secondary);
@@ -446,7 +455,8 @@ body.boot-departing { animation: page-fade-out 0.55s ease forwards; }
 
 /* ── Hint strip ──────────────────────────────────────────────────────────── */
 .hint-strip {
-  display: flex; align-items: center; gap: 12px; padding: 0 18px;
+  display: flex; align-items: center; gap: 12px;
+  padding: 0 18px env(safe-area-inset-bottom, 0px);
   background: rgba(3,0,11,0.85); border-top: 1px solid var(--border);
   font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); letter-spacing: 0.08em;
 }
@@ -662,6 +672,48 @@ body.boot-departing { animation: page-fade-out 0.55s ease forwards; }
   box-shadow: 0 0 12px rgba(0,245,255,0.3);
 }
 
+/* Section tag — matches RaBbLE-OS page .section-label aesthetic */
+.op-section-tag {
+  font-family: var(--font-mono); font-size: 10px;
+  letter-spacing: 0.32em; text-transform: uppercase;
+  color: var(--neon-cyan); text-shadow: 0 0 6px var(--neon-cyan);
+  margin-bottom: 14px;
+}
+
+/* Bootstrap command block — mirrors RaBbLE-OS bootstrap-block */
+.op-cmd-wrap {
+  background: rgba(3,0,11,0.6);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 14px 16px;
+  margin: 18px 0;
+}
+.op-cmd-label {
+  font-family: var(--font-mono); font-size: 9px;
+  letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--text-muted); margin-bottom: 10px;
+}
+.op-cmd-line {
+  display: flex; align-items: center; gap: 10px;
+  background: rgba(3,0,11,0.8);
+  border: 1px solid var(--neon-violet);
+  border-radius: 4px; padding: 10px 14px;
+  box-shadow: 0 0 10px rgba(191,95,255,0.15);
+}
+.op-cmd-prompt {
+  color: var(--neon-magenta);
+  font-family: var(--font-mono); font-size: 13px;
+  text-shadow: 0 0 4px var(--neon-magenta);
+  flex-shrink: 0;
+}
+/* Override .op-body code for command lines */
+.op-cmd-line code {
+  font-family: var(--font-mono); font-size: 11px;
+  color: var(--neon-cyan); text-shadow: 0 0 4px rgba(0,245,255,0.35);
+  background: transparent !important; padding: 0 !important;
+  border: none !important; word-break: break-all;
+}
+
 
 /* ═══════════════════════════════════════════════════════════════
    MOBILE NAV TOGGLE — floating pill, bottom-left (mobile only)
@@ -716,6 +768,49 @@ body.boot-departing { animation: page-fade-out 0.55s ease forwards; }
 }
 .nav-overlay-close:hover { color: var(--neon-magenta); border-color: var(--neon-magenta); }
 .nav-overlay-body { flex: 1; min-height: 0; overflow-y: auto; padding: 8px; }
+
+/* Back button shown in nav overlay detail header */
+.nav-back-btn {
+  background: transparent; border: 1px solid var(--border);
+  color: var(--text-muted); font-family: var(--font-mono); font-size: 10px;
+  padding: 4px 10px; border-radius: 3px; cursor: pointer;
+  letter-spacing: 0.10em; transition: all 140ms; flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+.nav-back-btn:hover { color: var(--neon-cyan); border-color: var(--neon-cyan); }
+
+.nav-detail-head { gap: 10px; }
+.nav-detail-status { font-size: 9px; margin-right: auto; }
+.nav-detail-status .op-dot { width: 5px; height: 5px; }
+
+/* Detail content body inside nav overlay — uses op-body styles */
+.nav-overlay-detail {
+  flex: 1; min-height: 0; overflow-y: auto;
+  padding: 22px 20px;
+  font-size: 13px; line-height: 1.85; color: var(--text-primary);
+}
+.nav-overlay-detail::-webkit-scrollbar       { width: 3px; }
+.nav-overlay-detail::-webkit-scrollbar-track { background: transparent; }
+.nav-overlay-detail::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+.nav-overlay-detail p { margin-bottom: 14px; }
+.nav-overlay-detail p:last-child { margin-bottom: 0; }
+.nav-overlay-detail strong { color: var(--text-primary); font-weight: 700; }
+.nav-overlay-detail code {
+  font-family: var(--font-mono); font-size: 11px;
+  background: rgba(0,245,255,0.06); padding: 2px 6px;
+  border-radius: 3px; color: var(--neon-cyan);
+  border: 1px solid rgba(0,245,255,0.2); word-break: break-all;
+}
+.nav-overlay-detail .op-dl {
+  display: grid; grid-template-columns: auto 1fr; gap: 6px 16px;
+  margin-top: 16px; padding-top: 14px;
+  border-top: 1px solid var(--border);
+  font-family: var(--font-mono); font-size: 11px; line-height: 1.6;
+}
+.nav-overlay-detail .op-cmd-wrap { margin: 14px 0; }
+.nav-overlay-detail .op-cmd-line code {
+  background: transparent !important; padding: 0 !important; border: none !important;
+}
 
 
 /* ═══════════════════════════════════════════════════════════════
@@ -927,8 +1022,8 @@ body.boot-departing { animation: page-fade-out 0.55s ease forwards; }
   .log-toggle  { display: flex; }
   .nav-toggle  { display: flex; }
   .nav-overlay { display: flex; }
-  /* Statusbar: two-line layout on mobile — brand/nav top row, status bottom row */
-  .shell { grid-template-rows: auto 1fr 24px; }
+  /* Statusbar: two-line layout on mobile — use auto for top row */
+  .shell { grid-template-rows: auto 1fr calc(24px + env(safe-area-inset-bottom, 0px)); }
   .statusbar {
     font-size: 9px; gap: 5px 10px; padding: 5px 12px;
     flex-wrap: wrap; height: auto;

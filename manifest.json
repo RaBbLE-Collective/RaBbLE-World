@@ -2,7 +2,7 @@
   "name": "RaBbLE — Boundless Behavioral Learning Engine",
   "short_name": "RaBbLE",
   "description": "RaBbLE · a Boundless Behavioral Learning Engine",
-  "start_url": "/RaBbLE-Boot.html",
+  "start_url": "/index.html",
   "display": "standalone",
   "orientation": "any",
   "background_color": "#03000b",

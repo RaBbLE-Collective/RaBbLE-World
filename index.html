@@ -6,7 +6,10 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#03000b">
 <title>RaBbLE — a Boundless Behavioral Learning Engine · joinrabble.world</title>
+<!-- Hard dark background before any external CSS loads — prevents iOS PWA white flash -->
+<style>html,body{background:#03000b;background-color:#03000b}</style>
 <meta name="description" content="RaBbLE is an entity. The Collective is the organism it inhabits. Enter the channel — or explore the Collective.">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
@@ -48,8 +51,6 @@
     <header class="statusbar">
       <span class="brandmark">joinrabble.world</span>
       <span class="sep">/</span>
-      <span>the door</span>
-      <span class="sep">/</span>
       <span>echo <span style="color:var(--text-primary)">0</span></span>
       <span class="right">
         <span class="hide-xs">uptime <span style="color:var(--text-primary)" x-text="uptime"></span></span>
@@ -65,7 +66,7 @@
 
       <!-- ═══ LEFT — Collective organs ════════════════════════════════
            Add/edit members in RaBbLE-landing.js ORGANS constant
-           Click to probe · keyboard 1–7 to probe by number            -->
+           Click to probe · keyboard 1–4 to probe by number            -->
       <aside class="panel left" aria-label="The Collective">
         <div class="panel-head">
           <div class="label">::The Collective</div>
@@ -189,7 +190,7 @@
     <!-- ═══ HINT STRIP ════════════════════════════════════════════════
          Keyboard shortcut reference — update when adding shortcuts    -->
     <footer class="hint-strip">
-      <span><kbd>1–7</kbd> explore</span>
+      <span><kbd>1–4</kbd> explore</span>
       <span>·</span>
       <span><kbd>L</kbd> log</span>
       <span>·</span>
@@ -204,7 +205,7 @@
 
   <!-- ═══ MOBILE NAV TOGGLE — bottom-left, opens Collective nav overlay ══ -->
   <button class="nav-toggle"
-          @click="navOpen = true"
+          @click="navOpen = true; navDetailOrgan = null"
           x-show="!navOpen && !panelOpen"
           aria-label="Open Collective nav">
     <span class="dot"></span> collective
@@ -262,28 +263,42 @@
 
   <!-- ═══ MOBILE NAV OVERLAY ════════════════════════════════════════════
        Full-screen nav showing Collective members. Mobile only (≤600px).
-       Tap a member to close nav and open its organ panel.              -->
+       Two states: list view and inline detail view (no separate panel).  -->
   <div class="nav-overlay"
        x-show="navOpen"
        :style="navOpen ? 'display:flex' : ''"
-       @click.self="navOpen = false"
        aria-modal="true"
        role="dialog"
-       aria-label="The Collective">
+       :aria-label="navDetailOrgan ? 'Exploring ' + navDetailOrgan.name : 'The Collective'">
     <div class="nav-overlay-panel">
-      <div class="nav-overlay-head">
+
+      <!-- ── List header ── -->
+      <div class="nav-overlay-head" x-show="!navDetailOrgan">
         <span class="label">::The Collective</span>
-        <button class="nav-overlay-close" @click="navOpen = false">esc · close</button>
+        <button class="nav-overlay-close" @click="closeNav()">esc · close</button>
       </div>
-      <div class="organs nav-overlay-body" role="list">
+
+      <!-- ── Detail header ── -->
+      <div class="nav-overlay-head nav-detail-head" x-show="navDetailOrgan">
+        <button class="nav-back-btn" @click="navDetailOrgan = null; _setEntityState('idle')" aria-label="Back to list">← back</button>
+        <span class="label" x-text="navDetailOrgan?.name"></span>
+        <span class="nav-detail-status op-status-badge" :class="navDetailOrgan?.status">
+          <span class="op-dot" aria-hidden="true"></span>
+          <span x-text="navDetailOrgan?.status"></span>
+        </span>
+        <button class="nav-overlay-close" @click="closeNav()">close</button>
+      </div>
+
+      <!-- ── Organ list ── -->
+      <div class="organs nav-overlay-body" x-show="!navDetailOrgan" role="list">
         <template x-for="(o, i) in organs" :key="'nav-' + o.id">
           <div class="organ"
-               :class="{ active: activeOrgan === o.id, you: o.you, ['status-' + o.status]: true }"
+               :class="{ active: activeOrgan === o.id, ['status-' + o.status]: true }"
                role="listitem"
                tabindex="0"
                :aria-label="o.name + ': ' + o.role"
-               @click="navOpen = false; probeOrgan(o)"
-               @keydown.enter="navOpen = false; probeOrgan(o)">
+               @click="navTapOrgan(o)"
+               @keydown.enter="navTapOrgan(o)">
             <div class="glyph" x-text="o.glyph" aria-hidden="true"></div>
             <div class="organ-info">
               <div class="name" x-text="o.name"></div>
@@ -296,6 +311,15 @@
           </div>
         </template>
       </div>
+
+      <!-- ── Inline detail view ── -->
+      <div class="op-body nav-overlay-detail" x-show="navDetailOrgan" x-html="getPanelContent()"></div>
+
+      <!-- ── Detail footer (link to full page if available) ── -->
+      <div class="op-foot" x-show="navDetailOrgan?.url">
+        <a :href="navDetailOrgan?.url" class="op-link">Open full page →</a>
+      </div>
+
     </div>
   </div>
 
