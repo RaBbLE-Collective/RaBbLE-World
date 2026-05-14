@@ -579,10 +579,16 @@
           var hostW = rect.width  || this.offsetWidth  || fallbackW;
           var hostH = rect.height || this.offsetHeight || fallbackH;
 
-          // Cap overscan on small viewports — large overscan at small host sizes
-          // creates a canvas whose clear-rect boundaries are visually obvious.
+          // Overscan cap strategy:
+          // • Landscape phone (innerHeight<500): cap at 1.2 — entity-wrap fills the
+          //   stage, so a 2.55× canvas would push cx far outside the stage bounds.
+          //   At 1.2, the 130px particle radius and ±36px eye gap stay within the canvas.
+          // • Small host (<220×160): cap at 1.8 — general small-canvas safety net.
+          // • Otherwise: use the raw HTML attribute value.
           var rawOverscan = parseFloat(this.getAttribute('overscan') || '2.35');
-          var overscan = (hostW < 220 || hostH < 160) ? Math.min(1.8, rawOverscan) : rawOverscan;
+          var overscan = window.innerHeight < 500
+            ? Math.min(1.2, rawOverscan)
+            : (hostW < 220 || hostH < 160) ? Math.min(1.8, rawOverscan) : rawOverscan;
 
           var cssW = Math.max(1, Math.round(hostW * overscan));
           var cssH = Math.max(1, Math.round(hostH * overscan));

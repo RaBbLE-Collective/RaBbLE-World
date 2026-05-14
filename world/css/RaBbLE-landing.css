@@ -1253,24 +1253,59 @@ body.boot-departing { animation: page-fade-out 0.55s ease forwards; }
   .organ .name { font-size: 11px; }
   .organ .role { font-size: 9px;  }
 
-  /* Stage: tight, no mission text */
-  .stage { gap: 3px; padding: 4px 14px; }
-  .entity-wrap { width: clamp(70px, 20vh, 130px); }
-  .entity-wordmark { font-size: clamp(18px, 5.5vh, 32px); }
-  .tagline { font-size: 9px; letter-spacing: 0.10em; }
-  .mission { display: none; }
-  .void-chat { max-height: 60px; }
-  .ask-box { width: 96%; }
+  /* ── Stage: entity as ambient background, content floats above ─── */
+  /*
+   * entity-wrap is pulled out of flex flow (position:absolute) and centered
+   * in the upper portion of the stage. The canvas at 1.2 overscan (enforced
+   * in NeBuLA.js via innerHeight<500 check) keeps cx/cy inside the stage
+   * bounds, so particles/eyes render correctly. Stage overflow:hidden clips
+   * the canvas to the tile. Content (wordmark, ask-box) floats above.
+   *
+   * The stage applet ring border is removed — at this size the tile gap
+   * between collective and stage is the visual separator. A border frame
+   * on the stage creates the "nested box" problem.
+   */
+  .stage {
+    overflow: hidden !important;  /* clip entity canvas to tile */
+    padding: 0 14px 8px !important;
+    justify-content: flex-end;    /* push text + ask-box to bottom */
+    gap: 4px;
+    position: relative;
+  }
+
+  /* Entity fills the upper half of the stage as an ambient presence */
+  .entity-wrap {
+    position: absolute !important;
+    left: 50% !important;
+    top: 42% !important;
+    transform: translate(-50%, -50%) !important;
+    width: clamp(160px, 42%, 220px) !important;
+    height: auto !important;
+    aspect-ratio: 23 / 16 !important;
+    overflow: visible !important;  /* particles drift beyond wrap bounds */
+  }
+
+  /* Stage content rides above the entity canvas */
+  .entity-wordmark { position: relative; z-index: 2; font-size: clamp(18px, 5.5vh, 30px); }
+  .tagline  { position: relative; z-index: 2; font-size: 9px; letter-spacing: 0.10em; }
+  .void-chat { position: relative; z-index: 2; max-height: 50px; }
+  .ask-box  { position: relative; z-index: 2; width: 96%; }
   .ask-input { font-size: 12px; }
   .ask-label { display: none; }
+  .mission  { display: none; }
 
-  /* Float toggles at landscape safe position */
+  /* Stage tile border removed — the gap between collective and stage separates them */
+  [data-applet="stage"].applet::before      { display: none !important; }
+  [data-applet="stage"].applet.wm-active::before { display: none !important; }
+  [data-applet="stage"].applet              { box-shadow: none !important; }
+
+  /* Float log toggle at landscape safe position */
   .log-toggle {
     bottom: calc(12px + env(safe-area-inset-bottom, 0px));
     right:  calc(14px + env(safe-area-inset-right,  0px));
   }
 
-  /* Metrics panel: close when opened in landscape */
+  /* Metrics panel: no room in landscape */
   .sb-metrics-panel { display: none !important; }
   .sb-chevron { display: none; }
 }
