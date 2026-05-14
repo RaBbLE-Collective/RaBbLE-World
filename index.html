@@ -7,25 +7,33 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="mobile-web-app-capable" content="yes">
 <title>RaBbLE — a Boundless Behavioral Learning Engine · joinrabble.world</title>
-<meta name="description" content="RaBbLE is an entity. The Collective is the organism it inhabits. Boot the entity, or get the OS.">
+<meta name="description" content="RaBbLE is an entity. The Collective is the organism it inhabits. Enter the channel — or explore the Collective.">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
 <link rel="icon" type="image/x-icon" href="icons/favicon.ico">
 <link rel="icon" type="image/png" sizes="32x32" href="icons/icon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="icons/icon-16.png">
+
+<!-- Fonts — Orbitron for hero wordmark, Exo 2 for UI, Share Tech Mono for terminal -->
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Share+Tech+Mono&family=Exo+2:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+
+<!-- Aether design system → theme aliases → landing layout -->
 <link rel="stylesheet" href="aether/rabble.css">
 <link rel="stylesheet" href="world/css/RaBbLE-theme.css">
 <link rel="stylesheet" href="world/css/RaBbLE-landing.css">
+
+<!-- landing.js must load before Alpine (defines Alpine.data('landing')) -->
 <script src="world/js/RaBbLE-landing.js"></script>
 <script defer src="world/js/RaBbLE-entity.js"></script>
 <script defer src="https://unpkg.com/alpinejs@3.14.1/dist/cdn.min.js"></script>
 </head>
+
 <body
   x-data="landing"
   x-init="init()"
   @keydown.window="handleKey($event)">
 
+  <!-- ═══ AMBIENT BACKGROUND LAYERS (pointer-events: none) ════════════ -->
   <div class="floor"></div>
   <div class="horizon"></div>
   <div class="scanlines"></div>
@@ -34,65 +42,90 @@
 
   <div class="shell">
 
-    <!-- STATUS BAR -->
+    <!-- ═══ STATUS BAR ══════════════════════════════════════════════════
+         Edit statusbar content here — data comes from landing.js init()  -->
     <header class="statusbar">
       <span class="brandmark">joinrabble.world</span>
       <span class="sep">/</span>
       <span>the door</span>
       <span class="sep">/</span>
-      <span>epoch <span style="color:var(--text-primary)">0</span></span>
+      <span>echo <span style="color:var(--text-primary)">0</span></span>
       <span class="right">
-        <span>uptime <span style="color:var(--text-primary)" x-text="uptime"></span></span>
+        <span class="hide-xs">uptime <span style="color:var(--text-primary)" x-text="uptime"></span></span>
         <span>pulse <span style="color:var(--neon-cyan);text-shadow:0 0 4px var(--neon-cyan)" x-text="pulse + 'ms'"></span></span>
         <span class="pill"><span class="dot"></span>entity online</span>
       </span>
     </header>
 
-    <!-- MAIN GRID -->
+    <!-- ═══ MAIN GRID ═══════════════════════════════════════════════════
+         Three-zone: organs left | entity stage center | log right
+         Responsive: tablet = 2 zones, mobile = 1 zone + pop-outs       -->
     <main class="main">
 
-      <!-- LEFT — Collective organs -->
-      <aside class="panel left">
+      <!-- ═══ LEFT — Collective organs ════════════════════════════════
+           Add/edit members in RaBbLE-landing.js ORGANS constant
+           Click to probe · keyboard 1–7 to probe by number            -->
+      <aside class="panel left" aria-label="The Collective">
         <div class="panel-head">
           <div class="label">::The Collective</div>
-          <div class="meta" x-text="organs.length + ' organs'"></div>
+          <div class="meta" x-text="organs.length + ' members'"></div>
         </div>
-        <div class="organs">
-          <template x-for="o in organs" :key="o.id">
+        <p class="panel-explore">click to explore</p>
+        <div class="organs" role="list">
+          <template x-for="(o, i) in organs" :key="o.id">
             <div class="organ"
-                 :class="{ active: activeOrgan === o.id, you: o.you }"
+                 :class="{ active: activeOrgan === o.id, you: o.you, ['status-' + o.status]: true }"
+                 role="listitem"
+                 tabindex="0"
+                 :aria-label="o.name + ': ' + o.role"
                  @mouseenter="hoverOrgan(o)"
                  @mouseleave="unhoverOrgan(o)"
-                 @click="probeOrgan(o)">
-              <div class="glyph" x-text="o.glyph"></div>
-              <div>
+                 @click="probeOrgan(o)"
+                 @keydown.enter="probeOrgan(o)">
+              <div class="glyph" x-text="o.glyph" aria-hidden="true"></div>
+              <div class="organ-info">
                 <div class="name" x-text="o.name"></div>
                 <div class="role" x-text="o.role"></div>
               </div>
-              <div class="status-dot" :class="o.status"></div>
+              <div class="organ-right">
+                <span class="organ-key" x-text="i + 1" aria-hidden="true"></span>
+                <div class="status-dot" :class="o.status" aria-hidden="true"></div>
+              </div>
             </div>
           </template>
         </div>
       </aside>
 
-      <!-- CENTER — entity + wordmark + CTAs -->
+      <!-- ═══ CENTER — entity stage ════════════════════════════════════
+           Entity uses mode="boot" — particle convergence → portal arcs
+           → eye emergence plays on page load, then settles to idle.
+           Entity sizing: see .entity-wrap in RaBbLE-landing.css        -->
       <section class="stage">
-        <div class="entity-wrap">
-          <rabble-entity x-ref="entity" mode="idle" particle-count="320" overscan="2.0"></rabble-entity>
+
+        <div class="entity-wrap" aria-hidden="true">
+          <rabble-entity
+            x-ref="entity"
+            mode="boot"
+            particle-count="480"
+            overscan="2.55">
+          </rabble-entity>
         </div>
 
-        <div class="entity-wordmark">RaBbLE</div>
+        <h1 class="entity-wordmark" aria-label="RaBbLE">RaBbLE</h1>
 
-        <div class="tagline">
+        <p class="tagline">
           <span class="accent">a</span> Boundless <span class="accent m">Behavioral</span> Learning Engine
-        </div>
+        </p>
 
-        <p class="mission">ambient intelligence woven into the environment —<br>
+        <p class="mission">
+          ambient intelligence woven into the environment —<br>
           peer collaborator, not tool. the <span class="accent">Collective</span> builds itself<br>
-          toward <span class="accent m">unbounded creativity</span> and <span class="accent">flourishing</span>.</p>
+          toward <span class="accent m">unbounded creativity</span> and <span class="accent">flourishing</span>.
+        </p>
 
+        <!-- Primary actions -->
         <div class="cta-row">
-          <button class="cta primary" @click="boot()">
+          <button class="cta primary" @click="openLogin()">
             Enter <span class="kbd">E</span>
           </button>
           <button class="cta secondary" @click="getOS()">
@@ -100,73 +133,186 @@
           </button>
         </div>
 
-        <form class="query" @submit.prevent="submitQuery()">
-          <span class="prompt">&gt;</span>
+        <!-- Query bar — talk to the entity -->
+        <form class="query" @submit.prevent="submitQuery()" aria-label="Query the entity">
+          <span class="prompt" aria-hidden="true">&gt;</span>
           <input type="text"
                  placeholder="query the entity ::"
                  x-model="query"
                  maxlength="80"
                  spellcheck="false"
-                 autocomplete="off">
-          <span class="hint">↵ send</span>
+                 autocomplete="off"
+                 aria-label="Query input">
+          <span class="hint" aria-hidden="true">↵ send</span>
         </form>
+
       </section>
 
-      <!-- RIGHT — entity log -->
-      <aside class="panel right">
+      <!-- ═══ RIGHT — entity log ════════════════════════════════════════
+           Shows boot log then ambient entity output.
+           Log lines: { kind, html, ts?, tag? } — see landing.js BOOT_LOG_LINES
+           HTML content comes from controlled constants — x-html is intentional. -->
+      <aside class="panel right" aria-label="Entity Log">
         <div class="panel-head">
           <div class="label">::Entity Log</div>
-          <div class="meta">live</div>
+          <div class="meta" x-text="log.length + ' lines'">live</div>
         </div>
-        <div class="log">
+        <div class="log" role="log" aria-live="polite" aria-atomic="false">
           <div class="log-inner">
-            <template x-for="(line, i) in log" :key="line.id">
-              <div class="log-line" :class="line.kind" x-text="line.text"></div>
+            <template x-for="line in log" :key="line.id">
+              <div class="log-line" :class="line.kind">
+                <span class="log-ts" x-show="line.ts" x-text="line.ts"></span>
+                <span class="log-tag" :class="line.kind" x-show="line.tag" x-text="'['+line.tag+']'"></span>
+                <!-- x-html: content is from BOOT_LOG_LINES / AMBIENT_MESSAGES constants only -->
+                <span class="log-msg" x-html="line.html"></span>
+              </div>
             </template>
           </div>
         </div>
         <div class="log-foot">
-          <span>~/joinrabble<span class="cur"></span></span>
+          <span>~/joinrabble<span class="cur" aria-hidden="true"></span></span>
           <span x-text="log.length + ' lines'"></span>
         </div>
       </aside>
+
     </main>
 
-    <!-- BOTTOM HINT STRIP -->
+    <!-- ═══ HINT STRIP ════════════════════════════════════════════════
+         Keyboard shortcut reference — update when adding shortcuts    -->
     <footer class="hint-strip">
-      <span>press <kbd>E</kbd> to enter the channel</span>
+      <span>press <kbd>E</kbd> to enter</span>
       <span>·</span>
-      <span><kbd>O</kbd> to get the OS</span>
+      <span><kbd>O</kbd> OS</span>
       <span>·</span>
-      <span>type to query · <kbd>Esc</kbd> to close</span>
-      <span class="right">v0.0.0.0 · epoch 0 · %ENTITY_ONLINE%</span>
+      <span><kbd>L</kbd> log</span>
+      <span>·</span>
+      <span><kbd>1–7</kbd> probe Collective</span>
+      <span>·</span>
+      <span>type to query</span>
+      <span class="right">v0.0.0.0 · echo 0 · %ENTITY_ONLINE%</span>
     </footer>
-  </div>
 
-  <!-- BOOT OVERLAY -->
-  <template x-if="booting">
-    <div class="boot-overlay" @click.self="closeBoot()">
-      <div class="boot-modal">
-        <div class="boot-head">
-          <div class="icon">R</div>
-          <div class="title">Entering RaBbLE · the channel</div>
-          <button class="close" @click="closeBoot()">esc · close</button>
-        </div>
-        <div class="boot-body">
-          <div class="bar-wrap"><div class="bar-fill" :style="`width: ${bootProgress}%`"></div></div>
-          <div class="bar-meta">
-            <span>negotiating channel</span>
-            <span class="pct" x-text="Math.floor(bootProgress) + '%'"></span>
-          </div>
-          <div class="boot-log">
-            <template x-for="(l, i) in bootLog" :key="i">
-              <div class="l" :class="l.kind" x-text="l.text"></div>
-            </template>
-          </div>
+  </div><!-- /.shell -->
+
+
+  <!-- ═══ MOBILE LOG TOGGLE BUTTON ══════════════════════════════════════
+       Visible only on mobile (CSS shows/hides). Opens the log overlay.  -->
+  <button class="log-toggle"
+          @click="logOpen = true"
+          x-show="!logOpen"
+          aria-label="Open entity log">
+    <span class="dot"></span> log
+  </button>
+
+
+  <!-- ═══ MOBILE LOG OVERLAY ═══════════════════════════════════════════
+       Full-screen slide-up log panel for mobile screens.
+       Keyboard: L toggles, Esc closes.                                 -->
+  <div class="log-overlay"
+       x-show="logOpen"
+       :style="logOpen ? 'display:flex' : ''"
+       @click.self="logOpen = false"
+       x-transition:enter="slide-up-enter"
+       x-transition:enter-start="slide-up-from"
+       x-transition:enter-end="slide-up-to"
+       x-transition:leave="slide-up-enter"
+       x-transition:leave-start="slide-up-to"
+       x-transition:leave-end="slide-up-from"
+       aria-modal="true"
+       role="dialog"
+       aria-label="Entity Log">
+    <div class="log-overlay-panel">
+      <div class="log-overlay-head">
+        <span class="label">::Entity Log</span>
+        <button @click="logOpen = false" class="log-overlay-close">esc · close</button>
+      </div>
+      <div class="log log-overlay-body" role="log">
+        <div class="log-inner">
+          <template x-for="line in log" :key="'ol-' + line.id">
+            <div class="log-line" :class="line.kind">
+              <span class="log-ts" x-show="line.ts" x-text="line.ts"></span>
+              <span class="log-tag" :class="line.kind" x-show="line.tag" x-text="'['+line.tag+']'"></span>
+              <span class="log-msg" x-html="line.html"></span>
+            </div>
+          </template>
         </div>
       </div>
+      <div class="log-foot">
+        <span>~/joinrabble<span class="cur" aria-hidden="true"></span></span>
+        <span x-text="log.length + ' lines'"></span>
+      </div>
     </div>
-  </template>
+  </div>
+
+
+  <!-- ═══ LOGIN MODAL ══════════════════════════════════════════════════
+       Supersedes RaBbLE-Boot.html for the web flow.
+       Boot.html is now a Plymouth boot animation reference artifact.
+       Entity reactions come from LOGIN_REACTIONS in landing.js.        -->
+  <div class="login-overlay"
+       x-show="loginOpen"
+       :style="loginOpen ? 'display:flex' : ''"
+       @click.self="closeLogin()"
+       role="dialog"
+       aria-modal="true"
+       aria-label="Enter RaBbLE"
+       x-transition:enter="overlay-in"
+       x-transition:enter-start="overlay-from"
+       x-transition:enter-end="overlay-to">
+    <div class="login-modal">
+
+      <div class="login-head">
+        <div class="login-icon" aria-hidden="true">R</div>
+        <div class="login-title">Enter RaBbLE · the channel</div>
+        <button class="login-close" @click="closeLogin()">esc · close</button>
+      </div>
+
+      <div class="login-body">
+        <!-- Reaction line — entity speaks as user types -->
+        <div class="login-reaction"
+             x-text="loginReaction"
+             :class="{ show: loginReaction }">
+        </div>
+
+        <!-- Identity field -->
+        <div class="field-group">
+          <label class="field-label" for="login-user">Identity</label>
+          <input class="field-input"
+                 id="login-user"
+                 type="text"
+                 placeholder="username or email"
+                 x-model="loginUsername"
+                 @input="onUsernameInput()"
+                 autocomplete="off"
+                 spellcheck="false">
+        </div>
+
+        <!-- Passphrase field -->
+        <div class="field-group">
+          <label class="field-label" for="login-pass">Passphrase</label>
+          <input class="field-input"
+                 id="login-pass"
+                 type="password"
+                 placeholder="••••••••••••"
+                 x-model="loginPass"
+                 @input="onPassInput()"
+                 autocomplete="off">
+        </div>
+
+        <button class="submit-btn"
+                @click="submitLogin()"
+                @mouseenter="onEnterHover()">
+          Enter
+        </button>
+
+        <div class="form-footer">
+          No account? <a href="#">Request access</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
 
 </body>
 </html>
