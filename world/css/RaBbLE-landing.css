@@ -158,7 +158,7 @@ body.boot-departing { animation: page-fade-out 0.55s ease forwards; }
   background: rgba(10,0,16,0.5); backdrop-filter: blur(6px);
   display: flex; flex-direction: column; min-height: 0;
 }
-.panel.left  { border-right: 1px solid var(--border); }
+.panel.left  { border-right: 1px solid var(--border); position: relative; overflow: hidden; }
 .panel.right { border-left:  1px solid var(--border); }
 
 .panel-head {
@@ -563,14 +563,14 @@ body.boot-departing { animation: page-fade-out 0.55s ease forwards; }
    Slides from the LEFT to stay near the Collective members nav.
    ═══════════════════════════════════════════════════════════════ */
 .organ-panel {
-  position: fixed; inset: 0; z-index: 300;
+  position: absolute; inset: 0; z-index: 10;
   display: flex; justify-content: flex-start;
   background: rgba(3,0,11,0.70);
   backdrop-filter: blur(6px);
 }
 
 .op-inner {
-  width: min(540px, 100vw);
+  width: 100%;
   height: 100%;
   background: var(--surface);
   border-right: 1px solid var(--border);
@@ -1022,30 +1022,32 @@ body.boot-departing { animation: page-fade-out 0.55s ease forwards; }
   .log-toggle  { display: flex; }
   .nav-toggle  { display: flex; }
   .nav-overlay { display: flex; }
-  /* Statusbar: two-line layout on mobile — use auto for top row */
-  .shell { grid-template-rows: auto 1fr calc(24px + env(safe-area-inset-bottom, 0px)); }
+  /* Shell: two rows only — hint-strip hidden, bottom safe area via padding */
+  .shell {
+    grid-template-rows: auto 1fr;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  /* Statusbar: two-line layout, preserve top safe area for Dynamic Island */
   .statusbar {
-    font-size: 9px; gap: 5px 10px; padding: 5px 12px;
+    font-size: 9px; gap: 5px 10px;
+    padding: calc(env(safe-area-inset-top, 0px) + 4px) 12px 5px;
     flex-wrap: wrap; height: auto;
   }
   .statusbar .right {
     width: 100%; margin-left: 0; gap: 8px;
     justify-content: flex-start; padding-bottom: 1px;
   }
+  /* Keyboard nav strip — not relevant on touch devices */
+  .hint-strip { display: none; }
+  /* Float toggles above the home indicator */
+  .nav-toggle { bottom: calc(20px + env(safe-area-inset-bottom, 0px)); }
+  .log-toggle { bottom: calc(20px + env(safe-area-inset-bottom, 0px)); }
   .entity-wrap { width: clamp(180px, 52vw, 280px); }
   .entity-wordmark { font-size: clamp(32px, 10vw, 54px); }
   .tagline { font-size: 10px; }
   .mission { font-size: 11px; max-width: 88vw; }
   .ask-box { width: 92%; }
   .ask-input { font-size: 13px; }
-  .hint-strip { font-size: 9px; gap: 8px; padding: 0 10px; }
-  /* Hide hint-strip separators on mobile */
-  .hint-strip > span:nth-child(2),
-  .hint-strip > span:nth-child(4),
-  .hint-strip > span:nth-child(6),
-  .hint-strip > span:nth-child(8) { display: none; }
-  /* Organ panel: full width on mobile */
-  .op-inner { width: 100vw; border-right: none; border-top: 1px solid var(--border); }
   /* Login modal: tighter on mobile */
   .login-body { padding: 16px 18px 14px; }
   .form-title { font-size: 22px; margin-top: 6px; }

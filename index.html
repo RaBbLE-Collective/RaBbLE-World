@@ -96,6 +96,36 @@
             </div>
           </template>
         </div>
+
+        <!-- ═══ ORGAN PANEL — slide-over within Collective pane ═══════
+             Contained in .panel.left (position:absolute) so it overlays
+             only the left pane, not the full screen.                   -->
+        <div class="organ-panel"
+             x-show="panelOpen"
+             :style="panelOpen ? 'display:flex' : ''"
+             role="dialog"
+             aria-modal="true"
+             :aria-label="'Exploring ' + (panelOrgan?.name || '')">
+          <div class="op-inner">
+            <header class="op-head">
+              <div class="op-icon" x-text="panelOrgan?.glyph" aria-hidden="true"></div>
+              <div class="op-title-group">
+                <div class="op-name" x-text="panelOrgan?.name"></div>
+                <div class="op-role" x-text="panelOrgan?.role"></div>
+              </div>
+              <div class="op-status-badge" :class="panelOrgan?.status">
+                <span class="op-dot" aria-hidden="true"></span>
+                <span x-text="panelOrgan?.status"></span>
+              </div>
+              <button class="op-close" @click="closePanel()" aria-label="Close panel">✕</button>
+            </header>
+            <div class="op-body" x-html="getPanelContent()"></div>
+            <footer class="op-foot" x-show="panelOrgan?.url">
+              <a :href="panelOrgan?.url" class="op-link">Open full page →</a>
+            </footer>
+          </div>
+        </div>
+
       </aside>
 
       <!-- ═══ CENTER — entity stage ════════════════════════════════════
@@ -320,38 +350,6 @@
         <a :href="navDetailOrgan?.url" class="op-link">Open full page →</a>
       </div>
 
-    </div>
-  </div>
-
-
-  <!-- ═══ ORGAN PANEL ═══════════════════════════════════════════════════
-       Slide-in content panel summoned when a Collective member is clicked.
-       Content per organ: ORGAN_PANELS constant in landing.js.
-       Keyboard: Esc closes.                                             -->
-  <div class="organ-panel"
-       x-show="panelOpen"
-       :style="panelOpen ? 'display:flex' : ''"
-       @click.self="closePanel()"
-       role="dialog"
-       aria-modal="true"
-       :aria-label="'Exploring ' + (panelOrgan?.name || '')">
-    <div class="op-inner">
-      <header class="op-head">
-        <div class="op-icon" x-text="panelOrgan?.glyph" aria-hidden="true"></div>
-        <div class="op-title-group">
-          <div class="op-name" x-text="panelOrgan?.name"></div>
-          <div class="op-role" x-text="panelOrgan?.role"></div>
-        </div>
-        <div class="op-status-badge" :class="panelOrgan?.status">
-          <span class="op-dot" aria-hidden="true"></span>
-          <span x-text="panelOrgan?.status"></span>
-        </div>
-        <button class="op-close" @click="closePanel()" aria-label="Close panel">✕</button>
-      </header>
-      <div class="op-body" x-html="getPanelContent()"></div>
-      <footer class="op-foot" x-show="panelOrgan?.url">
-        <a :href="panelOrgan?.url" class="op-link">Open full page →</a>
-      </footer>
     </div>
   </div>
 
