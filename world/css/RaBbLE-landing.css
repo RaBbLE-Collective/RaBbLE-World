@@ -410,10 +410,13 @@ body.boot-departing { animation: page-fade-out 0.55s ease forwards; }
   overflow: hidden; text-align: center; gap: 9px;
 }
 
-/* Entity canvas — explicit transparent bg prevents white-flash before first rAF
-   and ensures the canvas bounds don't render as a visible box at small sizes */
+/* Entity canvas — screen blend makes cleared (black) pixels invisible.
+   This eliminates the canvas box entirely: only bright particle/glow/eye
+   colors register; dark cleared areas contribute nothing to the composite.
+   background: transparent prevents pre-rAF white-flash as a secondary guard. */
 .rabble-entity-canvas {
   background: transparent !important;
+  mix-blend-mode: screen;
 }
 
 /* Entity canvas host — sized for 460×320 internal coordinates */
