@@ -149,7 +149,8 @@ body.boot-departing { animation: page-fade-out 0.55s ease forwards; }
 .main {
   display: grid;
   grid-template-columns: 340px 1fr 340px;
-  min-height: 0; overflow: hidden;
+  min-height: 0;
+  /* overflow and gap set by RaBbLE-wm.css */
 }
 
 
@@ -158,8 +159,9 @@ body.boot-departing { animation: page-fade-out 0.55s ease forwards; }
   background: rgba(10,0,16,0.5); backdrop-filter: blur(6px);
   display: flex; flex-direction: column; min-height: 0;
 }
-.panel.left  { border-right: 1px solid var(--border); position: relative; overflow: hidden; }
-.panel.right { border-left:  1px solid var(--border); }
+/* Side borders removed — applet tile border (RaBbLE-wm.css) replaces them */
+.panel.left  { position: relative; overflow: hidden; }
+.panel.right { /* border handled by .applet in wm.css */ }
 
 .panel-head {
   padding: 14px 18px 8px;
@@ -998,6 +1000,7 @@ body.boot-departing { animation: page-fade-out 0.55s ease forwards; }
 /* Large tablet / small desktop */
 @media (max-width: 1200px) {
   .main { grid-template-columns: 240px 1fr 240px; }
+  :root { --wm-gap: 4px; }
 }
 
 /* Tablet — one panel, log toggle shown, stage tightened to prevent scroll */

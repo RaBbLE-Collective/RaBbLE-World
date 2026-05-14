@@ -20,15 +20,17 @@
 <!-- Fonts — Orbitron for hero wordmark, Exo 2 for UI, Share Tech Mono for terminal -->
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Share+Tech+Mono&family=Exo+2:wght@300;400;600;700;800&display=swap" rel="stylesheet">
 
-<!-- Aether design system → theme aliases → landing layout -->
+<!-- Aether design system → theme aliases → landing layout → WM tile system -->
 <link rel="stylesheet" href="aether/rabble.css">
 <link rel="stylesheet" href="world/css/RaBbLE-theme.css">
 <link rel="stylesheet" href="world/css/RaBbLE-landing.css">
+<link rel="stylesheet" href="world/css/RaBbLE-wm.css">
 
 <!-- landing.js must load before Alpine (defines Alpine.data('landing')) -->
 <script src="world/js/RaBbLE-landing.js"></script>
 <script defer src="world/js/RaBbLE-bg.js"></script>
-<script defer src="world/js/RaBbLE-entity.js"></script>
+<script defer src="world/js/RaBbLE-NeBuLA.js"></script>
+<script defer src="world/js/RaBbLE-wm.js"></script>
 <script defer src="https://unpkg.com/alpinejs@3.14.1/dist/cdn.min.js"></script>
 </head>
 
@@ -67,7 +69,7 @@
       <!-- ═══ LEFT — Collective organs ════════════════════════════════
            Add/edit members in RaBbLE-landing.js ORGANS constant
            Click to probe · keyboard 1–4 to probe by number            -->
-      <aside class="panel left" aria-label="The Collective">
+      <aside class="panel left applet" data-applet="collective" aria-label="The Collective">
         <div class="panel-head">
           <div class="label">::The Collective</div>
           <div class="meta" x-text="organs.length + ' members'"></div>
@@ -132,7 +134,7 @@
            Entity uses mode="boot" — particle convergence → portal arcs
            → eye emergence plays on page load, then settles to idle.
            Entity sizing: see .entity-wrap in RaBbLE-landing.css        -->
-      <section class="stage">
+      <section class="stage applet" data-applet="stage">
 
         <div class="entity-wrap" aria-hidden="true">
           <rabble-entity
@@ -192,7 +194,7 @@
            Shows boot log then ambient entity output.
            Log lines: { kind, html, ts?, tag? } — see landing.js BOOT_LOG_LINES
            HTML content comes from controlled constants — x-html is intentional. -->
-      <aside class="panel right" aria-label="Entity Log">
+      <aside class="panel right applet" data-applet="log" aria-label="Entity Log">
         <div class="panel-head">
           <div class="label">::Entity Log</div>
           <div class="meta" x-text="log.length + ' lines'">live</div>
@@ -227,6 +229,10 @@
       <span><kbd>E</kbd> enter</span>
       <span>·</span>
       <span><kbd>Esc</kbd> close</span>
+      <span>·</span>
+      <span><kbd>Tab</kbd> focus</span>
+      <span>·</span>
+      <span><kbd>^1–4</kbd> layout</span>
       <span class="right">echo 0 · %ENTITY_ONLINE%</span>
     </footer>
 

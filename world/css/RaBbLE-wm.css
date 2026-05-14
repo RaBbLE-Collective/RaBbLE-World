@@ -1,0 +1,175 @@
+/* =========================================================================
+   RaBbLE-wm.css — Window Manager tile system
+   Hyprland-style tiling: applet tiles with animated cyan→magenta border chase.
+   Active applet: faster rotation, pronounced glow.
+   Layout presets applied as .wm-layout-{name} on .main.
+   ========================================================================= */
+
+/* ── CSS Houdini property — enables smooth conic-gradient rotation ─────── */
+@property --applet-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
+/* ── Border chase animation ─────────────────────────────────────────────── */
+@keyframes applet-border-chase {
+  to { --applet-angle: 360deg; }
+}
+
+/* ── Tile background variable — matches .panel surface ─────────────────── */
+:root {
+  --wm-tile-bg:   rgba(10, 0, 16, 0.50);
+  --wm-gap:       5px;
+  --wm-radius:    5px;
+  --wm-border:    1.5px;
+  --wm-chase-dur: 8s;    /* inactive rotation speed */
+  --wm-active-dur: 3s;   /* active rotation speed */
+}
+
+/* ── .applet — base tile ────────────────────────────────────────────────── */
+/*
+ * Dual-background technique:
+ *   padding-box layer  → solid panel colour fills the interior
+ *   border-box layer   → rotating conic-gradient visible only in the border strip
+ * border: transparent gives the border strip space to show through.
+ */
+.applet {
+  position: relative;
+  border-radius: var(--wm-radius);
+  border: var(--wm-border) solid transparent;
+  background:
+    linear-gradient(var(--wm-tile-bg), var(--wm-tile-bg)) padding-box,
+    conic-gradient(
+      from var(--applet-angle),
+      var(--neon-cyan)    0%,
+      var(--neon-magenta) 45%,
+      var(--neon-violet)  65%,
+      var(--neon-cyan)    100%
+    ) border-box;
+  animation: applet-border-chase var(--wm-chase-dur) linear infinite;
+  /* Subtle ambient glow — always present, inactive level */
+  box-shadow:
+    0 0 8px -3px rgba(0, 245, 255, 0.10),
+    0 0 2px  0px rgba(0, 245, 255, 0.05);
+  transition:
+    box-shadow     0.4s ease,
+    animation-duration 0s; /* instant on speed change */
+}
+
+/* ── Active tile — pronounced border + glow ─────────────────────────────── */
+.applet.wm-active {
+  animation-duration: var(--wm-active-dur);
+  border-width: 2px;
+  box-shadow:
+    0 0 0   1px rgba(0, 245, 255, 0.22),
+    0 0 16px 3px rgba(0, 245, 255, 0.16),
+    0 0 32px 6px rgba(191, 95, 255, 0.09),
+    0 0 48px 8px rgba(255, 45, 120, 0.05);
+}
+
+/* Stage tile: transparent interior — ambient background shows through ───── */
+[data-applet="stage"].applet {
+  background:
+    linear-gradient(transparent, transparent) padding-box,
+    conic-gradient(
+      from var(--applet-angle),
+      var(--neon-cyan)    0%,
+      var(--neon-magenta) 45%,
+      var(--neon-violet)  65%,
+      var(--neon-cyan)    100%
+    ) border-box;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   MAIN GRID — gap between tiles, padding for glow room
+   ═══════════════════════════════════════════════════════════════ */
+.main {
+  gap: var(--wm-gap);
+  padding: var(--wm-gap);
+  /* Allow glow to breathe within padding — overflow visible so
+     box-shadow isn't clipped at tile edges */
+  overflow: visible;
+}
+
+/* Shell still clips at its outer boundary */
+.shell { overflow: hidden; }
+
+
+/* ═══════════════════════════════════════════════════════════════
+   LAYOUT PRESETS — applied on .main via RaBbLE-wm.js
+   Ctrl+1 default · Ctrl+2 focus · Ctrl+3 left-focus · Ctrl+4 right-focus
+   ═══════════════════════════════════════════════════════════════ */
+
+/* focus: entity stage only */
+.main.wm-layout-focus {
+  grid-template-columns: 1fr;
+}
+.main.wm-layout-focus .panel.left,
+.main.wm-layout-focus .panel.right {
+  display: none;
+}
+
+/* left-focus: collective + stage */
+.main.wm-layout-left-focus {
+  grid-template-columns: 340px 1fr;
+}
+.main.wm-layout-left-focus .panel.right {
+  display: none;
+}
+
+/* right-focus: stage + log */
+.main.wm-layout-right-focus {
+  grid-template-columns: 1fr 340px;
+}
+.main.wm-layout-right-focus .panel.left {
+  display: none;
+}
+
+/* Large tablet adjustments for layout presets */
+@media (max-width: 1200px) {
+  .main.wm-layout-left-focus  { grid-template-columns: 240px 1fr; }
+  .main.wm-layout-right-focus { grid-template-columns: 1fr 240px; }
+}
+
+/* Tablet/mobile: layout presets yield to responsive rules */
+@media (max-width: 900px) {
+  .main.wm-layout-focus,
+  .main.wm-layout-left-focus,
+  .main.wm-layout-right-focus {
+    grid-template-columns: unset;
+  }
+  .main.wm-layout-focus .panel.left,
+  .main.wm-layout-focus .panel.right,
+  .main.wm-layout-left-focus .panel.right,
+  .main.wm-layout-right-focus .panel.left {
+    display: unset;  /* let responsive CSS decide */
+  }
+}
+
+/* Mobile: no applet border animation (saves battery, irrelevant at full-screen) */
+@media (max-width: 600px) {
+  .applet {
+    border: none;
+    background: transparent;
+    animation: none;
+    box-shadow: none;
+    border-radius: 0;
+  }
+  .applet.wm-active {
+    box-shadow: none;
+    border-width: 0;
+  }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   HINT STRIP — WM layout indicator (desktop only)
+   Appended to the existing hint strip via CSS content trick.
+   ═══════════════════════════════════════════════════════════════ */
+.hint-strip .wm-hints {
+  margin-left: auto;
+  display: flex; align-items: center; gap: 10px;
+}
+.hint-strip .wm-hints .sep { opacity: 0.35; }
