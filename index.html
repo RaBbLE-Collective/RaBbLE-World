@@ -126,27 +126,24 @@
           toward <span class="accent m">unbounded creativity</span> and <span class="accent">flourishing</span>.
         </p>
 
-        <!-- Primary actions -->
-        <div class="cta-row">
-          <button class="cta primary" @click="openLogin()">
-            Enter <span class="kbd">E</span>
-          </button>
-          <button class="cta secondary" @click="getOS()">
-            Get RaBbLE-OS <span class="kbd">O</span>
-          </button>
-        </div>
-
-        <!-- Query bar — talk to the entity -->
-        <form class="query" @submit.prevent="submitQuery()" aria-label="Query the entity">
-          <span class="prompt" aria-hidden="true">&gt;</span>
-          <input type="text"
-                 placeholder="query the entity ::"
-                 x-model="query"
-                 maxlength="80"
-                 spellcheck="false"
-                 autocomplete="off"
-                 aria-label="Query input">
-          <span class="hint" aria-hidden="true">↵ send</span>
+        <!-- Ask RaBbLE chat box — typing sends to the entity channel -->
+        <form class="ask-box" @submit.prevent="submitQuery()" aria-label="Ask RaBbLE">
+          <label class="ask-label" for="ask-input">
+            <span class="ask-glyph">◈</span> Ask RaBbLE
+          </label>
+          <div class="ask-input-row">
+            <span class="ask-prompt" aria-hidden="true">&gt;</span>
+            <input id="ask-input"
+                   class="ask-input"
+                   type="text"
+                   placeholder="ask anything…"
+                   x-model="query"
+                   maxlength="120"
+                   spellcheck="false"
+                   autocomplete="off"
+                   @focus="onEnterHover()">
+            <button type="submit" class="ask-send" aria-label="Send">↵</button>
+          </div>
         </form>
 
       </section>
@@ -183,26 +180,32 @@
     <!-- ═══ HINT STRIP ════════════════════════════════════════════════
          Keyboard shortcut reference — update when adding shortcuts    -->
     <footer class="hint-strip">
-      <span>press <kbd>E</kbd> to enter</span>
-      <span>·</span>
-      <span><kbd>O</kbd> OS</span>
+      <span><kbd>1–7</kbd> explore</span>
       <span>·</span>
       <span><kbd>L</kbd> log</span>
       <span>·</span>
-      <span><kbd>1–7</kbd> probe Collective</span>
+      <span><kbd>E</kbd> enter</span>
       <span>·</span>
-      <span>type to query</span>
-      <span class="right">v0.0.0.0 · echo 0 · %ENTITY_ONLINE%</span>
+      <span><kbd>Esc</kbd> close</span>
+      <span class="right">echo 0 · %ENTITY_ONLINE%</span>
     </footer>
 
   </div><!-- /.shell -->
 
 
+  <!-- ═══ MOBILE NAV TOGGLE — bottom-left, opens Collective nav overlay ══ -->
+  <button class="nav-toggle"
+          @click="navOpen = true"
+          x-show="!navOpen && !panelOpen"
+          aria-label="Open Collective nav">
+    <span class="dot"></span> collective
+  </button>
+
   <!-- ═══ MOBILE LOG TOGGLE BUTTON ══════════════════════════════════════
        Visible only on mobile (CSS shows/hides). Opens the log overlay.  -->
   <button class="log-toggle"
           @click="logOpen = true"
-          x-show="!logOpen"
+          x-show="!logOpen && !panelOpen"
           aria-label="Open entity log">
     <span class="dot"></span> log
   </button>
@@ -244,6 +247,78 @@
         <span>~/joinrabble<span class="cur" aria-hidden="true"></span></span>
         <span x-text="log.length + ' lines'"></span>
       </div>
+    </div>
+  </div>
+
+
+  <!-- ═══ MOBILE NAV OVERLAY ════════════════════════════════════════════
+       Full-screen nav showing Collective members. Mobile only (≤600px).
+       Tap a member to close nav and open its organ panel.              -->
+  <div class="nav-overlay"
+       x-show="navOpen"
+       :style="navOpen ? 'display:flex' : ''"
+       @click.self="navOpen = false"
+       aria-modal="true"
+       role="dialog"
+       aria-label="The Collective">
+    <div class="nav-overlay-panel">
+      <div class="nav-overlay-head">
+        <span class="label">::The Collective</span>
+        <button class="nav-overlay-close" @click="navOpen = false">esc · close</button>
+      </div>
+      <div class="organs nav-overlay-body" role="list">
+        <template x-for="(o, i) in organs" :key="'nav-' + o.id">
+          <div class="organ"
+               :class="{ active: activeOrgan === o.id, you: o.you, ['status-' + o.status]: true }"
+               role="listitem"
+               tabindex="0"
+               :aria-label="o.name + ': ' + o.role"
+               @click="navOpen = false; probeOrgan(o)"
+               @keydown.enter="navOpen = false; probeOrgan(o)">
+            <div class="glyph" x-text="o.glyph" aria-hidden="true"></div>
+            <div class="organ-info">
+              <div class="name" x-text="o.name"></div>
+              <div class="role" x-text="o.role"></div>
+            </div>
+            <div class="organ-right">
+              <span class="organ-key" x-text="i + 1" aria-hidden="true"></span>
+              <div class="status-dot" :class="o.status" aria-hidden="true"></div>
+            </div>
+          </div>
+        </template>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ═══ ORGAN PANEL ═══════════════════════════════════════════════════
+       Slide-in content panel summoned when a Collective member is clicked.
+       Content per organ: ORGAN_PANELS constant in landing.js.
+       Keyboard: Esc closes.                                             -->
+  <div class="organ-panel"
+       x-show="panelOpen"
+       :style="panelOpen ? 'display:flex' : ''"
+       @click.self="closePanel()"
+       role="dialog"
+       aria-modal="true"
+       :aria-label="'Exploring ' + (panelOrgan?.name || '')">
+    <div class="op-inner">
+      <header class="op-head">
+        <div class="op-icon" x-text="panelOrgan?.glyph" aria-hidden="true"></div>
+        <div class="op-title-group">
+          <div class="op-name" x-text="panelOrgan?.name"></div>
+          <div class="op-role" x-text="panelOrgan?.role"></div>
+        </div>
+        <div class="op-status-badge" :class="panelOrgan?.status">
+          <span class="op-dot" aria-hidden="true"></span>
+          <span x-text="panelOrgan?.status"></span>
+        </div>
+        <button class="op-close" @click="closePanel()" aria-label="Close panel">✕</button>
+      </header>
+      <div class="op-body" x-html="getPanelContent()"></div>
+      <footer class="op-foot" x-show="panelOrgan?.url">
+        <a :href="panelOrgan?.url" class="op-link">Open full page →</a>
+      </footer>
     </div>
   </div>
 

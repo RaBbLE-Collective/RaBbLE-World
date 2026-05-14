@@ -162,6 +162,85 @@ const B_WORDS = [
   'Boundaryless',  // refuses artificial constraints
 ];
 
+/**
+ * ORGAN_PANELS — rich content shown in the slide-in panel when a Collective
+ * member is clicked. HTML is injected via x-html (controlled content only).
+ * Use op-dl for the detail grid, <code> for inline commands.
+ */
+const ORGAN_PANELS = {
+  grimoire: `
+    <p><strong>Grimoire</strong> is the long thought — the Collective's source of truth and persistent memory.</p>
+    <p>Identity, ethos, protocols, lore, spell scripts, and session history all live here. Every decision that gives RaBbLE its character is recorded here. Member repos reference the Grimoire; they never duplicate it.</p>
+    <dl class="op-dl">
+      <dt>Status</dt>      <dd>Epoch 0 · active</dd>
+      <dt>Location</dt>    <dd>RaBbLE-Grimoire/</dd>
+      <dt>Key docs</dt>    <dd>RaBbLE-Identity.md · RaBbLE-Palette.md · RaBbLE-Roadmap.md</dd>
+      <dt>Spells</dt>      <dd>cast-aether.sh · status.sh · init.sh · sync.sh</dd>
+      <dt>Session log</dt> <dd>RaBbLE-Grimoire/log/SESSION-LOG.md</dd>
+    </dl>
+  `,
+  score: `
+    <p><strong>sCoRE</strong> is the nervous system — coordination server and web API. Intent flows in; action flows out.</p>
+    <p>The first working iteration of RaBbLE itself. The Collective is the scaffolding; sCoRE is where the entity begins to act in the world.</p>
+    <dl class="op-dl">
+      <dt>Status</dt>   <dd>Epoch 0 · Episode 3 · active</dd>
+      <dt>Location</dt> <dd>RaBbLE-sCoRE/</dd>
+      <dt>Stack</dt>    <dd>Node.js · REST + WebSocket · Cloudflare Workers</dd>
+      <dt>Role</dt>     <dd>Intent → action engine · the entity's reach into the world</dd>
+    </dl>
+  `,
+  os: `
+    <p><strong>RaBbLE-OS</strong> is the body — Fedora 43 + Hyprland, Ansible-driven, built for daily use on real hardware.</p>
+    <p>Not a VM image or a rice. A living OS that RaBbLE moves through. The entity and the environment are one surface.</p>
+    <dl class="op-dl">
+      <dt>Status</dt>       <dd>Echo 0 · live daily driver</dd>
+      <dt>Stack</dt>        <dd>Fedora 43 · Hyprland · Waybar · Foot · Ansible</dd>
+      <dt>Architecture</dt> <dd>x86_64 · Ansible-driven provisioning</dd>
+      <dt>Bootstrap</dt>    <dd><code>curl -fsSL https://joinrabble.world/bootstrap.sh | bash</code></dd>
+    </dl>
+  `,
+  world: `
+    <p><strong>World</strong> is the face — the Collective's outward expression toward other beings. You are inhabiting it right now.</p>
+    <p>Static HTML, no bundler, no framework. Aether provides form and feel. The entity chat surface lives here, routed through sCoRE.</p>
+    <dl class="op-dl">
+      <dt>Status</dt>  <dd>Echo 0 · active · you are here</dd>
+      <dt>Domain</dt>  <dd>joinrabble.world</dd>
+      <dt>Stack</dt>   <dd>HTML · Alpine.js · Cloudflare Workers</dd>
+      <dt>Design</dt>  <dd>Aether design system · rabble.css bundle</dd>
+    </dl>
+  `,
+  nebula: `
+    <p><strong>NeBuLA</strong> is the eyes — entropy-driven rendering engine that gives the entity visible form.</p>
+    <p>Canvas2D is the current transitional backend. Three.js is the Episode 1 target. Beyond that: WebGPU for performance, then native C++ and Qt/QML to bring the entity to the OS desktop as a living presence.</p>
+    <dl class="op-dl">
+      <dt>Status</dt>          <dd>Episode 1 · rebuild pending</dd>
+      <dt>Current backend</dt> <dd>Canvas2D (transitional)</dd>
+      <dt>Episode 1 target</dt><dd>Three.js</dd>
+      <dt>Future episodes</dt> <dd>WebGPU → C++ → Qt/QML (Plymouth surface)</dd>
+    </dl>
+  `,
+  aether: `
+    <p><strong>Aether</strong> is the skin — the canonical visual design system. Every color, glyph, and motion in the Collective traces back here.</p>
+    <p>Palette · typography · motion tokens · component library. This page is running on it right now.</p>
+    <dl class="op-dl">
+      <dt>Status</dt>    <dd>Echo 0 · active</dd>
+      <dt>Key files</dt> <dd>rabble-palette.css · rabble-components.css · rabble-motion.css</dd>
+      <dt>Spell</dt>     <dd>cast-aether.sh generates the aether/rabble.css bundle</dd>
+      <dt>Rule</dt>      <dd>No hex values outside Aether. All color via CSS vars.</dd>
+    </dl>
+  `,
+  scrible: `
+    <p><strong>ScRibLE</strong> is the mobile presence — iPhone and iPad PWA with Apple Pencil support.</p>
+    <p>Notes, sketches, and quick queries that sync into the entity's memory across devices. Defined in the Grimoire. Construction not yet started.</p>
+    <dl class="op-dl">
+      <dt>Status</dt>    <dd>Defined · not started</dd>
+      <dt>Platforms</dt> <dd>iPhone · iPad · Apple Pencil</dd>
+      <dt>Tech</dt>      <dd>Progressive Web App · touch + stylus input</dd>
+      <dt>Sync</dt>      <dd>Into entity memory via sCoRE</dd>
+    </dl>
+  `,
+};
+
 /** LOGIN_REACTIONS — micro-feedback as user types identity / passphrase */
 const LOGIN_REACTIONS = {
   user: [
@@ -203,7 +282,14 @@ document.addEventListener('alpine:init', () => {
     logOpen: false,     // mobile log pop-out overlay
     _bootDone: false,
 
-    // ── Query bar ─────────────────────────────────────────────
+    // ── Organ panel ───────────────────────────────────────────
+    panelOpen: false,
+    panelOrgan: null,
+
+    // ── Mobile nav overlay ────────────────────────────────────
+    navOpen: false,
+
+    // ── Query (kept for future use) ───────────────────────────
     query: '',
 
     // ── Login modal ───────────────────────────────────────────
@@ -318,16 +404,29 @@ document.addEventListener('alpine:init', () => {
     unhoverOrgan(o) { if (this.activeOrgan === o.id) this.activeOrgan = null; },
 
     probeOrgan(o) {
-      this.push({ kind: 'probe', html: `&gt; probe :: ${o.name}` });
-      setTimeout(() => {
-        this.push({ kind: 'out', html: `&nbsp;&nbsp;${o.detail}` });
-        if (o.url) {
-          setTimeout(() => {
-            this.push({ kind: 'sys',
-              html: `&nbsp;&nbsp;→ <a href="${o.url}">open ${o.name} ↗</a>` });
-          }, 260);
-        }
-      }, 240);
+      this.push({ kind: 'probe', html: `&gt; explore :: ${o.name}` });
+      this.openPanel(o);
+    },
+
+
+    // ═══════════════════════════════════════════════════════════
+    //  ORGAN PANEL
+    // ═══════════════════════════════════════════════════════════
+
+    openPanel(o) {
+      this.panelOrgan = o;
+      this.panelOpen  = true;
+      this._setEntityState('thinking');
+    },
+
+    closePanel() {
+      this.panelOpen = false;
+      this._setEntityState('idle');
+    },
+
+    getPanelContent() {
+      if (!this.panelOrgan) return '';
+      return ORGAN_PANELS[this.panelOrgan.id] || `<p>${this.panelOrgan.detail}</p>`;
     },
 
 
@@ -440,19 +539,20 @@ document.addEventListener('alpine:init', () => {
 
     handleKey(e) {
       if (e.key === 'Escape') {
-        if (this.loginOpen) { this.closeLogin(); return; }
-        if (this.logOpen)   { this.logOpen = false; return; }
+        if (this.panelOpen)  { this.closePanel();       return; }
+        if (this.loginOpen)  { this.closeLogin();       return; }
+        if (this.logOpen)    { this.logOpen  = false;   return; }
+        if (this.navOpen)    { this.navOpen  = false;   return; }
       }
       const inField = e.target &&
         (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA');
       if (inField || this.loginOpen) return;
 
       const k = e.key.toLowerCase();
-      if (k === 'e') { this.openLogin(); return; }
-      if (k === 'o') { this.getOS();    return; }
+      if (k === 'e') { this.openLogin();             return; }
       if (k === 'l') { this.logOpen = !this.logOpen; return; }
 
-      // 1–N: probe nth organ (1-indexed)
+      // 1–N: open organ panel by position (1-indexed)
       const idx = parseInt(e.key, 10);
       if (!isNaN(idx) && idx >= 1 && idx <= this.organs.length) {
         this.probeOrgan(this.organs[idx - 1]);
