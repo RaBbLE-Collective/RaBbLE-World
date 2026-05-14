@@ -270,13 +270,21 @@ document.addEventListener('alpine:init', () => {
     // iOS non-PWA entry prompt
     showIosEntry: false,
 
-    // Mobile state — reactive so resize doesn't strand buttons in wrong display state
+    // matchMedia-based mobile flag — consistent across Firefox, Chrome, Safari resize events
     isMobile: false,
 
-    pulse: 14,
+    // Waybar center zone — real rAF-measured pulse + expandable entity metrics
+    pulse:         16,       // ms — real rAF frame delta, EMA-smoothed
+    metricsOpen:   false,    // metrics panel expanded
+    entropyVal:    '0.000',  // normalized pulse variance — behavioral noise floor
+    renderBackend: 'Canvas2D',
+    particleCount: 480,
+    substrate:     '…',      // device type detected on init
+
     uptime: '0d 00h 00m 00s',
     startedAt: Date.now(),
     entityEl: null,
+    _pulseHistory: [],
 
 
     // ═══════════════════════════════════════════════════════════
@@ -312,9 +320,8 @@ document.addEventListener('alpine:init', () => {
       // Start boot log sequence
       this._playBootLog();
 
-      // Uptime + pulse ticker (every 1s)
+      // Uptime ticker — every 1s
       setInterval(() => {
-        this.pulse = 11 + Math.floor(Math.random() * 7);
         const dt = Math.floor((Date.now() - this.startedAt) / 1000);
         const d  = Math.floor(dt / 86400);
         const h  = Math.floor((dt % 86400) / 3600);
@@ -323,6 +330,11 @@ document.addEventListener('alpine:init', () => {
         this.uptime = `${d}d ${String(h).padStart(2,'0')}h `
                     + `${String(m).padStart(2,'0')}m ${String(s).padStart(2,'0')}s`;
       }, 1000);
+
+      // Real pulse — rAF frame-delta with EMA smoothing.
+      // Measures actual rendering cadence rather than using a random number.
+      // UI updates throttled to every 20 frames (~3Hz) to avoid excess DOM churn.
+      this._startPulseMeasurement();
 
       // Ambient log messages after boot (every ~14s)
       setInterval(() => {
@@ -338,10 +350,26 @@ document.addEventListener('alpine:init', () => {
         this.showIosEntry = true;
       }
 
-      // Reactive mobile flag — prevents Alpine x-show / CSS media query conflicts on resize
-      const updateMobile = () => { this.isMobile = window.innerWidth <= 600; };
-      updateMobile();
-      window.addEventListener('resize', updateMobile);
+      // matchMedia for isMobile — reliable across Firefox, Safari, Chrome + resize
+      // window.innerWidth at Alpine init time is unreliable in some browsers
+      const mql = window.matchMedia('(max-width: 600px)');
+      this.isMobile = mql.matches;
+      mql.addEventListener('change', (e) => { this.isMobile = e.matches; });
+
+      // Substrate detection — device/OS type in entity language
+      this.substrate = this._detectSubstrate();
+
+      // NeBuLA metrics — populated once the entity element is ready
+      window.addEventListener('rabble:entity-ready', () => {
+        if (window.NeBuLA) this.renderBackend = window.NeBuLA.backend || 'Canvas2D';
+        const el = this.$refs.entity;
+        if (el) this.particleCount = parseInt(el.getAttribute('particle-count') || '480', 10);
+      });
+
+      // Close metrics panel on Escape
+      window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && this.metricsOpen) this.metricsOpen = false;
+      });
     },
 
     dismissIosEntry() {
@@ -356,6 +384,65 @@ document.addEventListener('alpine:init', () => {
           window.scrollTo({ top: 0, behavior: 'instant' });
         }, 80);
       } catch (e) { /* noop */ }
+    },
+
+
+    // ═══════════════════════════════════════════════════════════
+    //  ENTITY METRICS — real pulse + expandable Waybar panel
+    // ═══════════════════════════════════════════════════════════
+
+    _startPulseMeasurement() {
+      let last     = performance.now();
+      let smoothed = 16.7;  // start at ideal 60fps cadence
+      let frames   = 0;
+
+      const tick = (now) => {
+        const delta = now - last;
+        last = now;
+
+        // Skip first few frames — rAF delta is unreliable right after init
+        if (delta > 0 && delta < 500) {
+          // EMA: α=0.08 keeps it stable; heavier weight on history
+          smoothed = smoothed * 0.92 + delta * 0.08;
+
+          // Rolling history for entropy calculation (last 90 frames = ~1.5s at 60fps)
+          this._pulseHistory.push(delta);
+          if (this._pulseHistory.length > 90) this._pulseHistory.shift();
+        }
+
+        frames++;
+        // Update Alpine reactive state every 20 frames (~3Hz) — avoids DOM churn
+        if (frames % 20 === 0) {
+          this.pulse      = Math.round(smoothed);
+          this.entropyVal = this._computeEntropy();
+        }
+
+        requestAnimationFrame(tick);
+      };
+
+      requestAnimationFrame(tick);
+    },
+
+    _computeEntropy() {
+      const h = this._pulseHistory;
+      if (h.length < 4) return '0.000';
+      const mean     = h.reduce((a, b) => a + b, 0) / h.length;
+      const variance = h.reduce((a, b) => a + (b - mean) ** 2, 0) / h.length;
+      // Normalize: stddev of 8ms ≈ noticeable jitter → entropy 1.0
+      const entropy  = Math.min(1, Math.sqrt(variance) / 8);
+      return entropy.toFixed(3);
+    },
+
+    _detectSubstrate() {
+      const ua = navigator.userAgent;
+      const p  = navigator.platform || '';
+      if (/iP(hone|od)/.test(ua))       return 'iPhone';
+      if (/iPad/.test(ua))               return 'iPad';
+      if (/Android/.test(ua))            return 'Android';
+      if (/Mac/.test(p) || /Mac/.test(ua)) return 'macOS';
+      if (/Win/.test(p))                 return 'x86_64 · win';
+      if (/Linux/.test(p))               return 'Linux · x86_64';
+      return navigator.platform || 'unknown';
     },
 
 

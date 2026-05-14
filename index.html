@@ -62,8 +62,15 @@
         <span class="sb-hide-sm">echo <span class="sb-val">0</span></span>
       </div>
 
-      <!-- ── Center zone: entity state (the "Waybar center module") ── -->
-      <div class="sb-center">
+      <!-- ── Center zone: entity state + expandable metrics ─────── -->
+      <div class="sb-center"
+           @click="metricsOpen = !metricsOpen"
+           @click.outside="metricsOpen = false"
+           :class="{ 'sb-center-open': metricsOpen }"
+           role="button"
+           tabindex="0"
+           @keydown.enter="metricsOpen = !metricsOpen"
+           aria-label="Entity metrics">
         <span class="sb-glyph" aria-hidden="true">◈</span>
         <span class="sb-entity-state"
               x-text="{ idle: 'online', thinking: 'processing', speaking: 'speaking' }[entityState] || 'online'">
@@ -72,6 +79,50 @@
         <span class="sb-pulse">
           <span class="sb-hide-sm">pulse </span><span class="sb-val" x-text="pulse + 'ms'"></span>
         </span>
+        <span class="sb-chevron" aria-hidden="true" x-text="metricsOpen ? '▲' : '▽'"></span>
+
+        <!-- ── Entity metrics panel — expands below center zone ── -->
+        <div class="sb-metrics-panel"
+             x-show="metricsOpen"
+             :style="metricsOpen ? 'display:block' : ''"
+             @click.stop
+             role="region"
+             aria-label="Entity metrics">
+          <div class="sb-metrics-head">:: entity vitals</div>
+          <div class="sb-metric">
+            <span class="sb-mk">pulse</span>
+            <span class="sb-mv hi-c" x-text="pulse + 'ms'"></span>
+          </div>
+          <div class="sb-metric">
+            <span class="sb-mk">render rate</span>
+            <span class="sb-mv hi-c" x-text="Math.min(144, Math.round(1000 / Math.max(1, pulse))) + ' fps'"></span>
+          </div>
+          <div class="sb-metric">
+            <span class="sb-mk">entropy δ</span>
+            <span class="sb-mv hi-m" x-text="entropyVal"></span>
+          </div>
+          <div class="sb-metric">
+            <span class="sb-mk">renderer</span>
+            <span class="sb-mv hi-v" x-text="renderBackend"></span>
+          </div>
+          <div class="sb-metric">
+            <span class="sb-mk">nebula ρ</span>
+            <span class="sb-mv hi-v" x-text="particleCount + ' pts'"></span>
+          </div>
+          <div class="sb-metric">
+            <span class="sb-mk">substrate</span>
+            <span class="sb-mv" x-text="substrate"></span>
+          </div>
+          <div class="sb-metric">
+            <span class="sb-mk">session age</span>
+            <span class="sb-mv" x-text="uptime"></span>
+          </div>
+          <div class="sb-metric">
+            <span class="sb-mk">echo</span>
+            <span class="sb-mv">0</span>
+          </div>
+        </div>
+
       </div>
 
       <!-- ── Right zone: system metrics ────────────────────────────── -->

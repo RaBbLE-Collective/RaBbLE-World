@@ -21,6 +21,9 @@
   --neon-violet:  var(--violet,  #bf5fff);
   --success:      var(--green,   #50fa7b);
   --warning:      #ffbe2e;
+
+  /* Statusbar height — used for overlay top offsets and shell grid row */
+  --sb-height: calc(32px + env(safe-area-inset-top, 0px));
 }
 
 /* ── Base ────────────────────────────────────────────────────────────────── */
@@ -106,7 +109,7 @@ body.boot-departing { animation: page-fade-out 0.55s ease forwards; }
   overflow: hidden;
   display: grid;
   grid-template-rows:
-    calc(32px + env(safe-area-inset-top, 0px))   /* statusbar clears Dynamic Island */
+    var(--sb-height)                               /* statusbar clears Dynamic Island */
     1fr                                            /* main tile area */
     calc(28px + env(safe-area-inset-bottom, 0px)); /* hint-strip + home indicator */
   /* Horizontal safe areas: landscape notch / Dynamic Island on left or right edge */
@@ -202,6 +205,74 @@ body.boot-departing { animation: page-fade-out 0.55s ease forwards; }
 /* Responsive hide helpers */
 @media (max-width: 700px) { .sb-hide-sm { display: none; } }
 @media (max-width: 400px) { .sb-hide-xs { display: none; } }
+
+/* ── Center zone interactive state ─────────────────────────────────────── */
+.sb-center {
+  cursor: pointer;
+  position: relative;          /* anchor for metrics panel */
+  user-select: none;
+  border-radius: 4px;
+  transition: background 0.15s;
+}
+.sb-center:hover,
+.sb-center.sb-center-open {
+  background: rgba(191, 95, 255, 0.07);
+}
+.sb-chevron {
+  font-size: 8px; opacity: 0.5;
+  margin-left: 2px;
+  color: var(--neon-violet);
+}
+
+/* ── Entity metrics panel — drops below the Waybar center ───────────────
+   position:fixed so it escapes the statusbar's overflow:hidden context.
+   Top anchored to --sb-height (same value as the grid row).             */
+.sb-metrics-panel {
+  position: fixed;
+  top: var(--sb-height);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 210;
+  min-width: 220px;
+  background: rgba(3, 0, 11, 0.96);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(191, 95, 255, 0.25);
+  border-top: none;
+  border-radius: 0 0 6px 6px;
+  padding: 10px 16px 14px;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.6),
+    0 0 0 1px rgba(0, 245, 255, 0.06),
+    0 0 20px 2px rgba(191, 95, 255, 0.08);
+  animation: metrics-in 0.16s cubic-bezier(0.2, 0.9, 0.2, 1) both;
+}
+@keyframes metrics-in {
+  from { opacity: 0; transform: translateX(-50%) translateY(-6px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+.sb-metrics-head {
+  font-family: var(--font-mono); font-size: 9px;
+  letter-spacing: 0.32em; text-transform: uppercase;
+  color: var(--neon-violet); text-shadow: 0 0 6px var(--neon-violet);
+  padding-bottom: 8px; margin-bottom: 4px;
+  border-bottom: 1px solid rgba(191, 95, 255, 0.15);
+}
+
+.sb-metric {
+  display: flex; justify-content: space-between; align-items: baseline;
+  gap: 20px; padding: 3px 0;
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.05em;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}
+.sb-metric:last-child { border-bottom: none; }
+.sb-mk { color: var(--text-muted); white-space: nowrap; }
+.sb-mv { color: var(--text-secondary); text-align: right; white-space: nowrap; }
+
+/* Metric value color classes — match log highlight scheme */
+.sb-mv.hi-c { color: var(--neon-cyan);    text-shadow: 0 0 4px var(--neon-cyan); }
+.sb-mv.hi-m { color: var(--neon-magenta); text-shadow: 0 0 4px var(--neon-magenta); }
+.sb-mv.hi-v { color: var(--neon-violet); }
 
 
 /* ═══════════════════════════════════════════════════════════════
@@ -806,8 +877,7 @@ body.boot-departing { animation: page-fade-out 0.55s ease forwards; }
 .nav-overlay {
   display: none;
   position: fixed;
-  /* Start below the statusbar — never cover the Waybar */
-  top: calc(32px + env(safe-area-inset-top, 0px));
+  top: var(--sb-height); /* start below Waybar, never cover it */
   left: 0; right: 0; bottom: 0;
   z-index: 150;
   background: rgba(3,0,11,0.94);
@@ -909,8 +979,7 @@ body.boot-departing { animation: page-fade-out 0.55s ease forwards; }
 .log-overlay {
   display: none; /* shown at ≤900px via media query */
   position: fixed;
-  /* Start below the statusbar — never cover the Waybar */
-  top: calc(32px + env(safe-area-inset-top, 0px));
+  top: var(--sb-height); /* start below Waybar, never cover it */
   left: 0; right: 0; bottom: 0;
   z-index: 150;
   background: rgba(3,0,11,0.94);
@@ -1185,6 +1254,10 @@ body.boot-departing { animation: page-fade-out 0.55s ease forwards; }
     bottom: calc(12px + env(safe-area-inset-bottom, 0px));
     right:  calc(14px + env(safe-area-inset-right,  0px));
   }
+
+  /* Metrics panel: close when opened in landscape */
+  .sb-metrics-panel { display: none !important; }
+  .sb-chevron { display: none; }
 }
 
 
