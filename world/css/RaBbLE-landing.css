@@ -1000,7 +1000,6 @@ body.boot-departing { animation: page-fade-out 0.55s ease forwards; }
 /* Large tablet / small desktop */
 @media (max-width: 1200px) {
   .main { grid-template-columns: 240px 1fr 240px; }
-  :root { --wm-gap: 4px; }
 }
 
 /* Tablet — one panel, log toggle shown, stage tightened to prevent scroll */
