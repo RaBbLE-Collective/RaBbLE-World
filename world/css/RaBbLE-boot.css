@@ -71,6 +71,7 @@ body.boot-exit {
 #brand-name {
   font-family: var(--font-hero, var(--font-ui)); font-size: 54px; font-weight: 800;
   letter-spacing: 0.18em; line-height: 1;
+  text-transform: none; /* guard: Orbitron must render mixed case, not forced uppercase */
   background: linear-gradient(90deg, var(--magenta), var(--cyan), var(--violet), var(--magenta));
   -webkit-background-clip: text; -webkit-text-fill-color: transparent;
   background-clip: text; background-size: 300%;
@@ -97,6 +98,7 @@ body.boot-exit {
 .ecb-name {
   font-family: var(--font-hero, var(--font-ui)); font-size: 32px; font-weight: 800;
   letter-spacing: 0.18em; line-height: 1;
+  text-transform: none; /* guard: Orbitron must render mixed case, not forced uppercase */
   background: linear-gradient(90deg, var(--magenta), var(--cyan), var(--violet), var(--magenta));
   -webkit-background-clip: text; -webkit-text-fill-color: transparent;
   background-clip: text; background-size: 300%;
