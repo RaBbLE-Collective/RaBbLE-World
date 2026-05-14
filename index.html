@@ -126,6 +126,15 @@
           toward <span class="accent m">unbounded creativity</span> and <span class="accent">flourishing</span>.
         </p>
 
+        <!-- Void chat — floating conversation bubbles summoned from the entity -->
+        <div class="void-chat" aria-live="polite" aria-label="Conversation">
+          <template x-for="msg in chatMessages" :key="msg.id">
+            <div class="void-msg" :class="[msg.role, { fading: msg.fading }]">
+              <div class="void-bubble" x-text="msg.text"></div>
+            </div>
+          </template>
+        </div>
+
         <!-- Ask RaBbLE chat box — typing sends to the entity channel -->
         <form class="ask-box" @submit.prevent="submitQuery()" aria-label="Ask RaBbLE">
           <label class="ask-label" for="ask-input">

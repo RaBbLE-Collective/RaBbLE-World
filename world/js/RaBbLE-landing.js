@@ -289,7 +289,11 @@ document.addEventListener('alpine:init', () => {
     // ── Mobile nav overlay ────────────────────────────────────
     navOpen: false,
 
-    // ── Query (kept for future use) ───────────────────────────
+    // ── Void chat (floating stage messages) ──────────────────
+    chatMessages: [],
+    chatMsgSeq: 0,
+
+    // ── Query ─────────────────────────────────────────────────
     query: '',
 
     // ── Login modal ───────────────────────────────────────────
@@ -431,6 +435,34 @@ document.addEventListener('alpine:init', () => {
 
 
     // ═══════════════════════════════════════════════════════════
+    //  VOID CHAT — floating bubbles in the entity stage
+    // ═══════════════════════════════════════════════════════════
+
+    pushChatMsg(role, text) {
+      const id = ++this.chatMsgSeq;
+      // If at capacity, start fading the oldest
+      if (this.chatMessages.length >= 5) {
+        const oldest = this.chatMessages[0];
+        oldest.fading = true;
+        setTimeout(() => {
+          const i = this.chatMessages.findIndex(m => m.id === oldest.id);
+          if (i !== -1) this.chatMessages.splice(i, 1);
+        }, 450);
+      }
+      this.chatMessages.push({ id, role, text, fading: false });
+      // Auto-fade after 9s
+      setTimeout(() => {
+        const msg = this.chatMessages.find(m => m.id === id);
+        if (msg) msg.fading = true;
+        setTimeout(() => {
+          const i = this.chatMessages.findIndex(m => m.id === id);
+          if (i !== -1) this.chatMessages.splice(i, 1);
+        }, 450);
+      }, 9000);
+    },
+
+
+    // ═══════════════════════════════════════════════════════════
     //  QUERY BAR
     // ═══════════════════════════════════════════════════════════
 
@@ -438,12 +470,16 @@ document.addEventListener('alpine:init', () => {
       const q = this.query.trim();
       if (!q) return;
       this.push({ kind: 'prompt', html: q });
+      this.pushChatMsg('user', q);
       this.query = '';
       this._setEntityState('thinking');
 
       const reply = QUERY_RESPONSES[Math.floor(Math.random() * QUERY_RESPONSES.length)];
       setTimeout(() => {
         this.push(reply);
+        // Strip HTML tags for the clean void bubble display
+        const replyText = reply.html.replace(/<[^>]+>/g, '').replace(/&gt;/g, '>').trim();
+        this.pushChatMsg('entity', replyText);
         this._setEntityState('idle');
 
         const ql = q.toLowerCase();
