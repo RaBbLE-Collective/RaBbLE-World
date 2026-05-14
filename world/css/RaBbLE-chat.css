@@ -67,6 +67,18 @@ body.chat-entry.chat-ready {
   z-index: 1;
 }
 
+.chat-back {
+  position: absolute; top: max(10px, env(safe-area-inset-top)); left: 12px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
+  color: #3d3860; text-decoration: none;
+  padding: 4px 10px; border: 1px solid #2a2840; border-radius: 3px;
+  background: rgba(3,0,11,0.6);
+  transition: all 140ms ease; z-index: 5;
+  -webkit-tap-highlight-color: transparent;
+}
+.chat-back:hover { color: #00f5ff; border-color: #00f5ff; box-shadow: 0 0 6px #00f5ff; }
+
 .top-panel::before {
   content: '';
   position: absolute;
@@ -78,7 +90,7 @@ body.chat-entry.chat-ready {
 }
 
 .brand-text {
-  font-family: 'Exo 2', sans-serif;
+  font-family: 'Orbitron', 'Exo 2', sans-serif;
   font-size: 1.4rem;
   font-weight: 800;
   letter-spacing: 0.26em;

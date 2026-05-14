@@ -13,7 +13,9 @@
 <link rel="icon" type="image/x-icon" href="icons/favicon.ico">
 <link rel="icon" type="image/png" sizes="32x32" href="icons/icon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="icons/icon-16.png">
-<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Exo+2:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Share+Tech+Mono&family=Exo+2:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="aether/rabble.css">
+<link rel="stylesheet" href="world/css/RaBbLE-theme.css">
 <link rel="stylesheet" href="world/css/RaBbLE-landing.css">
 <script src="world/js/RaBbLE-landing.js"></script>
 <script defer src="world/js/RaBbLE-entity.js"></script>
@@ -85,9 +87,13 @@
           <span class="accent">a</span> Boundless <span class="accent m">Behavioral</span> Learning Engine
         </div>
 
+        <p class="mission">ambient intelligence woven into the environment —<br>
+          peer collaborator, not tool. the <span class="accent">Collective</span> builds itself<br>
+          toward <span class="accent m">unbounded creativity</span> and <span class="accent">flourishing</span>.</p>
+
         <div class="cta-row">
           <button class="cta primary" @click="boot()">
-            Boot RaBbLE <span class="kbd">B</span>
+            Enter <span class="kbd">E</span>
           </button>
           <button class="cta secondary" @click="getOS()">
             Get RaBbLE-OS <span class="kbd">O</span>
@@ -128,7 +134,7 @@
 
     <!-- BOTTOM HINT STRIP -->
     <footer class="hint-strip">
-      <span>press <kbd>B</kbd> to boot the entity</span>
+      <span>press <kbd>E</kbd> to enter the channel</span>
       <span>·</span>
       <span><kbd>O</kbd> to get the OS</span>
       <span>·</span>
@@ -143,7 +149,7 @@
       <div class="boot-modal">
         <div class="boot-head">
           <div class="icon">R</div>
-          <div class="title">Boot RaBbLE · the entity</div>
+          <div class="title">Entering RaBbLE · the channel</div>
           <button class="close" @click="closeBoot()">esc · close</button>
         </div>
         <div class="boot-body">

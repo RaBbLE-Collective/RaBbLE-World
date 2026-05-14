@@ -1,150 +1,45 @@
 /**
- * rabble-theme.css — Shared RaBbLE visual identity
+ * rabble-theme.css — Aether alias bridge
  *
- * Include this on every RaBbLE page before page-specific styles.
- * Provides: CSS custom properties, overlay effects, scrollbars,
- *           common keyframes, and base resets.
+ * This file is World's interface to the Aether design system.
+ * Load AFTER aether/rabble.css, BEFORE any page-specific CSS.
+ *
+ * What this file does:
+ *   - Provides short-name CSS variable aliases for --rabble-* Aether tokens
+ *   - Hex fallbacks so it degrades gracefully if Aether is unavailable
+ *
+ * What this file does NOT do:
+ *   - Define colors, typography, or animations (those live in Aether)
+ *   - Style UI components (those live in Aether's component library)
+ *
+ * World page CSS is structural and behavioral only.
+ * Aether gives it form, look, and feel.
  */
 
-/* ── Reset ─────────────────────────────────────────────────────── */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-/* ── Palette ────────────────────────────────────────────────────── */
 :root {
-  /* Core neons */
-  --magenta:    #ff2d78;
-  --cyan:       #00f5ff;
-  --violet:     #bf5fff;
-  --pink:       #ff79c6;
-  --green:      #39ff14;
+  /* ── Neon identity ──────────────────────────────────────────────── */
+  --magenta:    var(--rabble-magenta,  #ff2d78);
+  --cyan:       var(--rabble-cyan,     #00f5ff);
+  --violet:     var(--rabble-violet,   #bf5fff);
+  --pink:       var(--rabble-pink,     #ff79c6);
+  --green:      var(--rabble-green,    #50fa7b);
 
-  /* Backgrounds (the void) */
-  --bg:         #03000b;   /* deepest void — used in boot */
-  --bg-surface: #0a0010;   /* standard page background */
-  --surface:    #12132a;
-  --raised:     #1a1b2e;
-  --border:     #2a2840;
+  /* ── Void / backgrounds ─────────────────────────────────────────── */
+  --bg:         var(--rabble-void,     #03000b);   /* deepest void — boot screens */
+  --bg-surface: var(--rabble-bg,       #0a0010);   /* standard page background */
+  --surface:    var(--rabble-surface,  #12132a);
+  --raised:     var(--rabble-raised,   #1a1b2e);
+  --border:     var(--rabble-border,   #2a2840);
 
-  /* Text */
-  --text:       #e8e0f0;
-  --text-dim:   #7870a0;
-  --text-dimmer:#3d3860;
+  /* ── Text ───────────────────────────────────────────────────────── */
+  --text:       var(--rabble-text,     #e8e6f0);
+  --text-dim:   var(--rabble-muted,    #6b6880);
+  --text-dimmer: var(--rabble-dimmer,  #3d3860);
 
-  /* Typography */
-  --font-mono:  'Share Tech Mono', 'Space Mono', monospace;
-  --font-ui:    'Exo 2', 'Rajdhani', sans-serif;
-}
-
-/* ── Base ───────────────────────────────────────────────────────── */
-html, body {
-  background: var(--bg-surface);
-  color: var(--text);
-  font-family: var(--font-ui);
-}
-
-/* ── iOS / Mobile hardening ─────────────────────────────────────── */
-/* Prevent elastic bounce scroll and touch-drag page repositioning  */
-html {
-  overscroll-behavior: none;
-  touch-action: manipulation;        /* disables double-tap zoom     */
-  -webkit-tap-highlight-color: transparent;
-}
-body {
-  overscroll-behavior: none;
-  -webkit-overflow-scrolling: auto;  /* kills momentum bounce        */
-}
-
-/* ── Scrollbars ─────────────────────────────────────────────────── */
-::-webkit-scrollbar           { width: 4px; }
-::-webkit-scrollbar-track     { background: var(--bg-surface); }
-::-webkit-scrollbar-thumb     { background: var(--border); border-radius: 2px; }
-::-webkit-scrollbar-thumb:hover { background: var(--violet); }
-
-/* ── Screen overlays ────────────────────────────────────────────── */
-.rabble-scanlines {
-  position: fixed; inset: 0; z-index: 10; pointer-events: none;
-  background: repeating-linear-gradient(
-    0deg,
-    rgba(0,0,0,0.05) 0px, rgba(0,0,0,0.05) 1px,
-    transparent 1px, transparent 3px
-  );
-}
-.rabble-vignette {
-  position: fixed; inset: 0; z-index: 9; pointer-events: none;
-  background: radial-gradient(ellipse at 50% 50%, transparent 50%, rgba(0,0,0,0.82) 100%);
-}
-.rabble-chromatic {
-  position: fixed; inset: 0; z-index: 11; pointer-events: none;
-  background: linear-gradient(
-    180deg,
-    rgba(255,45,120,0.015) 0%,
-    transparent 30%,
-    transparent 70%,
-    rgba(0,245,255,0.015) 100%
-  );
-}
-
-/* ── Common keyframes ───────────────────────────────────────────── */
-@keyframes holo {
-  0%, 100% { background-position: 0%; }
-  50%       { background-position: 100%; }
-}
-@keyframes rabble-fade-in {
-  from { opacity: 0; transform: translateY(8px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-@keyframes rabble-blink {
-  0%, 100% { opacity: 1; } 50% { opacity: 0; }
-}
-@keyframes status-pulse {
-  0%, 100% { opacity: 0.4; transform: scale(0.9); }
-  50%       { opacity: 1;   transform: scale(1.15); }
-}
-@keyframes neon-flicker {
-  0%,100%{opacity:1} 92%{opacity:1} 93%{opacity:0.4} 94%{opacity:1} 97%{opacity:0.6} 98%{opacity:1}
-}
-
-/* ── Brand helpers ──────────────────────────────────────────────── */
-.rabble-brand-text {
-  background: linear-gradient(90deg, var(--magenta), var(--cyan), var(--violet), var(--magenta));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  background-size: 300%;
-  animation: holo 6s ease infinite;
-}
-.rabble-brand-text-2 {
-  background: linear-gradient(90deg, var(--magenta), var(--cyan));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-/* ── Status pill ────────────────────────────────────────────────── */
-.rabble-status-pill {
-  display: inline-flex; align-items: center; gap: 5px;
-  padding: 3px 12px; border-radius: 20px;
-  background: rgba(0,245,255,0.07); border: 1px solid rgba(0,245,255,0.18);
-  font-size: 9px; font-family: var(--font-mono); letter-spacing: 0.1em;
-  color: var(--cyan); text-transform: uppercase;
-}
-.rabble-status-dot {
-  width: 5px; height: 5px; border-radius: 50%;
-  background: var(--cyan); box-shadow: 0 0 6px var(--cyan);
-  animation: status-pulse 2s ease-in-out infinite;
-}
-
-/* ── Glass surface ──────────────────────────────────────────────── */
-.rabble-glass {
-  background: rgba(18,19,42,0.7);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid var(--border);
-}
-
-/* ── Cursor ─────────────────────────────────────────────────────── */
-.rabble-cursor {
-  display: inline-block; width: 6px; height: 11px;
-  background: var(--violet); margin-left: 3px; vertical-align: middle;
-  animation: rabble-blink 1.1s step-end infinite;
+  /* ── Typography ─────────────────────────────────────────────────── */
+  --font-mono:    var(--rabble-font-mono, 'Share Tech Mono', 'Space Mono', monospace);
+  --font-ui:      var(--rabble-font-ui,   'Exo 2', 'Rajdhani', sans-serif);
+  --font-hero:    var(--rabble-font-hero, 'Orbitron', 'Exo 2', sans-serif);
+  --font-display: var(--rabble-font-ui,   'Exo 2', 'Rajdhani', sans-serif);
+  --font-body:    var(--rabble-font-ui,   'Exo 2', 'Rajdhani', sans-serif);
 }

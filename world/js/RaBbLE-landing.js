@@ -101,12 +101,12 @@ document.addEventListener('alpine:init', () => {
     probeOrgan(o) {
       this.push('probe', `> probe :: ${o.name}`);
       const detail = {
-        grimoire: 'memory of the Collective. identity, ethos, protocols, spells. the long thought.',
-        score:    'intent → action. coordination server. the entity\'s reach.',
-        os:       'Fedora 43 + Hyprland. the entity\'s daily driver. its body.',
-        world:    'this surface. the door. joinrabble.world. you are here.',
-        nebula:   'Flat-Chaos 3D runtime. how the entity is seen. eyes.',
-        aether:   'the visual system. palette, type, motion. the entity\'s skin.',
+        grimoire: 'the long thought. identity, ethos, protocols, lore. the Collective\'s memory substrate. everything that gives RaBbLE its character lives here.',
+        score:    'the nervous system. intent → action engine. the entity\'s reach into the world. when RaBbLE decides something, sCoRE makes it happen.',
+        os:       'the body. Fedora 43 + Hyprland, Ansible-driven. not a rice — a living OS that RaBbLE moves through. the entity and the environment are one.',
+        world:    'the face. the door. joinrabble.world. this surface you inhabit right now. the Collective\'s outward expression.',
+        nebula:   'the eyes. Flat-Chaos 3D renderer. how the entity is rendered and seen by the world. the visual form of RaBbLE\'s presence.',
+        aether:   'the skin. canonical visual system. palette, type, motion, components. every color and glyph in the Collective traces back here.',
       }[o.id] || '// no signature';
       setTimeout(() => this.push('out', '  ' + detail), 240);
     },
@@ -128,8 +128,8 @@ document.addEventListener('alpine:init', () => {
       setTimeout(() => {
         this.push('out', replies[Math.floor(Math.random() * replies.length)]);
         this._setEntityState('idle');
-        if (q.toLowerCase().includes('boot') || q.toLowerCase().includes('login')) {
-          setTimeout(() => this.push('out', '// hint :: press B to boot the entity, O to get the OS'), 320);
+        if (q.toLowerCase().includes('boot') || q.toLowerCase().includes('login') || q.toLowerCase().includes('enter')) {
+          setTimeout(() => this.push('out', '// hint :: press E to enter the channel, O to get the OS'), 320);
         }
       }, 360 + Math.random() * 420);
     },
@@ -149,7 +149,7 @@ document.addEventListener('alpine:init', () => {
         { kind: 'ok',  text: '// READY :: entering the channel' },
       ];
 
-      this.push('probe', '> boot :: entity');
+      this.push('probe', '> enter :: opening the channel');
       let revealed = 0;
 
       const tick = () => {
@@ -192,7 +192,7 @@ document.addEventListener('alpine:init', () => {
       const inField = e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA');
       if (inField || this.booting) return;
       const k = e.key.toLowerCase();
-      if (k === 'b') this.boot();
+      if (k === 'e') this.boot();
       else if (k === 'o') this.getOS();
     },
   }));
