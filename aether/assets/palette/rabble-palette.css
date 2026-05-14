@@ -35,6 +35,7 @@
   /* ── Typography ──────────────────────────────────────────────── */
   --rabble-font-mono: 'Share Tech Mono', 'Space Mono', monospace;
   --rabble-font-ui:   'Exo 2', 'Rajdhani', sans-serif;
+  --rabble-font-hero: 'Orbitron', 'Exo 2', sans-serif; /* OS lockups, wordmark, brand crawls */
 
   /* ── Pre-computed glow shadows (use directly in box-shadow / text-shadow) ── */
   --rabble-glow-magenta-sm:  0 0 6px #ff2d78;
@@ -95,6 +96,53 @@
   --rabble-cyan-35:    rgba(0, 245, 255, 0.35);
   --rabble-violet-10:  rgba(191, 95, 255, 0.10);
   --rabble-violet-20:  rgba(191, 95, 255, 0.20);
+  --rabble-violet-40:  rgba(191, 95, 255, 0.40);
   --rabble-surface-70: rgba(18, 19, 42, 0.70);   /* glass surface */
   --rabble-surface-85: rgba(10, 0, 16, 0.85);    /* heavy glass / nav */
+  --rabble-raised-85:  rgba(26, 27, 46, 0.85);   /* card/input glass */
+
+  /* ── Breakpoints ─────────────────────────────────────────────── */
+  --rabble-bp-sm:  600px;
+  --rabble-bp-md:  900px;
+  --rabble-bp-lg: 1200px;
+  --rabble-bp-xl: 1440px;
+
+  /* ── Type scale ──────────────────────────────────────────────── */
+  --rabble-fs-hero:  clamp(48px, 7vw, 96px);
+  --rabble-fs-h1:    clamp(36px, 4.5vw, 56px);
+  --rabble-fs-h2:    clamp(28px, 3.5vw, 40px);
+  --rabble-fs-h3:    clamp(20px, 2.5vw, 28px);
+  --rabble-fs-h4:    20px;
+  --rabble-fs-body:  16px;
+  --rabble-fs-small: 14px;
+  --rabble-fs-micro: 12px;
+  --rabble-fs-nano:  10px;
+
+  /* ── Tracking ────────────────────────────────────────────────── */
+  --rabble-tracking-display: 0.22em;
+  --rabble-tracking-eyebrow: 0.32em;
+  --rabble-tracking-ui:      0.08em;
+  --rabble-tracking-body:    0.01em;
+  --rabble-tracking-mono:    0.04em;
+
+  /* ── Line heights ────────────────────────────────────────────── */
+  --rabble-lh-display: 1.02;
+  --rabble-lh-heading: 1.15;
+  --rabble-lh-body:    1.55;
+
+  /* ── Motion — rich ease + duration tokens ────────────────────── */
+  --rabble-ease-snap:  cubic-bezier(0.2, 0.9, 0.2, 1);
+  --rabble-ease-glow:  cubic-bezier(0.4, 0, 0.2, 1);
+  --rabble-t-fast:  120ms;
+  --rabble-t-med:   220ms;
+  --rabble-t-slow:  420ms;
+
+  /* ── Elevation ───────────────────────────────────────────────── */
+  --rabble-shadow-1: 0 1px 0 rgba(255,255,255,0.04) inset, 0 1px 2px  rgba(0,0,0,0.60);
+  --rabble-shadow-2: 0 1px 0 rgba(255,255,255,0.04) inset, 0 8px 24px rgba(0,0,0,0.65);
+  --rabble-shadow-3: 0 1px 0 rgba(255,255,255,0.05) inset, 0 24px 64px rgba(0,0,0,0.75);
+
+  /* ── Outrun grid ─────────────────────────────────────────────── */
+  --rabble-grid-line:    rgba(255, 121, 198, 0.18);
+  --rabble-grid-horizon: linear-gradient(180deg, transparent 0%, rgba(255,45,120,0.10) 65%, rgba(255,45,120,0.45) 100%);
 }

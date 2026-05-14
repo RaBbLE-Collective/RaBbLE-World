@@ -227,3 +227,40 @@
 .rabble-anim-glow-v     { animation: rabble-glow-pulse-violet  2.5s ease-in-out infinite; }
 .rabble-anim-resonance  { animation: rabble-resonance  8s ease-in-out infinite; }
 .rabble-anim-glitch     { animation: rabble-glitch     0.4s steps(1) infinite; }
+
+/* ═══════════════════════════════════════════════════════════════
+   7. BRAND FLOW — cyan ↔ magenta text animation
+   ═══════════════════════════════════════════════════════════════ */
+
+@keyframes brand-harmony {
+  0%   { background-position:   0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position:   0% 50%; }
+}
+
+@keyframes brand-glow {
+  0%, 100% { filter: drop-shadow(0 0 12px rgba(0, 245, 255, 0.55)); }
+  50%       { filter: drop-shadow(0 0 12px rgba(255, 45, 120, 0.55)); }
+}
+
+@keyframes page-fade-out {
+  from { opacity: 1; transform: translateY(0); }
+  to   { opacity: 0; transform: translateY(-8px); }
+}
+
+@keyframes overlay-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes modal-in {
+  from { opacity: 0; transform: translateY(10px) scale(0.97); }
+  to   { opacity: 1; transform: none; }
+}
+
+.rabble-anim-brand-flow {
+  animation: brand-harmony 7s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite,
+             brand-glow    7s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+}
+.rabble-anim-brand-flow.slow { animation-duration: 11s, 11s; }
+.rabble-anim-brand-flow.fast { animation-duration: 4.5s, 4.5s; }

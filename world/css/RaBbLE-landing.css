@@ -73,13 +73,13 @@ body.boot-departing {
   content: "";
   position: absolute; left: -50%; right: -50%; top: 0; bottom: -20%;
   background-image:
-    linear-gradient(rgba(255,121,198,0.18) 1px, transparent 1px),
+    linear-gradient(var(--rabble-grid-line) 1px, transparent 1px),
     linear-gradient(90deg, rgba(255,121,198,0.14) 1px, transparent 1px);
   background-size: 70px 50px;
   transform: rotateX(62deg);
   transform-origin: top center;
   animation: floor-drift 18s linear infinite;
-  filter: drop-shadow(0 0 4px rgba(255,121,198,0.5));
+  filter: drop-shadow(0 0 4px var(--rabble-pink));
   mask-image: radial-gradient(ellipse at 50% 0%, black 35%, transparent 80%);
 }
 @keyframes floor-drift {
@@ -253,7 +253,7 @@ body.boot-departing {
   width: 6px; height: 6px; border-radius: 50%;
 }
 .organ .status-dot.online   { background: var(--success);  box-shadow: 0 0 6px var(--success); }
-.organ .status-dot.idle     { background: #8a8aa0; }
+.organ .status-dot.idle     { background: var(--text-dim); }
 .organ .status-dot.degraded { background: var(--warning);  box-shadow: 0 0 6px var(--warning); }
 
 /* CENTER stage */
@@ -379,7 +379,7 @@ body.boot-departing {
   width: min(480px, 90%);
   padding: 8px 14px;
   background: rgba(18,19,42,0.7);
-  border: 1px solid #6b6880;
+  border: 1px solid var(--text-dim);
   border-radius: 6px;
   font-family: var(--font-mono);
   font-size: 13px;
@@ -508,7 +508,7 @@ body.boot-departing {
 
 .bar-wrap {
   position: relative; height: 6px; border-radius: 3px;
-  background: rgba(42,40,64,0.55); overflow: hidden; margin-bottom: 6px;
+  background: rgba(42,40,64,0.55); /* boot-modal progress track — no token at this alpha */ overflow: hidden; margin-bottom: 6px;
 }
 .bar-fill {
   position: absolute; left: 0; top: 0; bottom: 0;

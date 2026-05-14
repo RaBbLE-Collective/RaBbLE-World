@@ -29,14 +29,71 @@ html {
   overscroll-behavior: none;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
+  scroll-behavior: smooth;
 }
 
 html, body {
   background: var(--rabble-bg);
   color: var(--rabble-text);
   font-family: var(--rabble-font-ui);
+  font-size: var(--rabble-fs-body);
+  line-height: var(--rabble-lh-body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
   -webkit-overflow-scrolling: auto;
   overscroll-behavior: none;
+}
+
+/* ── HTML prose elements ──────────────────────────────────────── */
+
+p { color: var(--rabble-text); margin: 0 0 1em; }
+
+a {
+  color: var(--rabble-cyan);
+  text-decoration: none;
+  text-shadow: var(--rabble-glow-cyan-sm);
+  transition: color var(--rabble-t-fast, 120ms) var(--rabble-ease-snap),
+              text-shadow var(--rabble-t-fast, 120ms) var(--rabble-ease-snap);
+}
+a:hover { color: var(--rabble-magenta); text-shadow: var(--rabble-glow-magenta-md); }
+
+code, kbd, .mono {
+  font-family: var(--rabble-font-mono);
+  font-size: 0.9em;
+  color: var(--rabble-cyan);
+}
+pre {
+  font-family: var(--rabble-font-mono);
+  font-size: var(--rabble-fs-micro);
+  line-height: 1.8;
+  background: var(--rabble-void);
+  border: 1px solid var(--rabble-border);
+  border-radius: var(--rabble-radius-md);
+  padding: 16px 18px;
+  overflow-x: auto;
+  margin: 12px 0;
+}
+pre code { color: var(--rabble-muted); font-size: inherit; }
+
+hr {
+  border: 0;
+  height: 1px;
+  background: var(--rabble-border);
+  box-shadow: var(--rabble-glow-magenta-sm);
+  opacity: 0.6;
+  margin: 24px 0;
+}
+
+::selection {
+  background: var(--rabble-magenta);
+  color: var(--rabble-void);
+}
+
+/* Focus ring — replaces browser default */
+:focus-visible {
+  outline: 1px solid var(--rabble-cyan);
+  outline-offset: 2px;
+  box-shadow: var(--rabble-glow-cyan-sm);
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -501,3 +558,116 @@ html, body {
 ::-webkit-scrollbar-track     { background: var(--rabble-bg); }
 ::-webkit-scrollbar-thumb     { background: var(--rabble-border); border-radius: 2px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--rabble-violet); }
+
+/* ═══════════════════════════════════════════════════════════════
+   13. BRAND FLOW
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Animated cyan ↔ magenta gradient — use on the RaBbLE wordmark and hero text */
+.rabble-brand-flow {
+  font-family: var(--rabble-font-hero);
+  background-image: linear-gradient(
+    90deg,
+    var(--rabble-cyan)    0%,
+    var(--rabble-violet) 30%,
+    var(--rabble-magenta) 50%,
+    var(--rabble-violet) 70%,
+    var(--rabble-cyan)   100%
+  );
+  background-size: 220% 100%;
+  background-position: 0% 50%;
+  -webkit-background-clip: text;
+          background-clip: text;
+  -webkit-text-fill-color: transparent;
+          color: transparent;
+  animation:
+    brand-harmony 7s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite,
+    brand-glow    7s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+}
+.rabble-brand-flow.slow { animation-duration: 11s, 11s; }
+.rabble-brand-flow.fast { animation-duration: 4.5s, 4.5s; }
+
+/* ═══════════════════════════════════════════════════════════════
+   14. TYPOGRAPHY UTILITIES
+   ═══════════════════════════════════════════════════════════════ */
+
+.rabble-eyebrow {
+  font-family: var(--rabble-font-ui);
+  font-size: var(--rabble-fs-micro, 12px);
+  font-weight: 600;
+  letter-spacing: var(--rabble-tracking-eyebrow, 0.32em);
+  text-transform: uppercase;
+  color: var(--rabble-cyan);
+  text-shadow: var(--rabble-glow-cyan-sm);
+}
+
+.rabble-display {
+  font-family: var(--rabble-font-ui);
+  font-weight: 800;
+  letter-spacing: var(--rabble-tracking-display, 0.22em);
+  line-height: var(--rabble-lh-display, 1.02);
+  text-transform: uppercase;
+}
+
+.rabble-mono-label {
+  font-family: var(--rabble-font-mono);
+  font-size: var(--rabble-fs-nano, 10px);
+  letter-spacing: var(--rabble-tracking-ui, 0.08em);
+  text-transform: uppercase;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   15. RESPONSIVE LAYOUT SYSTEM
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Max-width container with fluid padding */
+.rabble-container {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 clamp(16px, 4vw, 64px);
+}
+
+/* Responsive grids */
+.rabble-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--rabble-space-5, 24px);
+}
+.rabble-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--rabble-space-5, 24px);
+}
+.rabble-grid-auto {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: var(--rabble-space-5, 24px);
+}
+
+/* Breakpoint: tablet (≤900px) — 3-col → 2-col */
+@media (max-width: 900px) {
+  .rabble-grid-3 { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* Breakpoint: mobile (≤600px) — all grids → 1-col, tighter container */
+@media (max-width: 600px) {
+  .rabble-grid-2,
+  .rabble-grid-3,
+  .rabble-grid-auto { grid-template-columns: 1fr; }
+  .rabble-container { padding: 0 clamp(12px, 4vw, 20px); }
+}
+
+/* ── Visibility helpers ───────────────────────────────────────── */
+@media (max-width: 600px)  { .rabble-hide-mobile     { display: none !important; } }
+@media (max-width: 900px)  { .rabble-hide-tablet     { display: none !important; } }
+@media (min-width: 601px)  { .rabble-show-mobile     { display: none !important; } }
+@media (min-width: 901px)  { .rabble-show-tablet     { display: none !important; } }
+
+/* ── Flex utilities ───────────────────────────────────────────── */
+.rabble-flex         { display: flex; }
+.rabble-flex-col     { display: flex; flex-direction: column; }
+.rabble-flex-center  { display: flex; align-items: center; justify-content: center; }
+.rabble-gap-sm       { gap: var(--rabble-space-2, 8px); }
+.rabble-gap-md       { gap: var(--rabble-space-4, 16px); }
+.rabble-gap-lg       { gap: var(--rabble-space-5, 24px); }
