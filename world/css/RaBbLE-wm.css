@@ -1,107 +1,17 @@
 /* =========================================================================
-   RaBbLE-wm.css — Window Manager tile system
-   Hyprland-style tiling: applet tiles with animated cyan→magenta border chase.
-   Active applet: faster rotation, pronounced glow.
-   Layout presets applied as .wm-layout-{name} on .main.
-
-   Border technique: CSS mask on ::before
-     The ::before pseudo-element fills the applet area with the conic-gradient,
-     then mask-composite: exclude cuts out the interior — only the 1.5px ring
-     at the edge remains visible. This leaves the panel background and content
-     completely untouched regardless of transparency.
+   RaBbLE-wm.css — Window Manager tile layout
+   Visual effects (applet border ring, glow, tokens) live in Aether.
+   This file owns layout only: grid structure, presets, responsive rules.
    ========================================================================= */
 
-/* ── CSS Houdini property — enables smooth conic-gradient rotation ─────── */
-@property --applet-angle {
-  syntax: '<angle>';
-  inherits: false;
-  initial-value: 0deg;
-}
-
-/* ── Border chase animation ─────────────────────────────────────────────── */
-@keyframes applet-border-chase {
-  to { --applet-angle: 360deg; }
-}
-
-/* ── Tile tokens ────────────────────────────────────────────────────────── */
-:root {
-  --wm-gap:           5px;
-  --wm-radius:        5px;
-  --wm-ring-width:    1.5px;
-  --wm-chase-dur:     8s;   /* inactive rotation period */
-  --wm-active-dur:    3s;   /* active rotation period */
-  --wm-ring-opacity:  0.28; /* inactive ring visibility */
-}
-
-/* ── .applet — base tile ────────────────────────────────────────────────── */
-.applet {
-  position: relative;
-  border-radius: var(--wm-radius);
-  /* Ambient glow — inactive level */
-  box-shadow:
-    0 0 6px -3px rgba(0, 245, 255, 0.10);
-  transition: box-shadow 0.4s ease;
-}
-
-/*
- * Animated gradient border ring via ::before + CSS mask.
- *
- * The ::before fills the entire applet area with the rotating conic-gradient.
- * mask-composite: exclude then punches out everything except the ring strip
- * (padding: var(--wm-ring-width) defines the strip width).
- * Result: only the outermost 1.5px pixels show the gradient — the panel
- * background and all interior content are completely unaffected.
- */
-.applet::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  padding: var(--wm-ring-width);
-  background: conic-gradient(
-    from var(--applet-angle),
-    var(--neon-cyan)    0%,
-    var(--neon-magenta) 45%,
-    var(--neon-violet)  68%,
-    var(--neon-cyan)    100%
-  );
-  /* Mask: full element MINUS content-box = the ring strip only */
-  -webkit-mask:
-    linear-gradient(#fff 0 0) content-box,
-    linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  animation: applet-border-chase var(--wm-chase-dur) linear infinite;
-  opacity: var(--wm-ring-opacity);
-  pointer-events: none;
-  /* Paints above panel background, below panel content via natural paint order */
-}
-
-/* ── Active tile — faster chase, sharper ring + glow ──────────────────── */
-.applet.wm-active::before {
-  opacity: 1;
-  animation-duration: var(--wm-active-dur);
-}
-
-.applet.wm-active {
-  box-shadow:
-    0 0 0   1px rgba(0, 245, 255, 0.20),
-    0 0 14px 2px rgba(0, 245, 255, 0.15),
-    0 0 28px 5px rgba(191, 95, 255, 0.08),
-    0 0 44px 8px rgba(255, 45, 120, 0.04);
-}
-
-
-/* ═══════════════════════════════════════════════════════════════
-   MAIN GRID — gap between tiles, padding for glow room
-   ═══════════════════════════════════════════════════════════════ */
+/* ── Main grid ──────────────────────────────────────────────────────────── */
 .main {
   gap: var(--wm-gap);
   padding: var(--wm-gap);
   overflow: visible;
 }
 
-/* Shell still clips at its outer boundary */
+/* Shell clips at outer boundary */
 .shell { overflow: hidden; }
 
 
@@ -110,32 +20,17 @@
    Ctrl+1 default · Ctrl+2 focus · Ctrl+3 left-focus · Ctrl+4 right-focus
    ═══════════════════════════════════════════════════════════════ */
 
-/* focus: entity stage only */
-.main.wm-layout-focus {
-  grid-template-columns: 1fr;
-}
+.main.wm-layout-focus { grid-template-columns: 1fr; }
 .main.wm-layout-focus .panel.left,
-.main.wm-layout-focus .panel.right {
-  display: none;
-}
+.main.wm-layout-focus .panel.right { display: none; }
 
-/* left-focus: collective + stage */
-.main.wm-layout-left-focus {
-  grid-template-columns: 340px 1fr;
-}
-.main.wm-layout-left-focus .panel.right {
-  display: none;
-}
+.main.wm-layout-left-focus { grid-template-columns: 340px 1fr; }
+.main.wm-layout-left-focus .panel.right { display: none; }
 
-/* right-focus: stage + log */
-.main.wm-layout-right-focus {
-  grid-template-columns: 1fr 340px;
-}
-.main.wm-layout-right-focus .panel.left {
-  display: none;
-}
+.main.wm-layout-right-focus { grid-template-columns: 1fr 340px; }
+.main.wm-layout-right-focus .panel.left { display: none; }
 
-/* Large tablet adjustments */
+/* Large tablet */
 @media (max-width: 1200px) {
   :root { --wm-gap: 4px; }
   .main.wm-layout-left-focus  { grid-template-columns: 240px 1fr; }
@@ -146,21 +41,10 @@
 @media (max-width: 900px) {
   .main.wm-layout-focus,
   .main.wm-layout-left-focus,
-  .main.wm-layout-right-focus {
-    grid-template-columns: unset;
-  }
+  .main.wm-layout-right-focus { grid-template-columns: unset; }
+
   .main.wm-layout-focus .panel.left,
   .main.wm-layout-focus .panel.right,
   .main.wm-layout-left-focus .panel.right,
-  .main.wm-layout-right-focus .panel.left {
-    display: unset;
-  }
-}
-
-/* Mobile: animations off — battery + irrelevant at single-column layout */
-@media (max-width: 600px) {
-  .applet::before  { display: none; }
-  .applet          { box-shadow: none; border-radius: 0; }
-  .applet.wm-active { box-shadow: none; }
-  :root { --wm-gap: 0px; }
+  .main.wm-layout-right-focus .panel.left { display: unset; }
 }

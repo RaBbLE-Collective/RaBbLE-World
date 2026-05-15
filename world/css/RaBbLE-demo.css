@@ -1,0 +1,128 @@
+/* =========================================================================
+   RaBbLE-demo.css — NeBuLA Demo page layout
+   Structure only. All visual effects (borders, glows, animations,
+   colours, overlays) come from Aether.
+   ========================================================================= */
+
+/* Shell overrides: 2-row grid (statusbar + main) for demo */
+.shell {
+  display: grid;
+  grid-template-rows: auto 1fr;
+}
+
+/* WM main: 2-column applet grid, fills remaining height */
+.main {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 0;
+}
+
+@media (max-width: 900px) {
+  .main {
+    grid-template-columns: 1fr;
+    overflow-y: auto;
+  }
+}
+
+/* ── Applet inner content ─────────────────────────────────────────────── */
+.applet-inner {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 16px;
+  gap: 10px;
+  overflow: auto;
+  min-height: 0;
+}
+
+.applet-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 45, 120, 0.2);
+  flex-shrink: 0;
+}
+
+.applet-title {
+  font-family: var(--rabble-font-hero, 'Orbitron', monospace);
+  font-size: 0.95em;
+  font-weight: 700;
+  color: var(--rabble-cyan, #00f5ff);
+  letter-spacing: 0.06em;
+}
+
+.applet-desc {
+  font-size: 0.85em;
+  color: var(--rabble-muted, #6b6880);
+  line-height: 1.5;
+  margin: 0;
+  flex-shrink: 0;
+}
+
+/* ── Canvas area ──────────────────────────────────────────────────────── */
+.canvas-container {
+  flex: 1;
+  background: var(--rabble-void, #03000b);
+  border: 1px solid rgba(0, 245, 255, 0.12);
+  border-radius: var(--wm-radius, 5px);
+  min-height: 180px;
+  position: relative;
+  overflow: hidden;
+}
+
+.canvas-container canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.canvas-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: var(--rabble-violet, #bf5fff);
+  text-align: center;
+  padding: 20px;
+  height: 100%;
+}
+
+.canvas-placeholder-title {
+  font-family: var(--rabble-font-hero, 'Orbitron', monospace);
+  font-weight: 700;
+  font-size: 0.9em;
+  letter-spacing: 0.05em;
+}
+
+.canvas-placeholder-detail {
+  font-size: 10px;
+  color: var(--rabble-muted, #6b6880);
+  font-family: var(--rabble-font-mono, 'Share Tech Mono', monospace);
+  line-height: 1.7;
+}
+
+/* ── Controls ─────────────────────────────────────────────────────────── */
+.control-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+}
+
+/* ── Status line ──────────────────────────────────────────────────────── */
+.status-line {
+  padding: 8px 10px;
+  background: rgba(10, 0, 16, 0.6);
+  border-left: 2px solid var(--rabble-cyan, #00f5ff);
+  border-radius: 3px;
+  font-family: var(--rabble-font-mono, 'Share Tech Mono', monospace);
+  font-size: 10px;
+  color: var(--rabble-muted, #6b6880);
+  flex-shrink: 0;
+}
+
+.status-line strong {
+  color: var(--rabble-cyan, #00f5ff);
+}

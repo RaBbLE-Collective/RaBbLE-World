@@ -136,14 +136,7 @@ body.boot-departing { animation: page-fade-out 0.55s ease forwards; }
   overflow: hidden;
 }
 
-/* Harmony accent line below the bar */
-.statusbar::after {
-  content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 1px;
-  background-image: linear-gradient(90deg,
-    transparent, var(--neon-cyan) 20%, var(--neon-violet) 50%, var(--neon-magenta) 80%, transparent);
-  background-size: 220% 100%; animation: harmony-bar 9s ease-in-out infinite; opacity: 0.9;
-}
-@keyframes harmony-bar { 0%, 100% { background-position: 0%; } 50% { background-position: 100%; } }
+/* Statusbar uses Aether harmony line */
 
 /* ── Left zone ────────────────────────────────────────────────────────────── */
 .sb-left {
@@ -428,19 +421,12 @@ body.boot-departing { animation: page-fade-out 0.55s ease forwards; }
 }
 .entity-wrap rabble-entity { width: 100%; height: 100%; display: block; }
 
-/* Wordmark */
+/* Wordmark — uses .rabble-brand-flow from Aether design system */
 .entity-wordmark {
-  font-family: var(--font-hero); font-weight: 800;
   font-size: clamp(40px, 5vw, 72px);
-  letter-spacing: 0.18em; line-height: 1;
-  flex-shrink: 0; user-select: none;
-  background: linear-gradient(90deg,
-    var(--neon-magenta), var(--neon-cyan), var(--neon-violet), var(--neon-magenta));
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  background-clip: text; background-size: 300%;
-  animation: brand-flow 6s ease infinite;
+  flex-shrink: 0;
+  animation-duration: 6s; /* align with boot page */
 }
-@keyframes brand-flow { 0%, 100% { background-position: 0%; } 50% { background-position: 100%; } }
 
 /* Tagline — NO text-transform: organ names and "Behavioral Learning Engine" need correct mixed case */
 .tagline {

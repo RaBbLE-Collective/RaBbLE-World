@@ -21,7 +21,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Share+Tech+Mono&family=Exo+2:wght@300;400;600;700;800&display=swap" rel="stylesheet">
 
 <!-- Aether design system → theme aliases → landing layout → WM tile system -->
-<link rel="stylesheet" href="aether/rabble.css">
+<link rel="stylesheet" href="http://localhost:8000/aether/v0.0.0.0/aether.min.css">
 <link rel="stylesheet" href="world/css/RaBbLE-theme.css">
 <link rel="stylesheet" href="world/css/RaBbLE-landing.css">
 <link rel="stylesheet" href="world/css/RaBbLE-wm.css">
@@ -51,7 +51,7 @@
     <!-- ═══ STATUS BAR — Waybar-style three-zone layout ════════════════
          Left: workspace/branding  ·  Center: entity state  ·  Right: metrics
          Data: landing.js init() — entityState reactive on _setEntityState()  -->
-    <header class="statusbar">
+    <header class="statusbar rabble-harmony-line">
 
       <!-- ── Left zone: workspace identity ─────────────────────────── -->
       <div class="sb-left">
@@ -220,7 +220,7 @@
           </rabble-entity>
         </div>
 
-        <h1 class="entity-wordmark" aria-label="RaBbLE">RaBbLE</h1>
+        <h1 class="entity-wordmark rabble-brand-flow" aria-label="RaBbLE">RaBbLE</h1>
 
         <p class="tagline">
           <span class="accent">a</span>
