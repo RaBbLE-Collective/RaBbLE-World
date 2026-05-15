@@ -622,6 +622,21 @@
           entityState = s;
           window.dispatchEvent(new CustomEvent('rabble:entity-state', { detail: { state: s } }));
         };
+        this.triggerBoot = () => {
+          // Reset timeline to play boot sequence again
+          t = 0;
+          blinkMachine = 0;
+          nextBlink = T_EYES_START + 200;
+          blinkT = 0;
+          blinkPhase = 0;
+          burstCount = 0;
+          eyeOpenProgress = 0;
+          // Reset particles to start position for convergence
+          parts.forEach(p => {
+            p.x = cx + (Math.random() - 0.5) * cv.width * 2.4;
+            p.y = cy + (Math.random() - 0.5) * cv.height * 2.2;
+          });
+        };
         this.injectEyeJolt = (dx, dy) => { joltX = dx; joltY = dy; joltDecay = 1.0; };
         this.resize = () => { preserveParticlesOnResize(); };
         this.destroy = () => {
@@ -652,7 +667,7 @@
           mode: 'idle',
           particleCount: 480,
           interactive: true,
-          showWaveform: false,
+          showWaveform: true,
           dpr: dpr,
           glowScale: glowScale,
         });
