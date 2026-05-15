@@ -62,8 +62,8 @@
 
           <div class="control-row">
             <button class="rabble-btn rabble-btn-ghost" onclick="startBootSequence()">Boot</button>
-            <button class="rabble-btn rabble-btn-ghost" onclick="changeState('thinking')">Thinking</button>
-            <button class="rabble-btn rabble-btn-ghost" onclick="changeState('idle')">Idle</button>
+            <button class="rabble-btn rabble-btn-ghost" onclick="changeState('thinking', 'nebula-l1')">Thinking</button>
+            <button class="rabble-btn rabble-btn-ghost" onclick="changeState('idle', 'nebula-l1')">Idle</button>
           </div>
 
           <div class="status-line">
@@ -85,8 +85,8 @@
           </div>
 
           <div class="control-row">
-            <button class="rabble-btn rabble-btn-ghost" onclick="changeState('thinking', true)">Thinking</button>
-            <button class="rabble-btn rabble-btn-ghost" onclick="changeState('idle', true)">Idle</button>
+            <button class="rabble-btn rabble-btn-ghost" onclick="changeState('thinking', 'nebula-l2')">Thinking</button>
+            <button class="rabble-btn rabble-btn-ghost" onclick="changeState('idle', 'nebula-l2')">Idle</button>
           </div>
 
           <div class="status-line">
@@ -151,9 +151,10 @@
     });
 
     // ═════════════════════════════════════════════════════════════════════════
-    // Boot Sequence Trigger
+    // Boot Sequence Trigger — applies to WM-selected applet
     // ═════════════════════════════════════════════════════════════════════════
     function startBootSequence() {
+      // Trigger boot on the currently WM-selected applet
       if (activeApplet === 'nebula-l1' && window.entity) {
         window.entity.setEntityState('idle');
         window.entity.triggerBoot?.();
@@ -668,17 +669,21 @@
       window.addEventListener('load', initEntity);
     })();
 
+    let state2d = 'idle';
     let state3d = 'idle';
 
-    function changeState(state, is3d = false) {
-      if (is3d) {
-        state3d = state;
-        if (window.three3d) window.three3d.setEntityState(state);
-        document.getElementById('status-three').textContent = `State: ${state}`;
-      } else {
+    function changeState(state, applet) {
+      if (applet === 'nebula-l1') {
+        state2d = state;
         if (window.entity) {
           window.entity.setEntityState(state);
           document.getElementById('status-canvas2d').textContent = `State: ${state}`;
+        }
+      } else if (applet === 'nebula-l2') {
+        state3d = state;
+        if (window.three3d) {
+          window.three3d.setEntityState(state);
+          document.getElementById('status-three').textContent = `State: ${state}`;
         }
       }
     }
