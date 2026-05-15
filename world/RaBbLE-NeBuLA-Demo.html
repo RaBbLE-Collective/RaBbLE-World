@@ -61,10 +61,9 @@
           </div>
 
           <div class="control-row">
-            <button class="rabble-btn rabble-btn-ghost" onclick="injectJolt(0.5, -0.5)">⬆️ Jolt</button>
-            <button class="rabble-btn rabble-btn-ghost" onclick="injectJolt(-0.5, 0.5)">⬇️ Jolt</button>
-            <button class="rabble-btn rabble-btn-ghost" onclick="changeState('thinking')">🤔 Think</button>
-            <button class="rabble-btn rabble-btn-ghost" onclick="changeState('idle')">👁️ Idle</button>
+            <button class="rabble-btn rabble-btn-ghost" onclick="startBootSequence()">Boot</button>
+            <button class="rabble-btn rabble-btn-ghost" onclick="changeState('thinking')">Thinking</button>
+            <button class="rabble-btn rabble-btn-ghost" onclick="changeState('idle')">Idle</button>
           </div>
 
           <div class="status-line">
@@ -86,8 +85,8 @@
           </div>
 
           <div class="control-row">
-            <button class="rabble-btn rabble-btn-ghost" onclick="changeState('thinking', true)">🤔 Think (3D)</button>
-            <button class="rabble-btn rabble-btn-ghost" onclick="changeState('idle', true)">👁️ Idle (3D)</button>
+            <button class="rabble-btn rabble-btn-ghost" onclick="changeState('thinking', true)">Thinking</button>
+            <button class="rabble-btn rabble-btn-ghost" onclick="changeState('idle', true)">Idle</button>
           </div>
 
           <div class="status-line">
@@ -103,6 +102,42 @@
   <script src="http://localhost:8000/nebula/v0.0.0.0/nebula.iife.js"></script>
 
   <script>
+    // ═════════════════════════════════════════════════════════════════════════
+    // WM Applet Selection System
+    // ═════════════════════════════════════════════════════════════════════════
+    let selectedApplet = 'nebula-l1';
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const applets = document.querySelectorAll('.applet');
+      applets.forEach(applet => {
+        applet.addEventListener('click', (e) => {
+          // Don't select if clicking a button
+          if (e.target.tagName === 'BUTTON') return;
+
+          applets.forEach(a => a.classList.remove('selected'));
+          applet.classList.add('selected');
+          selectedApplet = applet.dataset.applet;
+        });
+      });
+
+      // Select first applet by default
+      if (applets.length > 0) {
+        applets[0].classList.add('selected');
+      }
+    });
+
+    // ═════════════════════════════════════════════════════════════════════════
+    // Boot Sequence Trigger
+    // ═════════════════════════════════════════════════════════════════════════
+    function startBootSequence() {
+      if (selectedApplet === 'nebula-l1' && window.entity) {
+        window.entity.setEntityState('idle');
+        window.entity.triggerBoot?.();
+      } else if (selectedApplet === 'nebula-l2' && window.three3d) {
+        window.three3d.triggerBoot?.();
+      }
+    }
+
     // Full RaBbLE Entity Renderer — integrated from RaBbLE-World/js/RaBbLE-NeBuLA.js
     // Rendering the exact entity with portals, eyes, particle nebula, and interactions
 
@@ -650,69 +685,140 @@
         console.log('✓ Three.js loaded');
       };
 
-      // Create a simple Three.js scene for demo
+      // Create a particle-based Three.js scene for entropy visualization
       import('https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js').then(THREE => {
         const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, canvas3d.clientWidth / canvas3d.clientHeight, 0.1, 1000);
+        const camera = new THREE.PerspectiveCamera(60, canvas3d.clientWidth / canvas3d.clientHeight, 0.1, 1000);
         const renderer = new THREE.WebGLRenderer({ canvas: canvas3d, antialias: true, alpha: true });
         renderer.setSize(canvas3d.clientWidth, canvas3d.clientHeight);
         renderer.setClearColor(0x010008, 1);
-        camera.position.z = 6;
+        camera.position.z = 8;
 
-        // Create simple geometries with entropy-like emissive shading
-        const geometries = [
-          new THREE.SphereGeometry(0.5, 32, 32),
-          new THREE.BoxGeometry(0.8, 0.8, 0.8),
-          new THREE.TetrahedronGeometry(0.6),
+        // Particle system: dense cloud of glowing particles
+        const particleCount = 800;
+        const geometry = new THREE.BufferGeometry();
+        const positions = new Float32Array(particleCount * 3);
+        const colors = new Float32Array(particleCount * 3);
+        const colorPalette = [
+          { r: 0, g: 0.96, b: 1 },    // cyan
+          { r: 1, g: 0.18, b: 0.47 }, // magenta
+          { r: 0.75, g: 0.35, b: 1 }, // violet
         ];
 
-        const colors = [0x00f5ff, 0xff2d78, 0xbf5fff];
-        const meshes = [];
+        for (let i = 0; i < particleCount; i++) {
+          const r = Math.random() * 4;
+          const theta = Math.random() * Math.PI * 2;
+          const phi = Math.acos(2 * Math.random() - 1);
+          positions[i * 3] = r * Math.sin(phi) * Math.cos(theta);
+          positions[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
+          positions[i * 3 + 2] = r * Math.cos(phi);
 
-        for (let i = 0; i < 50; i++) {
-          const geom = geometries[i % geometries.length];
-          const color = colors[i % colors.length];
-          const mat = new THREE.MeshStandardMaterial({
-            color,
-            emissive: color,
-            emissiveIntensity: 0.3,
-            metalness: 0.1,
-            roughness: 0.9,
-          });
-          const mesh = new THREE.Mesh(geom, mat);
-          mesh.position.x = (Math.random() - 0.5) * 10;
-          mesh.position.y = (Math.random() - 0.5) * 10;
-          mesh.position.z = (Math.random() - 0.5) * 10;
-          mesh.rotation.x = Math.random() * Math.PI;
-          mesh.rotation.y = Math.random() * Math.PI;
-          meshes.push(mesh);
-          scene.add(mesh);
+          const col = colorPalette[i % colorPalette.length];
+          colors[i * 3] = col.r;
+          colors[i * 3 + 1] = col.g;
+          colors[i * 3 + 2] = col.b;
         }
 
-        // Lighting
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+        const material = new THREE.PointsMaterial({
+          size: 0.05,
+          vertexColors: true,
+          sizeAttenuation: true,
+        });
+
+        const particles = new THREE.Points(geometry, material);
+        scene.add(particles);
+
+        // Lighting for better depth
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
         scene.add(ambientLight);
-        const pointLight = new THREE.PointLight(0x00f5ff, 1, 100);
-        pointLight.position.set(5, 5, 5);
+        const pointLight = new THREE.PointLight(0x00f5ff, 0.8, 100);
+        pointLight.position.set(8, 8, 8);
         scene.add(pointLight);
+
+        // Camera controls
+        let mouseDown = false, mouseX = 0, mouseY = 0;
+        let cameraRotX = 0, cameraRotY = 0;
+        let zoom = 8;
+
+        canvas3d.addEventListener('mousedown', (e) => {
+          mouseDown = true;
+          mouseX = e.clientX;
+          mouseY = e.clientY;
+        });
+
+        document.addEventListener('mousemove', (e) => {
+          if (!mouseDown) return;
+          const deltaX = e.clientX - mouseX;
+          const deltaY = e.clientY - mouseY;
+          cameraRotY += deltaX * 0.005;
+          cameraRotX += deltaY * 0.005;
+          mouseX = e.clientX;
+          mouseY = e.clientY;
+        });
+
+        document.addEventListener('mouseup', () => {
+          mouseDown = false;
+        });
+
+        canvas3d.addEventListener('wheel', (e) => {
+          e.preventDefault();
+          zoom += e.deltaY > 0 ? 0.5 : -0.5;
+          zoom = Math.max(2, Math.min(15, zoom));
+        });
 
         // Animation loop
         let entropy = 0.3;
+        let bootProgress = 0;
+        let bootActive = false;
+
         function animate() {
           requestAnimationFrame(animate);
 
-          // Rotate meshes
-          meshes.forEach((mesh, i) => {
-            mesh.rotation.x += 0.001 * (1 + entropy);
-            mesh.rotation.y += 0.002 * (1 + entropy);
-            mesh.position.z += 0.01 * (Math.sin(i + Date.now() * 0.0001) - 0.5) * entropy;
-          });
+          // Update particle positions with entropy-driven movement
+          const posAttr = geometry.getAttribute('position');
+          const positions = posAttr.array;
 
-          // Update emissive based on state
-          meshes.forEach(mesh => {
-            const factor = 0.2 + entropy * 0.6;
-            mesh.material.emissiveIntensity = factor;
-          });
+          for (let i = 0; i < particleCount; i++) {
+            const x = positions[i * 3];
+            const y = positions[i * 3 + 1];
+            const z = positions[i * 3 + 2];
+
+            // Spiral inward during boot
+            const bootInfluence = bootActive ? Math.sin(bootProgress * Math.PI) * 0.5 : 0;
+            const scale = 1 - bootInfluence;
+
+            const noise = Math.sin(x * 2 + Date.now() * 0.0005) * Math.cos(y * 2 + Date.now() * 0.0003);
+            const drift = entropy * 0.02 + bootInfluence * 0.03;
+
+            positions[i * 3] = x * scale + noise * drift;
+            positions[i * 3 + 1] = y * scale + noise * drift * 0.8;
+            positions[i * 3 + 2] = z * scale + noise * drift * 0.6;
+          }
+          posAttr.needsUpdate = true;
+
+          // Update particle size with entropy
+          material.size = 0.03 + entropy * 0.05;
+
+          // Rotate camera
+          camera.position.x = Math.sin(cameraRotY) * zoom;
+          camera.position.y = Math.sin(cameraRotX) * zoom;
+          camera.position.z = Math.cos(cameraRotY) * zoom;
+          camera.lookAt(0, 0, 0);
+
+          // Rotate particles slowly
+          particles.rotation.z += 0.0003 * (1 + entropy);
+
+          // Update boot sequence
+          if (bootActive) {
+            bootProgress += 0.015;
+            if (bootProgress >= 1) {
+              bootActive = false;
+              bootProgress = 0;
+            }
+          }
 
           renderer.render(scene, camera);
         }
@@ -728,15 +834,19 @@
           renderer.setSize(w, h);
         });
 
-        // API: setEntityState
+        // API: setEntityState and boot
         window.three3d = {
           setEntityState(state) {
             entropy = state === 'idle' ? 0.3 : state === 'thinking' ? 0.6 : 0.8;
+          },
+          triggerBoot() {
+            bootActive = true;
+            bootProgress = 0;
           }
         };
 
-        document.getElementById('status-three').textContent = `Rendering • 50 entities • Entropy: ${entropy.toFixed(1)}`;
-        console.log('✓ Three.js backend initialized (Phase 4)');
+        document.getElementById('status-three').textContent = `Rendering • ${particleCount} particles • Drag to rotate • Scroll to zoom`;
+        console.log('✓ Three.js backend initialized (Phase 4) - particle cloud');
       }).catch(e => {
         console.error('Failed to load Three.js:', e);
         document.getElementById('canvas3d').parentElement.innerHTML = '<div style="color:#ff2d78;padding:20px;">Three.js failed to load</div>';
