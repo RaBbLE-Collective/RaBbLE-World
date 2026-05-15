@@ -15,8 +15,8 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   min-height: 0;
-  gap: 8px;
-  padding: 8px;
+  gap: var(--wm-gap);
+  padding: var(--wm-gap);
 }
 
 @media (max-width: 900px) {
@@ -31,11 +31,12 @@
    Rotating conic gradient border + harmony animation
    ═════════════════════════════════════════════════════════════════ */
 :root {
-  --wm-radius: 6px;
-  --wm-ring-width: 2px;
-  --wm-ring-opacity: 0.2;
-  --wm-active-dur: 12s;
-  --wm-chase-dur: 24s;
+  --wm-radius: 5px;
+  --wm-ring-width: 1.5px;
+  --wm-ring-opacity: 0.28;
+  --wm-active-dur: 3s;
+  --wm-chase-dur: 8s;
+  --wm-gap: 5px;
   --harmony-angle: 0deg;
 }
 
