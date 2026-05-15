@@ -103,37 +103,61 @@
 
   <script>
     // ═════════════════════════════════════════════════════════════════════════
-    // WM Applet Selection System
+    // WM Applet Focus System (matches landing page behavior)
     // ═════════════════════════════════════════════════════════════════════════
-    let selectedApplet = 'nebula-l1';
+    let activeApplet = 'nebula-l1';
 
     document.addEventListener('DOMContentLoaded', () => {
       const applets = document.querySelectorAll('.applet');
+
       applets.forEach(applet => {
         applet.addEventListener('click', (e) => {
-          // Don't select if clicking a button
+          // Don't focus if clicking a button
           if (e.target.tagName === 'BUTTON') return;
 
-          applets.forEach(a => a.classList.remove('selected'));
-          applet.classList.add('selected');
-          selectedApplet = applet.dataset.applet;
+          // Remove wm-active from all applets
+          applets.forEach(a => a.classList.remove('wm-active'));
+
+          // Add wm-active to clicked applet
+          applet.classList.add('wm-active');
+          activeApplet = applet.dataset.applet;
+
+          // Dispatch custom event like the landing page
+          window.dispatchEvent(new CustomEvent('rabble:wm-focus', {
+            detail: { applet: activeApplet }
+          }));
         });
       });
 
-      // Select first applet by default
+      // Focus first applet by default
       if (applets.length > 0) {
-        applets[0].classList.add('selected');
+        applets[0].classList.add('wm-active');
+        activeApplet = applets[0].dataset.applet;
       }
+    });
+
+    // Keyboard: Tab to cycle focus
+    document.addEventListener('keydown', (e) => {
+      if (e.key !== 'Tab' || e.ctrlKey || e.metaKey) return;
+      e.preventDefault();
+
+      const applets = Array.from(document.querySelectorAll('.applet'));
+      const current = applets.findIndex(a => a.classList.contains('wm-active'));
+      const next = (current + 1) % applets.length;
+
+      applets.forEach(a => a.classList.remove('wm-active'));
+      applets[next].classList.add('wm-active');
+      activeApplet = applets[next].dataset.applet;
     });
 
     // ═════════════════════════════════════════════════════════════════════════
     // Boot Sequence Trigger
     // ═════════════════════════════════════════════════════════════════════════
     function startBootSequence() {
-      if (selectedApplet === 'nebula-l1' && window.entity) {
+      if (activeApplet === 'nebula-l1' && window.entity) {
         window.entity.setEntityState('idle');
         window.entity.triggerBoot?.();
-      } else if (selectedApplet === 'nebula-l2' && window.three3d) {
+      } else if (activeApplet === 'nebula-l2' && window.three3d) {
         window.three3d.triggerBoot?.();
       }
     }
