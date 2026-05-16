@@ -1,11 +1,11 @@
 /**
- * RaBbLE-aether.js — Aether design system health monitor
+ * RaBbLE-aether.js — Aether design system loader + health monitor
  *
- * Loaded synchronously (no defer) immediately after the Aether <link> so the
- * onerror listener is registered before the browser resolves the request.
+ * Single point of import for Aether CSS. Loaded synchronously (no defer) so
+ * the <link> is injected and listeners are registered during HTML parsing.
  *
  * Two detection paths:
- *   1. onerror on #aether-css — fires on 404 / network failure
+ *   1. onerror on the link — fires on 404 / network failure
  *   2. window.load CSS var check — catches empty or silent failures
  *
  * On failure: marks <html data-aether="failed"> and inserts a visible banner.
@@ -14,8 +14,13 @@
 (function () {
   'use strict';
 
-  var link = document.getElementById('aether-css');
-  if (!link) return;
+  var AETHER_URL = '/aether/v0.0.0.0/aether.css';
+
+  var link = document.createElement('link');
+  link.rel = 'stylesheet';
+  link.href = AETHER_URL;
+  link.id = 'aether-css';
+  document.head.appendChild(link);
 
   var fired = false;
 
@@ -37,7 +42,7 @@
       'font-family:"Share Tech Mono",monospace',
       'font-size:10px;letter-spacing:.12em;text-transform:uppercase',
     ].join(';');
-    banner.textContent = '⚠ aether failed — degraded visual mode · /aether/v0.0.0.0/aether.css';
+    banner.textContent = '⚠ aether failed — degraded visual mode · ' + AETHER_URL;
 
     function insertBanner() {
       if (document.body) {
