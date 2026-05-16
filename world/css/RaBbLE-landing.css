@@ -45,58 +45,15 @@ body {
   cursor: default;
 }
 
-/* Page-exit fade (triggered by landing.js openLogin → submitLogin) */
+/* Page-exit fade — keyframe is in Aether motion (page-fade-out) */
 body.boot-departing { animation: page-fade-out 0.55s ease forwards; }
-@keyframes page-fade-out { from { opacity: 1; } to { opacity: 0; } }
 
 /* Utility: hide on very small screens */
 @media (max-width: 480px) { .hide-xs { display: none !important; } }
 
 
-/* ── CRT screen overlays ─────────────────────────────────────────────────── */
-.scanlines, .vignette, .chromatic {
-  position: fixed; inset: 0; pointer-events: none; z-index: 100;
-}
-.scanlines {
-  background: repeating-linear-gradient(0deg,
-    rgba(0,0,0,0.06) 0px, rgba(0,0,0,0.06) 1px, transparent 1px, transparent 3px);
-  opacity: 0.9;
-}
-.vignette {
-  background: radial-gradient(ellipse at 50% 50%, transparent 55%, rgba(0,0,0,0.72) 100%);
-}
-.chromatic {
-  background: linear-gradient(180deg,
-    rgba(255,45,120,0.020) 0%, transparent 30%, transparent 70%, rgba(0,245,255,0.020) 100%);
-  mix-blend-mode: screen;
-}
-
-
-/* ── Outrun grid + horizon ───────────────────────────────────────────────── */
-.floor {
-  position: fixed; left: -10%; right: -10%; bottom: -10%; top: 60%;
-  pointer-events: none; z-index: 0; perspective: 600px; overflow: hidden;
-}
-.floor::before {
-  content: "";
-  position: absolute; left: -50%; right: -50%; top: 0; bottom: -20%;
-  background-image:
-    linear-gradient(rgba(255,121,198,0.32) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,121,198,0.24) 1px, transparent 1px);
-  background-size: 70px 50px;
-  transform: rotateX(62deg); transform-origin: top center;
-  animation: floor-drift 18s linear infinite;
-  filter: drop-shadow(0 0 8px rgba(255,121,198,0.65));
-  mask-image: radial-gradient(ellipse at 50% 0%, black 35%, transparent 80%);
-}
-@keyframes floor-drift { from { background-position: 0 0; } to { background-position: 0 50px; } }
-
-.horizon {
-  position: fixed; left: 0; right: 0; top: 60%; height: 1px;
-  background: linear-gradient(90deg, transparent, var(--neon-magenta), transparent);
-  box-shadow: 0 0 14px var(--neon-magenta), 0 0 28px rgba(255,45,120,0.4);
-  z-index: 1; pointer-events: none;
-}
+/* ── CRT screen overlays — provided by Aether components ────────────────── */
+/* .scanlines, .vignette, .chromatic, .floor, .horizon all live in aether.css */
 
 
 /* ═══════════════════════════════════════════════════════════════
@@ -193,7 +150,7 @@ body.boot-departing { animation: page-fade-out 0.55s ease forwards; }
   background: var(--success); box-shadow: 0 0 6px var(--success);
   animation: pulse-dot 2s ease-in-out infinite;
 }
-@keyframes pulse-dot { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
+/* @keyframes pulse-dot — provided by Aether components */
 
 /* Responsive hide helpers */
 @media (max-width: 700px) { .sb-hide-sm { display: none; } }
@@ -430,7 +387,7 @@ body.boot-departing { animation: page-fade-out 0.55s ease forwards; }
 
 /* Tagline — NO text-transform: organ names and "Behavioral Learning Engine" need correct mixed case */
 .tagline {
-  font-family: var(--font-mono); font-size: 12px;
+  font-family: var(--font-hero); font-size: 12px;
   letter-spacing: 0.16em;
   color: var(--text-primary); flex-shrink: 0;
 }
