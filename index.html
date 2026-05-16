@@ -22,37 +22,7 @@
 
 <!-- Aether design system → theme aliases → landing layout → WM tile system -->
 <link rel="stylesheet" href="/aether/v0.0.0.0/aether.css" id="aether-css">
-<script>
-/* Detect Aether load failure and show a visible indicator */
-(function () {
-  var link = document.getElementById('aether-css');
-  function onAetherError() {
-    document.documentElement.dataset.aether = 'failed';
-    var b = document.createElement('div');
-    b.id = 'aether-fail-banner';
-    b.style.cssText = [
-      'position:fixed;top:0;left:0;right:0;z-index:9999',
-      'padding:5px 14px;text-align:center',
-      'background:rgba(224,92,111,0.12)',
-      'border-bottom:1px solid rgba(224,92,111,0.45)',
-      'color:#e05c6f',
-      'font-family:"Share Tech Mono",monospace',
-      'font-size:10px;letter-spacing:.12em;text-transform:uppercase',
-    ].join(';');
-    b.textContent = '⚠ aether failed — degraded visual mode · /aether/v0.0.0.0/aether.css';
-    document.addEventListener('DOMContentLoaded', function () {
-      document.body.insertBefore(b, document.body.firstChild);
-    });
-  }
-  link.addEventListener('error', onAetherError);
-  /* Fallback: check CSS sentinel after load in case the file loaded empty */
-  window.addEventListener('load', function () {
-    if (!getComputedStyle(document.documentElement).getPropertyValue('--rabble-magenta').trim()) {
-      onAetherError();
-    }
-  });
-}());
-</script>
+<script src="world/js/RaBbLE-aether.js"></script>
 <link rel="stylesheet" href="world/css/RaBbLE-theme.css">
 <link rel="stylesheet" href="world/css/RaBbLE-landing.css">
 <link rel="stylesheet" href="world/css/RaBbLE-wm.css">

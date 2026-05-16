@@ -36,6 +36,7 @@ RaBbLE-World is the public-facing web presence and entity chat surface for the C
 **`world/js/`**
 | Path | What |
 |---|---|
+| `world/js/RaBbLE-aether.js` | Aether health monitor — detects load failure, shows degraded-mode banner |
 | `world/js/RaBbLE-entity.js` | `<rabble-entity>` custom element — shared across all pages |
 | `world/js/RaBbLE-bg.js` | Ambient background — particles, grid, cursor effects |
 | `world/js/RaBbLE-landing.js` | Alpine.js component for landing (wakeup sequence, boot, OS nav) |
