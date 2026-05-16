@@ -36,13 +36,15 @@ RaBbLE-World is the public-facing web presence and entity chat surface for the C
 **`world/js/`**
 | Path | What |
 |---|---|
-| `world/js/RaBbLE-aether.js` | Aether health monitor — detects load failure, shows degraded-mode banner |
-| `world/js/RaBbLE-entity.js` | `<rabble-entity>` custom element — shared across all pages |
+| `world/js/RaBbLE-aether.js` | Aether loader + monitor — injects CSS bundle, shows failure banner |
+| `world/js/RaBbLE-NeBuLA.js` | NeBuLA loader + monitor — injects JS bundle, shows failure banner |
 | `world/js/RaBbLE-bg.js` | Ambient background — particles, grid, cursor effects |
 | `world/js/RaBbLE-landing.js` | Alpine.js component for landing (wakeup sequence, boot, OS nav) |
 | `world/js/RaBbLE-boot.js` | Boot sequence behavior and login |
 | `world/js/RaBbLE-chat.js` | Chat surface behavior |
 | `world/js/RaBbLE-ios-install.js` | iOS PWA install prompt |
+
+**Note:** `<rabble-entity>` is now defined inside the NeBuLA bundle (`/nebula/v0.0.0.0/nebula.iife.js`). Do not redefine it in World.
 
 ## Commits & Branches
 

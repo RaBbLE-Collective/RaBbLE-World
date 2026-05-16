@@ -20,8 +20,10 @@
 <!-- Fonts — Orbitron for hero wordmark, Exo 2 for UI, Share Tech Mono for terminal -->
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Share+Tech+Mono&family=Exo+2:wght@300;400;600;700;800&display=swap" rel="stylesheet">
 
-<!-- Aether design system — loaded + monitored by RaBbLE-aether.js -->
+<!-- Bundle loaders — synchronous, inject from CDN, monitor for failure -->
 <script src="world/js/RaBbLE-aether.js"></script>
+<script src="world/js/RaBbLE-NeBuLA.js"></script>
+
 <link rel="stylesheet" href="world/css/RaBbLE-theme.css">
 <link rel="stylesheet" href="world/css/RaBbLE-landing.css">
 <link rel="stylesheet" href="world/css/RaBbLE-wm.css">
@@ -29,7 +31,6 @@
 <!-- landing.js must load before Alpine (defines Alpine.data('landing')) -->
 <script src="world/js/RaBbLE-landing.js"></script>
 <script defer src="world/js/RaBbLE-bg.js"></script>
-<script defer src="world/js/RaBbLE-NeBuLA.js"></script>
 <script defer src="world/js/RaBbLE-wm.js"></script>
 <script defer src="https://unpkg.com/alpinejs@3.14.1/dist/cdn.min.js"></script>
 </head>
