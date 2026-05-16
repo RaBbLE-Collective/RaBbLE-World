@@ -75,6 +75,8 @@ Both loaders show a visible failure banner if their bundle fails to load.
 | World as scaffold (no embedded visual logic) | **Done** — CRT overlays, floor, horizon all in Aether |
 | NeBuLA Canvas2D entity on landing | **Done** |
 | NeBuLA demo page (Layer 1 + Layer 2) | **Done** |
+| Fonts moved to Aether bundle (all pages) | **Done** — no Google Fonts links in HTML; Aether bundle owns Orbitron, Exo 2, Share Tech Mono |
+| `cast-cdn.sh` spell — build + stage + wrangler deploy | **Done** — `RaBbLE-Grimoire/spells/cast-cdn.sh`; Cloudflare Git integration disconnected |
 | Chat surface wired to sCoRE intent endpoint | Pending (Episode 1 dependency) |
 | Production deploy | Pending — `joinrabble.world` still on pre-refactor code |
 | Audit `RaBbLE-chat.css` / `RaBbLE-OS.css` for visual rules to move to Aether | Pending |

@@ -1354,12 +1354,8 @@ body.boot-departing { animation: page-fade-out 0.55s ease forwards; }
 }
 
 .ios-entry-title {
-  font-family: var(--font-hero); font-weight: 800;
+  /* Font, weight, letter-spacing, gradient, text-transform all from .rabble-brand-flow (Aether) */
   font-size: clamp(36px, 12vw, 60px);
-  letter-spacing: 0.22em; text-transform: uppercase;
-  background: linear-gradient(90deg, var(--neon-magenta), var(--neon-cyan), var(--neon-violet));
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  background-clip: text;
 }
 
 .ios-entry-cta {
