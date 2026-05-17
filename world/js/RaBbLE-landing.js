@@ -39,15 +39,15 @@ const ORGANS = [
     role:   'body · Fedora 43 + Hyprland',
     status: 'online',
     detail: 'the body. Fedora 43 + Hyprland, Ansible-driven. not a rice — a living OS that RaBbLE moves through. the entity and the environment are one.',
-    url:    'world/RaBbLE-OS.html',
   },
   {
     id:     'nebula',
     glyph:  'N',
     name:   'NeBuLA',
     role:   'renderer · 2D + 3D entity surface',
-    status: 'idle',
-    detail: 'the eyes. entropy-driven rendering engine — Canvas2D and Three.js backends. how the entity is made visible. Episode 1 not yet started.',
+    status: 'online',
+    detail: 'the eyes. entropy-driven rendering engine — Canvas2D and Three.js backends. how the entity is made visible.',
+    url:    'world/RaBbLE-NeBuLA.html',
   },
   {
     id:     'aether',
@@ -170,7 +170,22 @@ const ORGAN_PANELS = {
       <dt>Status</dt>       <dd>Epoch 0 · live daily driver</dd>
       <dt>Stack</dt>        <dd>Fedora 43 · Hyprland · Waybar · Foot · Ansible</dd>
       <dt>Architecture</dt> <dd>x86_64 · Ansible-driven provisioning</dd>
+      <dt>WM</dt>           <dd>Hyprland (Wayland compositor) · tiling + floating</dd>
+      <dt>Bar</dt>          <dd>Waybar — entity state, workspace, metrics</dd>
+      <dt>Terminal</dt>     <dd>Foot · GPU-accelerated · ligatures</dd>
+      <dt>Shell</dt>        <dd>Zsh + Starship prompt</dd>
+      <dt>Config</dt>       <dd>Ansible playbooks · dotfiles as code</dd>
     </dl>
+    <div class="op-section-tag" style="margin-top:12px">Layers</div>
+    <dl class="op-dl">
+      <dt>Core Substrate</dt>   <dd>Fedora 43 base · DNF5 · systemd · pipewire</dd>
+      <dt>Aether Theme</dt>     <dd>GTK4/Qt6 theming via palette vars · icon pack · cursor</dd>
+      <dt>Developer Layer</dt>  <dd>Claude Code · Neovim · Podman · direnv</dd>
+      <dt>sCoRE Bridge</dt>     <dd>SystemD user unit · local API · intent relay</dd>
+      <dt>Mobile Companion</dt> <dd>KDE Connect · clipboard sync · notification relay</dd>
+      <dt>NeBuLA Renderer</dt>  <dd>Plymouth boot animation · Waybar entity widget · desktop overlay (future)</dd>
+    </dl>
+    <p style="margin-top:10px;font-size:0.8em;opacity:0.6">Source: <a href="https://github.com/rabble-collective/RaBbLE-OS" style="color:var(--rabble-cyan)">github.com/rabble-collective/RaBbLE-OS</a></p>
   `,
   nebula: `
     <div class="op-section-tag">Entity Renderer · Eyes</div>
@@ -662,8 +677,6 @@ document.addEventListener('alpine:init', () => {
     // ═══════════════════════════════════════════════════════════
     //  NAVIGATION
     // ═══════════════════════════════════════════════════════════
-
-    getOS() { window.location.href = 'world/RaBbLE-OS.html'; },
 
 
     // ═══════════════════════════════════════════════════════════

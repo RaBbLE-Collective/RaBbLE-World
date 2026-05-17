@@ -40,6 +40,9 @@ coverage/
 .stylelintcache
 *.tsbuildinfo
 
+# ── Captures (screenshots, debug images) ──────────────────────────────
+captures/
+
 # ── OS / editor noise ──────────────────────────────────────────────────
 .DS_Store
 Thumbs.db
