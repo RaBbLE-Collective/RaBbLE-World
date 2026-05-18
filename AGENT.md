@@ -75,3 +75,16 @@ See Grimoire: `../RaBbLE-Grimoire/common/RaBbLE-CommitStyle.md` (Pulse Protocol)
 2. `../RaBbLE-Grimoire/RaBbLE-World/RaBbLE-World-Architecture.md` — layer stack, module map
 3. `rabble-theme.css` — before touching any CSS or visual elements
 4. For Collective context → `../RaBbLE-Grimoire/common/RaBbLE-Collective.md`
+
+## Visual Verification (on RaBbLE-OS)
+
+After any CSS, layout, or visual change, cast the screenshot spell to see the result:
+
+```bash
+# Serve locally: python -m http.server 8000 (from this directory)
+bash ../RaBbLE-Grimoire/spells/visual-screenshot.sh --url http://localhost:8000 --close
+# Prints: SCREENSHOT: ~/RaBbLE-screenshots/visual-TIMESTAMP.png
+# Use Read tool on that path — Claude Code reads PNG files directly
+```
+
+Use `--url http://localhost:8000/world/Boot.html` for specific pages. See `../RaBbLE-Grimoire/SPELLS.md → visual-screenshot.sh` for full options.
