@@ -297,6 +297,10 @@ document.addEventListener('alpine:init', () => {
     renderBackend: 'Canvas2D',
     particleCount: 480,
     substrate:     '…',      // device type detected on init
+    nebulaFps:     60,       // NeBuLA internal FPS counter (from getPerformanceMetrics)
+    glowLevel:     '100%',   // adaptive glow level (drops under load)
+    budgetMs:      '—',      // frame budget remaining ms (from FrameBudget)
+    nebulaLinks:   0,        // pre-computed connection count
 
     uptime: '0d 00h 00m 00s',
     startedAt: Date.now(),
@@ -438,6 +442,22 @@ document.addEventListener('alpine:init', () => {
         if (frames % 20 === 0) {
           this.pulse      = Math.round(smoothed);
           this.entropyVal = this._computeEntropy();
+        }
+        // Poll NeBuLA backend metrics every 60 frames (~1Hz)
+        if (frames % 60 === 0) {
+          const m = window.NeBuLA?._instance?.getPerformanceMetrics?.();
+          if (m) {
+            this.nebulaFps   = m.fps ?? this.nebulaFps;
+            this.glowLevel   = m.adaptiveGlow != null
+              ? Math.round(m.adaptiveGlow * 100) + '%'
+              : this.glowLevel;
+            this.nebulaLinks = m.links ?? this.nebulaLinks;
+            this.budgetMs    = m.budget?.remaining != null
+              ? m.budget.remaining.toFixed(1) + 'ms'
+              : this.budgetMs;
+            // Keep particle count live — may differ from attribute on mobile
+            if (m.particles) this.particleCount = m.particles;
+          }
         }
 
         requestAnimationFrame(tick);
