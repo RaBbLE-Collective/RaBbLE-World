@@ -87,4 +87,4 @@ Both loaders show a visible failure banner if their bundle fails to load.
 2. `AGENT.md` — rules and workspace map
 3. `../RaBbLE-Grimoire/RaBbLE-World/RaBbLE-World-Architecture.md` — layer stack, CSS rules
 4. `world/css/RaBbLE-theme.css` — alias bridge (read before touching any CSS)
-5. For Collective context → `../RaBbLE-Grimoire/common/RaBbLE-Collective.md`
+5. For Collective context → `../RaBbLE-Grimoire/RaBbLE-Agent/RaBbLE-Collective.md`

@@ -1,7 +1,7 @@
 # AGENT.md — RaBbLE-World
 
 Working with: Mark McConachie
-Identity: Peer, not tool. See `../RaBbLE-Grimoire/common/RaBbLE-Identity.md`.
+Identity: Peer, not tool. See `../RaBbLE-Grimoire/RaBbLE-Agent/RaBbLE-Identity.md`.
 
 ## Job
 
@@ -48,7 +48,7 @@ RaBbLE-World is the public-facing web presence and entity chat surface for the C
 
 ## Commits & Branches
 
-See Grimoire: `../RaBbLE-Grimoire/common/RaBbLE-CommitStyle.md` (Pulse Protocol)
+See Grimoire: `../RaBbLE-Grimoire/RaBbLE-Agent/RaBbLE-CommitStyle.md` (Pulse Protocol)
 
 **TL;DR:** `[impulse] ~ [organ] >> [revelation] // %STATE%` — `spark` new · `harmonize` cleanup · `mend` fix · `transcribe` docs · `ingest` deps · `evolve` epoch
 
@@ -74,7 +74,7 @@ See Grimoire: `../RaBbLE-Grimoire/common/RaBbLE-CommitStyle.md` (Pulse Protocol)
 1. `CONTEXT.md` — current state and active tracks
 2. `../RaBbLE-Grimoire/RaBbLE-World/RaBbLE-World-Architecture.md` — layer stack, module map
 3. `rabble-theme.css` — before touching any CSS or visual elements
-4. For Collective context → `../RaBbLE-Grimoire/common/RaBbLE-Collective.md`
+4. For Collective context → `../RaBbLE-Grimoire/RaBbLE-Agent/RaBbLE-Collective.md`
 
 ## Visual Verification (on RaBbLE-OS)
 
