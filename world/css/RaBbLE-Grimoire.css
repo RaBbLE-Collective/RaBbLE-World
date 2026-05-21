@@ -1,0 +1,959 @@
+/* RaBbLE-Grimoire.css — Grimoire summoning circle styles (Variant B)
+ * Stripped from grimoire-variants.css: shared .gv-* chrome + .sc-* circle + .ec-* entity creature.
+ */
+
+/* ─── Aether ring passthrough ────────────────────────────────────────────────
+ * .gv-panel fills the full <aside class="applet"> but must not bury the
+ * Aether animated conic border ring (.applet::before). Fix:
+ *   1. Remove .gv-panel's static border — Aether owns the border.
+ *   2. Lift .applet::before above .gv-panel so the ring is always visible.
+ *      (The ::before uses mask-composite:exclude so only the 1.5px ring edge
+ *       is opaque — content underneath is fully visible.)
+ * ─────────────────────────────────────────────────────────────────────────── */
+[data-applet="grimoire"]::before { z-index: 1; }
+
+/* ═════════════════════════════════════════════════════════════════
+ * SHARED CHROME · void-panel backdrop that matches .panel.left
+ * ═════════════════════════════════════════════════════════════════ */
+.gv-panel {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background:
+    radial-gradient(ellipse at 50% 110%, rgba(255,45,120,0.10), transparent 55%),
+    radial-gradient(ellipse at 20% -10%, rgba(0,245,255,0.05), transparent 60%),
+    rgba(10,0,16,0.78);
+  backdrop-filter: blur(6px);
+  border: none;       /* Aether .applet::before owns the border */
+  border-radius: var(--wm-radius, 5px);
+  font-family: var(--rabble-font-ui);
+  color: var(--rabble-text);
+  overflow: hidden;
+  isolation: isolate;
+}
+.gv-inner { position: relative; z-index: 2; display: flex; flex-direction: column; height: 100%; min-height: 0; }
+
+.gv-horizon {
+  position: absolute; left: 0; right: 0; bottom: 28%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--rabble-magenta), transparent);
+  box-shadow: 0 0 12px var(--rabble-magenta);
+  opacity: 0.4;
+  z-index: 1;
+}
+.gv-scanlines {
+  position: absolute; inset: 0; pointer-events: none; z-index: 3;
+  background: repeating-linear-gradient(0deg,
+    rgba(0,0,0,0.10) 0px, rgba(0,0,0,0.10) 1px, transparent 1px, transparent 3px);
+  opacity: 0.7;
+  mix-blend-mode: multiply;
+}
+
+/* Variant-specific panel tints */
+.gv-panel--codex {
+  background:
+    radial-gradient(ellipse at 50% 110%, rgba(0,245,255,0.08), transparent 55%),
+    rgba(10,0,16,0.82);
+}
+.gv-panel--circle {
+  background:
+    radial-gradient(ellipse at 50% 30%, rgba(191,95,255,0.14), transparent 60%),
+    radial-gradient(ellipse at 50% 110%, rgba(255,45,120,0.10), transparent 50%),
+    rgba(7,0,18,0.86);
+}
+.gv-panel--tome {
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(255,121,198,0.10), transparent 45%),
+    radial-gradient(ellipse at 50% 110%, rgba(191,95,255,0.08), transparent 50%),
+    rgba(10,0,18,0.85);
+}
+
+/* ── Chrome header ─────────────────────────────────────────────── */
+.gv-head {
+  display: flex; flex-direction: column; gap: 4px;
+  padding: 12px 14px 10px;
+  border-bottom: 1px solid var(--rabble-border);
+  flex-shrink: 0;
+}
+.gv-crumb {
+  display: flex; align-items: center; gap: 7px;
+  font-family: var(--rabble-font-mono);
+  font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
+}
+.gv-crumb-prev { color: var(--rabble-muted); }
+.gv-crumb-sep  { color: var(--rabble-violet); opacity: 0.7; }
+.gv-crumb-now  { font-weight: 700; letter-spacing: 0.20em; }
+.gv-head-meta {
+  display: flex; align-items: center; gap: 8px;
+  font-family: var(--rabble-font-mono); font-size: 9px;
+  color: var(--rabble-muted); letter-spacing: 0.12em; text-transform: uppercase;
+}
+.gv-meta-tag { white-space: nowrap; }
+.gv-meta-sub::before { content: "· "; margin-right: 2px; opacity: 0.5; }
+
+
+/* ═════════════════════════════════════════════════════════════════
+ * SHARED · in-panel doc reader (slide-over)
+ * ═════════════════════════════════════════════════════════════════ */
+.gv-reader {
+  position: absolute; inset: 0; z-index: 30;
+  display: flex; flex-direction: column;
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(191,95,255,0.10), transparent 60%),
+    rgba(7,0,18,0.94);
+  backdrop-filter: blur(10px);
+  overflow: hidden;
+}
+.gv-reader--slide  { animation: gv-reader-slide-in 280ms cubic-bezier(0.2,0.9,0.2,1) both; }
+.gv-reader--rune   { animation: gv-reader-rune-in 420ms cubic-bezier(0.2,0.9,0.2,1) both; }
+.gv-reader--page   { animation: gv-reader-page-in 380ms cubic-bezier(0.2,0.9,0.2,1) both; transform-origin: left center; }
+
+@keyframes gv-reader-slide-in {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(0); }
+}
+@keyframes gv-reader-rune-in {
+  from { opacity: 0; transform: scale(0.96); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@keyframes gv-reader-page-in {
+  from { opacity: 0; transform: perspective(800px) rotateY(-22deg); }
+  to   { opacity: 1; transform: perspective(800px) rotateY(0); }
+}
+
+.gv-runedraw {
+  position: absolute; top: -40px; left: 50%; transform: translateX(-50%);
+  width: 220px; height: 220px;
+  opacity: 0.35;
+  pointer-events: none;
+  animation: gv-rune-draw 600ms cubic-bezier(0.2,0.9,0.2,1) forwards,
+             gv-rune-spin 32s linear infinite;
+}
+@keyframes gv-rune-draw {
+  from { stroke-dashoffset: 277; }
+  to   { stroke-dashoffset: 0; }
+}
+.gv-runedraw circle:first-child {
+  animation: gv-rune-draw 700ms cubic-bezier(0.2,0.9,0.2,1) forwards;
+}
+@keyframes gv-rune-spin {
+  from { transform: translateX(-50%) rotate(0deg); }
+  to   { transform: translateX(-50%) rotate(360deg); }
+}
+
+.gv-reader-head {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 16px 14px 14px;
+  flex-shrink: 0;
+  position: relative; z-index: 2;
+}
+.gv-reader-sigil {
+  width: 38px; height: 38px; border-radius: 50%;
+  border: 1px solid; display: flex; align-items: center; justify-content: center;
+  font-family: var(--rabble-font-hero); font-size: 17px; font-weight: 700;
+  flex-shrink: 0;
+}
+.gv-reader-titles { flex: 1; min-width: 0; }
+.gv-reader-name {
+  font-family: var(--rabble-font-hero);
+  font-size: 15px; font-weight: 700; letter-spacing: 0.06em;
+  color: var(--rabble-text);
+  line-height: 1.2;
+}
+.gv-reader-ext { color: var(--rabble-muted); margin-left: 1px; font-weight: 400; }
+.gv-reader-role {
+  font-family: var(--rabble-font-mono); font-size: 10px;
+  letter-spacing: 0.12em; text-transform: lowercase;
+  margin-top: 4px;
+}
+.gv-reader-close {
+  width: 26px; height: 26px;
+  border: 1px solid var(--rabble-border); border-radius: 3px;
+  background: transparent; color: var(--rabble-muted);
+  font-family: var(--rabble-font-mono); font-size: 12px;
+  cursor: pointer; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 140ms;
+}
+.gv-reader-close:hover {
+  color: var(--rabble-magenta); border-color: var(--rabble-magenta);
+  box-shadow: 0 0 8px var(--rabble-magenta);
+}
+
+.gv-reader-body {
+  flex: 1; overflow-y: auto;
+  padding: 14px 16px 20px;
+  position: relative; z-index: 2;
+}
+.gv-reader-kicker {
+  font-family: var(--rabble-font-mono); font-size: 9px;
+  letter-spacing: 0.32em; text-transform: uppercase;
+  text-shadow: 0 0 6px currentColor;
+  margin-bottom: 10px;
+}
+.gv-reader-summary {
+  font-family: var(--rabble-font-ui);
+  font-size: 13px; line-height: 1.65;
+  color: var(--rabble-text);
+  margin: 0 0 18px;
+  text-wrap: pretty;
+}
+
+.gv-reader-dl {
+  display: grid; grid-template-columns: 70px 1fr;
+  gap: 6px 12px;
+  margin: 0 0 18px;
+  font-family: var(--rabble-font-mono);
+  font-size: 11px;
+  padding-top: 12px;
+  border-top: 1px solid var(--rabble-border);
+}
+.gv-reader-dl dt {
+  color: var(--rabble-muted);
+  letter-spacing: 0.10em;
+  text-transform: lowercase;
+}
+.gv-reader-dl dd {
+  color: var(--rabble-text);
+  margin: 0;
+}
+
+.gv-reader-cmd {
+  display: flex; align-items: center; gap: 8px;
+  padding: 9px 11px;
+  background: rgba(3,0,11,0.85);
+  border: 1px solid var(--rabble-violet);
+  border-radius: 3px;
+  box-shadow: 0 0 8px rgba(191,95,255,0.20);
+  margin-bottom: 6px;
+}
+.gv-reader-prompt {
+  color: var(--rabble-magenta); text-shadow: 0 0 4px var(--rabble-magenta);
+  font-family: var(--rabble-font-mono); font-size: 11px;
+}
+.gv-reader-cmd code {
+  font-family: var(--rabble-font-mono); font-size: 10px;
+  color: var(--rabble-cyan); text-shadow: 0 0 3px var(--rabble-cyan-35);
+  word-break: break-all;
+}
+
+.gv-reader-foot {
+  padding: 12px 14px;
+  border-top: 1px solid var(--rabble-border);
+  flex-shrink: 0;
+  position: relative; z-index: 2;
+  background: rgba(3,0,11,0.3);
+}
+.gv-reader-link {
+  display: inline-block;
+  padding: 7px 14px;
+  border: 1px solid; border-radius: 3px;
+  font-family: var(--rabble-font-mono); font-size: 11px;
+  letter-spacing: 0.14em; text-transform: lowercase;
+  text-decoration: none;
+  transition: all 160ms;
+}
+.gv-reader-link:hover {
+  background: currentColor;
+  filter: brightness(1.1);
+}
+.gv-reader-link:hover { color: var(--rabble-void) !important; }
+
+
+
+/* ═════════════════════════════════════════════════════════════════
+ * VARIANT B · SUMMONING CIRCLE — refined
+ * Header w/ watching entity · ring w/ ambient + hologram center ·
+ * hologram readout panel · summon cards.
+ * ═════════════════════════════════════════════════════════════════ */
+
+/* ── Header with watching entity ─────────────────────────────── */
+.sc-head {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 8px;
+  padding: 10px 12px 8px;
+  border-bottom: 1px solid var(--rabble-border);
+  flex-shrink: 0;
+}
+.sc-crumb {
+  display: flex; align-items: center; gap: 6px;
+  font-family: var(--rabble-font-mono);
+  font-size: 9px; letter-spacing: 0.20em; text-transform: uppercase;
+}
+.sc-crumb-prev { color: var(--rabble-muted); }
+.sc-crumb-sep  { color: var(--rabble-violet); opacity: 0.7; }
+.sc-crumb-now  {
+  color: var(--rabble-violet); font-weight: 700; letter-spacing: 0.22em;
+  text-shadow: 0 0 6px var(--rabble-violet);
+}
+
+/* The watching entity — small SVG eye + label */
+.sc-eye {
+  display: flex; align-items: center; gap: 8px;
+  padding: 3px 7px 3px 4px;
+  background: rgba(3,0,11,0.5);
+  border: 1px solid rgba(191,95,255,0.35);
+  border-radius: 999px;
+  flex-shrink: 0;
+  transition: border-color 240ms;
+}
+.sc-eye.is-alert { border-color: rgba(255,121,198,0.6); box-shadow: 0 0 8px rgba(255,121,198,0.35); }
+.sc-eye-svg { width: 28px; height: 28px; flex-shrink: 0; display: block; }
+.sc-eye-spin {
+  transform-origin: 20px 20px;
+  animation: sc-eye-rotate 14s linear infinite;
+}
+@keyframes sc-eye-rotate { from { transform: rotate(0); } to { transform: rotate(360deg); } }
+/* Blink — the eyelid <rect> covers the eye briefly */
+.sc-eye-lid {
+  transform-origin: 20px 20px;
+  transform: scaleY(0);
+  transition: transform 90ms ease-out;
+}
+.sc-eye.is-blink .sc-eye-lid { transform: scaleY(1); }
+.sc-eye-label { line-height: 1.1; }
+.sc-eye-name {
+  font-family: var(--rabble-font-hero); font-weight: 700;
+  font-size: 9px; letter-spacing: 0.18em;
+  color: var(--rabble-text);
+}
+.sc-eye-state {
+  font-family: var(--rabble-font-mono);
+  font-size: 8px; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--rabble-muted);
+  margin-top: 1px;
+  transition: color 200ms;
+}
+
+/* ── Rune ring container ─────────────────────────────────────── */
+.sc-ring-wrap {
+  position: relative;
+  display: flex; justify-content: center;
+  padding: 6px 0 0;
+  flex-shrink: 0;
+  transition: filter 600ms;
+}
+.sc-ring-wrap.is-summoning {
+  filter: brightness(1.25) saturate(1.2);
+}
+.sc-ring {
+  position: relative;
+  width: 260px; height: 260px;
+}
+.sc-ring-halo {
+  position: absolute; inset: -10px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--ring-color, #bf5fff) 0%, transparent 55%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 400ms;
+}
+.sc-ring-wrap.is-summoning .sc-ring-halo { opacity: 0.18; }
+.sc-ring-wrap.is-summoned  .sc-ring-halo { opacity: 0.10; }
+
+.sc-ring-svg {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+}
+.sc-ring-rotate {
+  transform-origin: 100px 100px;
+  animation: sc-rot-cw 48s linear infinite;
+}
+.sc-ring-counter {
+  transform-origin: 100px 100px;
+  animation: sc-rot-ccw 72s linear infinite;
+}
+.sc-ring-wrap.is-summoning .sc-ring-rotate  { animation-duration: 6s; }
+.sc-ring-wrap.is-summoning .sc-ring-counter { animation-duration: 9s; }
+.sc-ring-wrap.is-summoned  .sc-ring-rotate  { animation-duration: 36s; }
+.sc-ring-wrap.is-summoned  .sc-ring-counter { animation-duration: 54s; }
+@keyframes sc-rot-cw  { from { transform: rotate(0); } to { transform: rotate(360deg); } }
+@keyframes sc-rot-ccw { from { transform: rotate(0); } to { transform: rotate(-360deg); } }
+
+.sc-ring-runes {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  animation: sc-rot-cw 64s linear infinite;
+}
+.sc-ring-wrap.is-summoning .sc-ring-runes { animation-duration: 8s; }
+.sc-ring-wrap.is-summoned  .sc-ring-runes { animation-duration: 48s; }
+.sc-ring-rune {
+  position: absolute;
+  font-family: var(--rabble-font-mono);
+  font-size: 13px;
+  opacity: 0.85;
+}
+
+/* Ring center common */
+.sc-ring-center {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center;
+  padding: 0 14px;
+}
+
+/* ── Ambient entity (default ring center) ────────────────────── */
+.sc-ambient {
+  display: flex; flex-direction: column; align-items: center;
+  animation: sc-ambient-breathe 5s ease-in-out infinite;
+}
+@keyframes sc-ambient-breathe {
+  0%, 100% { opacity: 0.92; transform: scale(1); }
+  50%      { opacity: 1;    transform: scale(1.04); }
+}
+.sc-ambient-svg { width: 90px; height: 90px; }
+.sc-ambient-iris { transform-origin: 30px 30px; animation: sc-rot-cw 18s linear infinite; }
+.sc-ambient-pupil { animation: sc-pupil 4.2s ease-in-out infinite; transform-origin: 30px 30px; }
+@keyframes sc-pupil {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.25); filter: drop-shadow(0 0 10px #bf5fff); }
+}
+
+/* Ring caption — sits BELOW the ring so the rotating runes can never
+   cross through the text. Two-line label (kind + name or idle prompt). */
+.sc-ring-caption {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 2px;
+  padding: 4px 12px 0;
+  flex-shrink: 0;
+  text-align: center;
+}
+.sc-ring-caption-kind {
+  font-family: var(--rabble-font-mono);
+  font-size: 9px; letter-spacing: 0.24em; text-transform: uppercase;
+}
+.sc-ring-caption-kind--idle {
+  color: var(--rabble-violet);
+  text-shadow: 0 0 5px var(--rabble-violet);
+  opacity: 0.7;
+}
+.sc-ring-caption-name {
+  font-family: var(--rabble-font-hero); font-weight: 700;
+  font-size: 12px; letter-spacing: 0.14em;
+  color: var(--rabble-text);
+  text-shadow: 0 0 6px currentColor;
+}
+.sc-ring-caption-name--idle {
+  font-family: var(--rabble-font-mono); font-style: italic; font-weight: 400;
+  font-size: 10px; letter-spacing: 0.04em;
+  color: var(--rabble-muted);
+  text-shadow: none;
+}
+
+/* ── Hologram sigil (replaces ambient when summoned) ─────────── */
+.sc-holo-sigil {
+  position: relative;
+  display: flex; flex-direction: column; align-items: center;
+  animation: sc-holo-float 3.2s ease-in-out infinite,
+             sc-holo-flicker 6.4s steps(1) infinite;
+}
+.sc-holo-sigil.is-summoning {
+  animation: sc-holo-materialise 700ms cubic-bezier(0.2,0.9,0.2,1),
+             sc-holo-float 3.2s ease-in-out 700ms infinite,
+             sc-holo-flicker 6.4s steps(1) 700ms infinite;
+}
+@keyframes sc-holo-float {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-3px); }
+}
+@keyframes sc-holo-flicker {
+  0%, 96%, 100% { opacity: 1; }
+  97%           { opacity: 0.7; }
+  98%           { opacity: 1; }
+  99%           { opacity: 0.85; }
+}
+@keyframes sc-holo-materialise {
+  0%   { opacity: 0; transform: translateY(8px) scale(0.5); filter: blur(8px); }
+  35%  { opacity: 0.5; transform: translateY(4px) scale(0.9); filter: blur(2px); }
+  60%  { opacity: 1; transform: translateY(-4px) scale(1.1); filter: blur(0); }
+  100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+}
+
+.sc-holo-glyph {
+  position: relative;
+  font-family: var(--rabble-font-hero); font-weight: 700;
+  font-size: 56px;
+  line-height: 1;
+  text-shadow:
+    0 0 10px currentColor,
+    0 0 20px currentColor;
+}
+/* Chromatic aberration — cyan + magenta ghost copies */
+.sc-holo-glyph::before,
+.sc-holo-glyph::after {
+  content: attr(data-glyph);
+  position: absolute; inset: 0;
+  pointer-events: none;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  font-weight: inherit;
+}
+.sc-holo-glyph::before {
+  color: #00f5ff;
+  transform: translate(-1.5px, 0);
+  mix-blend-mode: screen;
+  opacity: 0.65;
+  text-shadow: 0 0 4px #00f5ff;
+}
+.sc-holo-glyph::after {
+  color: #ff2d78;
+  transform: translate(1.5px, 0);
+  mix-blend-mode: screen;
+  opacity: 0.65;
+  text-shadow: 0 0 4px #ff2d78;
+}
+.sc-holo-scan {
+  position: absolute; inset: -20% -10%;
+  background: repeating-linear-gradient(0deg,
+    rgba(255,255,255,0.06) 0px, rgba(255,255,255,0.06) 1px,
+    transparent 1px, transparent 3px);
+  mix-blend-mode: screen;
+  pointer-events: none;
+  animation: sc-scan-drift 6s linear infinite;
+}
+@keyframes sc-scan-drift {
+  from { transform: translateY(0); }
+  to   { transform: translateY(3px); }
+}
+
+/* ── Projection beam from ring base to hologram readout ─────── */
+.sc-beam {
+  position: absolute;
+  left: 50%; bottom: -6px;
+  width: 140px;
+  height: 14px;
+  transform: translateX(-50%);
+  background: linear-gradient(180deg, transparent, var(--beam-color, #bf5fff));
+  opacity: 0.5;
+  mix-blend-mode: screen;
+  pointer-events: none;
+  clip-path: polygon(35% 0, 65% 0, 100% 100%, 0 100%);
+  animation: sc-beam-flicker 2.4s ease-in-out infinite;
+  filter: blur(2px);
+}
+@keyframes sc-beam-flicker {
+  0%, 100% { opacity: 0.55; }
+  50%      { opacity: 0.30; }
+}
+
+/* ── Hologram readout panel ──────────────────────────────────── */
+.sc-holo {
+  position: relative;
+  margin: 14px 12px 6px;
+  padding: 14px 14px 12px;
+  background:
+    linear-gradient(180deg, rgba(0,245,255,0.04), rgba(191,95,255,0.05) 50%, rgba(255,45,120,0.04));
+  border: 1px solid var(--holo-color, #bf5fff);
+  border-radius: 3px;
+  box-shadow:
+    0 0 14px color-mix(in srgb, var(--holo-color, #bf5fff) 35%, transparent),
+    inset 0 0 18px color-mix(in srgb, var(--holo-color, #bf5fff) 12%, transparent);
+  flex-shrink: 0;
+  overflow: hidden;
+  animation:
+    sc-holo-readout-in 480ms cubic-bezier(0.2,0.9,0.2,1) both,
+    sc-holo-float 3.6s ease-in-out 480ms infinite;
+  backdrop-filter: blur(4px);
+}
+@keyframes sc-holo-readout-in {
+  0%   { opacity: 0; transform: translateY(8px) scaleY(0.4); filter: blur(6px); }
+  60%  { opacity: 1; transform: translateY(-2px) scaleY(1.04); filter: blur(0); }
+  100% { opacity: 1; transform: translateY(0) scaleY(1); filter: blur(0); }
+}
+.sc-holo-base {
+  position: absolute; left: 10%; right: 10%; bottom: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--holo-color), transparent);
+  box-shadow: 0 0 8px var(--holo-color);
+  opacity: 0.9;
+}
+/* corner chevrons */
+.sc-holo-corner {
+  position: absolute;
+  width: 10px; height: 10px;
+  border: 1px solid var(--holo-color);
+  opacity: 0.85;
+}
+.sc-holo-corner--tl { top: -1px; left: -1px;  border-right: 0; border-bottom: 0; }
+.sc-holo-corner--tr { top: -1px; right: -1px; border-left: 0;  border-bottom: 0; }
+.sc-holo-corner--bl { bottom: -1px; left: -1px;  border-right: 0; border-top: 0; }
+.sc-holo-corner--br { bottom: -1px; right: -1px; border-left: 0;  border-top: 0; }
+
+.sc-holo-head {
+  display: flex; align-items: flex-start; gap: 8px;
+  margin-bottom: 8px;
+}
+.sc-holo-titles { flex: 1; min-width: 0; }
+.sc-holo-title {
+  font-family: var(--rabble-font-hero); font-weight: 700;
+  font-size: 14px; letter-spacing: 0.06em;
+  color: var(--rabble-text);
+  text-shadow: 0.8px 0 0 rgba(0,245,255,0.4), -0.8px 0 0 rgba(255,45,120,0.4);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.sc-holo-ext { color: var(--rabble-muted); font-weight: 400; }
+.sc-holo-role {
+  font-family: var(--rabble-font-mono); font-size: 9px;
+  color: var(--holo-color);
+  letter-spacing: 0.16em; text-transform: lowercase;
+  margin-top: 2px;
+  opacity: 0.85;
+}
+.sc-holo-dismiss {
+  width: 22px; height: 22px;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 2px;
+  color: var(--rabble-muted);
+  font-family: var(--rabble-font-mono); font-size: 10px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: all 140ms;
+}
+.sc-holo-dismiss:hover {
+  color: var(--rabble-magenta);
+  border-color: var(--rabble-magenta);
+  box-shadow: 0 0 6px var(--rabble-magenta);
+}
+
+.sc-holo-summary {
+  font-family: var(--rabble-font-ui);
+  font-size: 11.5px; line-height: 1.55;
+  color: var(--rabble-text);
+  margin: 0 0 10px;
+  text-wrap: pretty;
+  text-shadow: 0 0 8px rgba(0,245,255,0.06);
+}
+
+.sc-holo-stats {
+  display: grid; grid-template-columns: 1fr 1fr 1fr;
+  gap: 4px 8px;
+  padding: 8px 0;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  margin-bottom: 10px;
+}
+.sc-holo-stat { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.sc-holo-stat-k {
+  font-family: var(--rabble-font-mono); font-size: 7.5px;
+  letter-spacing: 0.20em; text-transform: uppercase;
+  color: var(--rabble-muted);
+}
+.sc-holo-stat-v {
+  font-family: var(--rabble-font-mono); font-size: 10px;
+  color: var(--rabble-text);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.sc-holo-stat-u {
+  color: var(--rabble-muted);
+}
+
+.sc-holo-action {
+  display: flex; align-items: center; gap: 8px;
+  width: 100%;
+  padding: 8px 10px;
+  background: rgba(3,0,11,0.5);
+  border: 1px solid;
+  border-radius: 3px;
+  font-family: var(--rabble-font-mono);
+  font-size: 11px; letter-spacing: 0.10em;
+  cursor: pointer;
+  text-transform: lowercase;
+  text-align: left;
+  transition: all 160ms;
+}
+.sc-holo-action:hover {
+  background: rgba(255,255,255,0.04);
+  box-shadow: 0 0 10px currentColor;
+}
+.sc-holo-action-glyph {
+  font-family: var(--rabble-font-mono); font-size: 14px;
+  text-shadow: 0 0 5px currentColor;
+}
+.sc-holo-action-label { flex: 1; }
+.sc-holo-action-arrow {
+  font-size: 14px;
+  transition: transform 140ms;
+}
+.sc-holo-action:hover .sc-holo-action-arrow { transform: translateX(2px); }
+
+.sc-holo-scan-full {
+  position: absolute; inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(0deg,
+    rgba(255,255,255,0.04) 0px, rgba(255,255,255,0.04) 1px,
+    transparent 1px, transparent 4px);
+  mix-blend-mode: screen;
+  animation: sc-scan-drift 7s linear infinite;
+}
+
+/* ── Pre-summon: incant bar + recents ────────────────────────── */
+.sc-pre { flex-shrink: 0; }
+
+.sc-incant {
+  position: relative;
+  display: flex; align-items: center; gap: 10px;
+  margin: 14px 12px 6px;
+  padding: 9px 12px 11px;
+  background: rgba(3,0,11,0.55);
+  border: 1px solid rgba(191,95,255,0.5);
+  border-radius: 3px;
+  box-shadow: 0 0 10px rgba(191,95,255,0.18);
+  transition: all 200ms;
+}
+.sc-incant:focus-within {
+  border-color: var(--rabble-cyan);
+  box-shadow: 0 0 14px rgba(0,245,255,0.3), inset 0 0 8px rgba(0,245,255,0.06);
+}
+.sc-incant-glyph {
+  color: var(--rabble-violet); text-shadow: 0 0 5px var(--rabble-violet);
+  font-family: var(--rabble-font-mono); font-size: 14px;
+}
+.sc-incant-input {
+  flex: 1; background: transparent; border: 0; outline: 0;
+  font-family: var(--rabble-font-mono); font-size: 12.5px;
+  color: var(--rabble-text);
+  caret-color: var(--rabble-cyan);
+  letter-spacing: 0.06em;
+}
+.sc-incant-input::placeholder { color: var(--rabble-muted); font-style: italic; }
+.sc-incant-bar {
+  position: absolute; left: 12px; right: 12px; bottom: 3px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--rabble-cyan), transparent);
+  background-size: 200% 100%;
+  animation: sc-incant-glow 4s linear infinite;
+  opacity: 0.8;
+}
+@keyframes sc-incant-glow {
+  from { background-position: -100% 0; }
+  to   { background-position:  100% 0; }
+}
+
+.sc-recents {
+  padding: 4px 12px 6px;
+}
+.sc-recents-label {
+  font-family: var(--rabble-font-mono); font-size: 8px;
+  letter-spacing: 0.32em; text-transform: uppercase;
+  color: var(--rabble-muted); margin-bottom: 5px;
+}
+.sc-recents-row { display: flex; gap: 5px; flex-wrap: wrap; }
+.sc-recent {
+  background: rgba(3,0,11,0.55);
+  border: 1px solid var(--rabble-border);
+  border-radius: 999px;
+  padding: 3px 9px;
+  font-family: var(--rabble-font-mono); font-size: 9px;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 140ms;
+}
+.sc-recent:hover { transform: translateY(-1px); }
+
+/* ── Kinds row ───────────────────────────────────────────────── */
+.sc-kinds {
+  display: flex; gap: 4px;
+  padding: 8px 12px;
+  border-top: 1px solid var(--rabble-border);
+  border-bottom: 1px solid var(--rabble-border);
+  flex-shrink: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.sc-kinds::-webkit-scrollbar { display: none; }
+.sc-kind {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 8px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  color: var(--rabble-muted);
+  font-family: var(--rabble-font-mono); font-size: 9px;
+  letter-spacing: 0.10em; text-transform: lowercase;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 140ms;
+}
+.sc-kind:hover { color: var(--rabble-text); }
+.sc-kind span {
+  font-size: 8px; opacity: 0.6; margin-left: 2px;
+}
+
+/* ── Entity Creature — mini RaBbLE-style being ───────────────── */
+.entity-creature {
+  display: inline-block;
+  position: relative;
+  line-height: 0;
+  flex-shrink: 0;
+  animation: ec-breathe 6s ease-in-out infinite;
+}
+.ec-svg {
+  width: 100%; height: 100%; display: block;
+  overflow: visible;
+}
+@keyframes ec-breathe {
+  0%, 100% { transform: scale(1)    translateY(0); filter: brightness(1); }
+  50%      { transform: scale(1.04) translateY(-0.5px); filter: brightness(1.08); }
+}
+
+/* Particle twinkle — staggered opacity pulses */
+.ec-dot {
+  opacity: 0.65;
+  animation: ec-twinkle 4s ease-in-out infinite;
+  transform-origin: center;
+}
+@keyframes ec-twinkle {
+  0%, 100% { opacity: 0.45; }
+  50%      { opacity: 1; }
+}
+
+/* Orb blink — eyelid is implemented as a scaled <g> hiding the orb.
+   transform-box: fill-box lets transform-origin: center work against each
+   <g>'s own bounding box, regardless of viewBox→CSS scale. */
+.ec-orb-wrap {
+  animation: ec-blink 6.4s steps(1) infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+@keyframes ec-blink {
+  0%, 90%, 96%, 100% { transform: scaleY(1); }
+  92%                { transform: scaleY(0.12); }
+  94%                { transform: scaleY(1); }
+}
+/* Skip blink at small sizes to avoid jitter — only the .is-blink instances blink */
+.entity-creature:not(.is-blink) .ec-orb-wrap { animation: none; }
+
+/* Holographic treatment — chromatic split + intensified glow + flicker */
+.entity-creature.is-holo {
+  filter: drop-shadow(0 0 8px var(--ec-left, #ff2d78)) drop-shadow(0 0 8px var(--ec-right, #00f5ff));
+  animation: ec-holo-float 3.4s ease-in-out infinite, ec-holo-flicker 7.2s steps(1) infinite;
+}
+@keyframes ec-holo-float {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-3px); }
+}
+@keyframes ec-holo-flicker {
+  0%, 96%, 100% { opacity: 1; }
+  97%           { opacity: 0.6; }
+  98%           { opacity: 1; }
+  99%           { opacity: 0.85; }
+}
+/* Subtle chromatic ghost via pseudo-elements layered behind */
+.entity-creature.is-holo::before,
+.entity-creature.is-holo::after {
+  content: "";
+  position: absolute; inset: 0;
+  pointer-events: none;
+}
+
+/* Holographic scanlines layer */
+.ec-scanlines {
+  position: absolute; inset: -5%;
+  pointer-events: none;
+  background: repeating-linear-gradient(0deg,
+    rgba(255,255,255,0.10) 0px, rgba(255,255,255,0.10) 1px,
+    transparent 1px, transparent 3px);
+  mix-blend-mode: screen;
+  animation: ec-scan-drift 5s linear infinite;
+  opacity: 0.7;
+}
+@keyframes ec-scan-drift {
+  from { transform: translateY(0); }
+  to   { transform: translateY(3px); }
+}
+
+/* Entity card variant — wider creature slot replaces the round sigil */
+.sc-card-creature {
+  position: relative;
+  width: 48px; height: 32px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.sc-card-seal--corner {
+  position: absolute; top: 0; right: 2px;
+  width: 6px; height: 6px; border-radius: 50%;
+  border: 1px solid var(--rabble-void);
+}
+.sc-card--entity {
+  grid-template-columns: 52px 1fr auto;
+}
+
+/* Hologram creature container — sized for ring center (~140px wide) */
+.sc-holo-creature {
+  position: relative;
+  display: flex; align-items: center; justify-content: center;
+  width: 140px; height: 95px;
+}
+.sc-holo-sigil.is-entity {
+  /* Make room for the wider creature */
+  width: 140px;
+}
+.sc-cards {
+  flex: 1; min-height: 0; overflow-y: auto;
+  padding: 6px 10px 12px;
+  display: flex; flex-direction: column; gap: 5px;
+}
+.sc-cards::-webkit-scrollbar { width: 2px; }
+.sc-cards::-webkit-scrollbar-thumb { background: var(--rabble-border); }
+.sc-card {
+  display: grid; grid-template-columns: 34px 1fr auto;
+  align-items: center; gap: 10px;
+  padding: 8px 10px;
+  background: rgba(18,19,42,0.45);
+  border: 1px solid var(--rabble-border);
+  border-radius: 3px;
+  cursor: pointer; text-align: left;
+  transition: all 160ms;
+}
+.sc-card:hover {
+  background: rgba(18,19,42,0.7);
+  border-color: rgba(191,95,255,0.45);
+  transform: translateX(1px);
+}
+.sc-card-sigil {
+  position: relative;
+  width: 34px; height: 34px; border-radius: 50%;
+  border: 1px solid;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--rabble-font-mono); font-size: 16px;
+}
+.sc-card-seal {
+  position: absolute; top: -2px; right: -2px;
+  width: 6px; height: 6px; border-radius: 50%;
+  border: 1px solid var(--rabble-void);
+}
+.sc-card-body { min-width: 0; }
+.sc-card-name {
+  font-family: var(--rabble-font-hero); font-weight: 700;
+  font-size: 11px; letter-spacing: 0.05em;
+  color: var(--rabble-text);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.sc-card-ext { color: var(--rabble-muted); font-weight: 400; }
+.sc-card-meta {
+  display: flex; align-items: center; gap: 5px;
+  font-family: var(--rabble-font-mono); font-size: 8px;
+  color: var(--rabble-muted);
+  letter-spacing: 0.08em;
+  margin-top: 3px;
+}
+.sc-card-dot { opacity: 0.5; }
+.sc-card-verb {
+  font-family: var(--rabble-font-mono); font-size: 9px;
+  letter-spacing: 0.14em; text-transform: lowercase;
+  text-shadow: 0 0 4px currentColor;
+  white-space: nowrap;
+}
+.sc-card.is-active .sc-card-verb { font-weight: 700; }
+
+.sc-empty {
+  text-align: center; padding: 30px 14px;
+  color: var(--rabble-muted);
+  font-family: var(--rabble-font-mono); font-size: 11px;
+}
+.sc-empty span { font-size: 28px; color: var(--rabble-violet); opacity: 0.5; display: block; margin-bottom: 8px; }
+

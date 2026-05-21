@@ -23,6 +23,7 @@
 <script src="world/js/RaBbLE-NeBuLA.js"></script>
 
 <link rel="stylesheet" href="world/css/RaBbLE-theme.css">
+<link rel="stylesheet" href="world/css/RaBbLE-Grimoire.css">
 <link rel="stylesheet" href="world/css/RaBbLE-landing.css">
 <link rel="stylesheet" href="world/css/RaBbLE-wm.css">
 
@@ -31,6 +32,10 @@
 <script defer src="world/js/RaBbLE-bg.js"></script>
 <script defer src="world/js/RaBbLE-wm.js"></script>
 <script defer src="https://unpkg.com/alpinejs@3.14.1/dist/cdn.min.js"></script>
+
+<!-- Grimoire applet — data must load before component -->
+<script defer src="world/js/RaBbLE-Grimoire-Data.js"></script>
+<script defer src="world/js/RaBbLE-Grimoire.js"></script>
 </head>
 
 <body
@@ -148,69 +153,10 @@
          Responsive: tablet = 2 zones, mobile = 1 zone + pop-outs       -->
     <main class="main">
 
-      <!-- ═══ LEFT — Collective organs ════════════════════════════════
-           Add/edit members in RaBbLE-landing.js ORGANS constant
-           Click to probe · keyboard 1–4 to probe by number            -->
-      <aside class="panel left applet" data-applet="collective" aria-label="The Collective">
-        <div class="panel-head">
-          <div class="label">::The Collective</div>
-          <div class="meta" x-text="organs.length + ' members'"></div>
-        </div>
-        <p class="panel-explore">click to explore</p>
-        <div class="organs" role="list">
-          <template x-for="(o, i) in organs" :key="o.id">
-            <div class="organ"
-                 :class="{ active: activeOrgan === o.id, you: o.you, ['status-' + o.status]: true }"
-                 role="listitem"
-                 tabindex="0"
-                 :aria-label="o.name + ': ' + o.role"
-                 @mouseenter="hoverOrgan(o)"
-                 @mouseleave="unhoverOrgan(o)"
-                 @click="probeOrgan(o)"
-                 @keydown.enter="probeOrgan(o)">
-              <div class="glyph" x-text="o.glyph" aria-hidden="true"></div>
-              <div class="organ-info">
-                <div class="name" x-text="o.name"></div>
-                <div class="role" x-text="o.role"></div>
-              </div>
-              <div class="organ-right">
-                <span class="organ-key" x-text="i + 1" aria-hidden="true"></span>
-                <div class="status-dot" :class="o.status" aria-hidden="true"></div>
-              </div>
-            </div>
-          </template>
-        </div>
-
-        <!-- ═══ ORGAN PANEL — slide-over within Collective pane ═══════
-             Contained in .panel.left (position:absolute) so it overlays
-             only the left pane, not the full screen.                   -->
-        <div class="organ-panel"
-             x-show="panelOpen"
-             :style="panelOpen ? 'display:flex' : ''"
-             role="dialog"
-             aria-modal="true"
-             :aria-label="'Exploring ' + (panelOrgan?.name || '')">
-          <div class="op-inner">
-            <header class="op-head">
-              <div class="op-icon" x-text="panelOrgan?.glyph" aria-hidden="true"></div>
-              <div class="op-title-group">
-                <div class="op-name" x-text="panelOrgan?.name"></div>
-                <div class="op-role" x-text="panelOrgan?.role"></div>
-              </div>
-              <div class="op-status-badge" :class="panelOrgan?.status">
-                <span class="op-dot" aria-hidden="true"></span>
-                <span x-text="panelOrgan?.status"></span>
-              </div>
-              <button class="op-close" @click="closePanel()" aria-label="Close panel">✕</button>
-            </header>
-            <div class="op-body" x-html="getPanelContent()"></div>
-            <footer class="op-foot" x-show="panelOrgan?.url">
-              <a :href="panelOrgan?.url" class="op-link">Open full page →</a>
-            </footer>
-          </div>
-        </div>
-
-      </aside>
+      <!-- ═══ LEFT — Grimoire summoning circle ════════════════════════
+           Mounted by RaBbLE-Grimoire.js after rabble:wm-ready.
+           Browse Grimoire docs, summon entities, trace sigils.        -->
+      <aside class="panel left applet" data-applet="grimoire" aria-label="The Grimoire"></aside>
 
       <!-- ═══ CENTER — entity stage ════════════════════════════════════
            Entity uses mode="boot" — particle convergence → portal arcs

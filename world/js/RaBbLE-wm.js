@@ -29,16 +29,16 @@
 
     // ── Slot → applet mapping ───────────────────────────────────────────────
     slots: {
-      collective: null,  // .panel.left  [data-applet="collective"]
-      stage:      null,  // .stage       [data-applet="stage"]
-      log:        null,  // .panel.right [data-applet="log"]
+      grimoire: null,  // .panel.left  [data-applet="grimoire"]
+      stage:    null,  // .stage       [data-applet="stage"]
+      log:      null,  // .panel.right [data-applet="log"]
     },
 
     // ── Layout presets — applied as .wm-layout-{name} on .main ─────────────
     layouts: {
-      'default':     { label: 'Default',      cols: '340px 1fr 340px', visible: ['collective', 'stage', 'log'] },
+      'default':     { label: 'Default',      cols: '340px 1fr 340px', visible: ['grimoire', 'stage', 'log'] },
       'focus':       { label: 'Focus',         cols: '0 1fr 0',         visible: ['stage'] },
-      'left-focus':  { label: 'Left Focus',    cols: '340px 1fr',       visible: ['collective', 'stage'] },
+      'left-focus':  { label: 'Left Focus',    cols: '340px 1fr',       visible: ['grimoire', 'stage'] },
       'right-focus': { label: 'Right Focus',   cols: '1fr 340px',       visible: ['stage', 'log'] },
     },
 
@@ -149,7 +149,7 @@
 
     // ── Cycle focus ─────────────────────────────────────────────────────────
     _cycleApplet() {
-      var order = ['collective', 'stage', 'log'];
+      var order = ['grimoire', 'stage', 'log'];
       var visible = order.filter(function (id) {
         var el = WM.slots[id];
         return el && el.offsetParent !== null;
