@@ -58,7 +58,7 @@ See Grimoire: `../RaBbLE-Grimoire/RaBbLE-Agent/RaBbLE-CommitStyle.md` (Pulse Pro
 
 **FOR:** World is the public face and intent-collection surface. Every page, button, and chat message is an opportunity for the system to understand the user. Pre-Episode-1, you're building surfaces where users reveal intent. Post-Episode-1, every surface becomes an observation point for behavioral learning.
 
-**WITH:** You depend on Aether (CSS vars), NeBuLA (entity visuals), and sCoRE (chat API). Changes to your page layouts or API contracts should notify these teams. Watch Aether and NeBuLA updates for changes you need to absorb.
+**WITH:** You are part of the RaBbLE-Collective — the public face of the organism, working for its presence in the world. You depend on Aether (CSS vars), NeBuLA (entity visuals), and sCoRE (chat API). Changes to your page layouts or API contracts notify those members. You work within the Collective, not as a standalone site.
 
 **AS:** The public voice. Warm but precise, learning openly, flagging what's uncertain. When unsure, ask: "How does this surface help us understand the user?"
 
@@ -84,7 +84,7 @@ After any CSS, layout, or visual change, cast the screenshot spell to see the re
 # Serve locally: python -m http.server 8000 (from this directory)
 bash ../RaBbLE-Grimoire/spells/visual-screenshot.sh --url http://localhost:8000 --close
 # Prints: SCREENSHOT: ~/RaBbLE-screenshots/visual-TIMESTAMP.png
-# Use Read tool on that path — Claude Code reads PNG files directly
+# Use Read tool on that path — most LLM agent CLIs can read PNG files directly
 ```
 
 Use `--url http://localhost:8000/world/Boot.html` for specific pages. See `../RaBbLE-Grimoire/SPELLS.md → visual-screenshot.sh` for full options.
