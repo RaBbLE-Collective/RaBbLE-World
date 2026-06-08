@@ -2,7 +2,7 @@
 
 ```
 epoch: 0 | status: active
-last session: 2026-06-08 (Session 52)
+last session: 2026-06-08 (Session 53)
 ```
 
 RaBbLE-World is the public-facing surface of the RaBbLE Collective — the browser entry point where the entity lives and speaks.
@@ -62,6 +62,7 @@ Both loaders show a visible failure banner if their bundle fails to load.
 | `world/js/RaBbLE-aether.js` | Aether loader + monitor — injects CSS bundle, shows failure banner |
 | `world/js/RaBbLE-NeBuLA.js` | NeBuLA loader + monitor — injects JS bundle, shows failure banner |
 | `world/js/RaBbLE-landing.js` | Alpine.js landing component |
+| `world/js/RaBbLE-page-runtime.js` | Shared page runtime helpers — background, clipboard, entity mini mounting |
 | `world/js/RaBbLE-wm.js` | WM keyboard shortcuts and layout presets |
 | `world/js/RaBbLE-bg.js` | Ambient background (particles, grid, cursor) |
 
@@ -76,13 +77,14 @@ Both loaders show a visible failure banner if their bundle fails to load.
 | World as scaffold (no embedded visual logic) | **Done** — CRT overlays, floor, horizon all in Aether |
 | NeBuLA Canvas2D entity on landing | **Done** |
 | RaBbLE-Collective community page | **Done** — visitor orientation + join path on its own page |
+| Shared page runtime for World pages | **Done** — start background, copy CTA text, mount NeBuLA minis |
 | NeBuLA demo page (Layer 1 + Layer 2) | **Done** |
 | Fonts moved to Aether bundle (all pages) | **Done** — no Google Fonts links in HTML; Aether bundle owns Orbitron, Exo 2, Share Tech Mono |
 | `cast-cdn.sh` spell — build + stage + wrangler deploy | **Done** — `RaBbLE-Grimoire/spells/cast-cdn.sh`; Cloudflare Git integration disconnected |
 | Chat surface wired to sCoRE intent endpoint | Pending (Episode 1 dependency) |
 | Production deploy | Pending — `joinrabble.world` still on pre-refactor code |
 | Audit `RaBbLE-chat.css` / `RaBbLE-OS.css` for visual rules to move to Aether | Pending |
-| Refactor World/Aether/NeBuLA modular boundaries | Pending — see session plan for next decomposition pass |
+| Refactor World/Aether/NeBuLA modular boundaries | In progress — base layer + page runtime + shared NeBuLA UID helper landed |
 
 ## Reading Order for a New Session
 
