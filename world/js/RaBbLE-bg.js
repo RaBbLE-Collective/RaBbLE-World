@@ -56,28 +56,40 @@
       var ctx = cv.getContext('2d');
       fit(cv);
 
-      // ── particles — match STABLE exactly ─────────────────────────
-      var N = 280;  // STABLE: 280
+      // ── particles ────────────────────────────────────────────────
+      var N = 100;  // 280 → 100: ambient field, density not noticeable
       var pts = [];
       for (var i = 0; i < N; i++) {
         var col = COLS[Math.floor(Math.random() * COLS.length)];
-        var r   = Math.random() * 2.2 + 0.3;  // STABLE: 2.2+0.3
+        var r   = Math.random() * 2.2 + 0.3;
         pts.push({
           x:     Math.random() * window.innerWidth,
           y:     Math.random() * window.innerHeight,
-          vx:    (Math.random() - 0.5) * 0.11,  // STABLE: ±0.055 max
-          vy:    (Math.random() - 0.5) * 0.08,  // STABLE: ±0.04 max
+          vx:    (Math.random() - 0.5) * 0.11,
+          vy:    (Math.random() - 0.5) * 0.08,
           r:     r,
           col:   col,
-          alpha: Math.random() * 0.45 + 0.08,   // STABLE: 0.45+0.08
+          alpha: Math.random() * 0.45 + 0.08,
           phase: Math.random() * Math.PI * 2,
-          glow:  Math.random() > 0.65,
+          glow:  Math.random() < 0.12,  // 35% → 12%: fewer bloom particles
         });
       }
 
+      // Offscreen bloom buffer — same pattern as NeBuLA particle-system.js.
+      // Glow particles draw flat here every GLOW_EVERY frames; composited
+      // onto main canvas with ctx.filter='blur()' — one GPU pass, not N shadowBlurs.
+      var GLOW_EVERY  = 3;
+      var glowFrame   = 0;
+      var glowCv      = document.createElement('canvas');
+      glowCv.width  = cv.width; glowCv.height = cv.height;
+      var glowCtx     = glowCv.getContext('2d');
+
+      var physicsFrame = 0;  // throttle: skip every-other physics tick
+
       var onResize = function () {
         fit(cv);
-        // clamp any particles now outside the new bounds so density stays even
+        glowCv.width = cv.width; glowCv.height = cv.height;
+        glowFrame = 0;
         var W = cv.width, H = cv.height;
         for (var ri = 0; ri < pts.length; ri++) {
           if (pts[ri].x > W + 8) pts[ri].x = Math.random() * W;
@@ -122,40 +134,65 @@
         if (opts.grid) drawGrid();
 
         if (opts.particles) {
-          for (var k = 0; k < pts.length; k++) {
-            var p = pts[k];
-            p.x += p.vx; p.y += p.vy;
-            p.phase += 0.011;  // STABLE: 0.011
-            // wrap
-            if (p.x < -8) p.x = W + 8; if (p.x > W + 8) p.x = -8;
-            if (p.y < -8) p.y = H + 8; if (p.y > H + 8) p.y = -8;
-            // STABLE alpha oscillation: 0.6+0.4*sin
-            var a = p.alpha * (0.6 + 0.4 * Math.sin(p.phase));
-            if (p.glow) {
-              ctx.shadowColor = p.col; ctx.shadowBlur = 22;  // STABLE: 22
-            } else {
-              ctx.shadowColor = p.col; ctx.shadowBlur = 3;   // STABLE: 3
+          // Physics — throttle to every-other frame post-init (imperceptible
+          // at these drift speeds, halves the sin/cos budget).
+          physicsFrame ^= 1;
+          if (!physicsFrame) {
+            for (var k = 0; k < pts.length; k++) {
+              var p = pts[k];
+              p.x += p.vx; p.y += p.vy;
+              p.phase += 0.011;
+              if (p.x < -8) p.x = W + 8; if (p.x > W + 8) p.x = -8;
+              if (p.y < -8) p.y = H + 8; if (p.y > H + 8) p.y = -8;
             }
-            ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-            ctx.fillStyle = p.col; ctx.globalAlpha = a; ctx.fill();
-            ctx.shadowBlur = 0; ctx.globalAlpha = 1;
           }
 
-          // connections — STABLE: distance 85, alpha (1-d/85)*0.07
-          for (var ii = 0; ii < pts.length; ii++) {
-            for (var jj2 = ii + 1; jj2 < pts.length; jj2++) {
-              var dx = pts[ii].x - pts[jj2].x, dy = pts[ii].y - pts[jj2].y;
-              var d  = Math.sqrt(dx * dx + dy * dy);
-              if (d < 85) {
-                ctx.beginPath();
-                ctx.moveTo(pts[ii].x, pts[ii].y);
-                ctx.lineTo(pts[jj2].x, pts[jj2].y);
-                ctx.strokeStyle = pts[ii].col;
-                ctx.globalAlpha = (1 - d / 85) * 0.07;  // STABLE: *0.07
-                ctx.lineWidth = 0.4; ctx.stroke(); ctx.globalAlpha = 1;
+          // Pass 1 — flat particles, every frame, no shadowBlur.
+          for (var k2 = 0; k2 < pts.length; k2++) {
+            var p2 = pts[k2];
+            if (p2.glow) continue;
+            var a2 = p2.alpha * (0.6 + 0.4 * Math.sin(p2.phase));
+            ctx.beginPath(); ctx.arc(p2.x, p2.y, p2.r, 0, Math.PI * 2);
+            ctx.fillStyle = p2.col; ctx.globalAlpha = a2; ctx.fill();
+          }
+          ctx.globalAlpha = 1;
+
+          // Pass 2 — bloom layer via offscreen buffer + single ctx.filter composite.
+          // Glow particles drawn flat into glowCv every GLOW_EVERY frames;
+          // composited with blur filter — one GPU pass instead of N shadowBlurs.
+          glowFrame--;
+          if (glowFrame <= 0) {
+            glowFrame = GLOW_EVERY;
+            glowCtx.clearRect(0, 0, glowCv.width, glowCv.height);
+            for (var k3 = 0; k3 < pts.length; k3++) {
+              var p3 = pts[k3];
+              if (!p3.glow) continue;
+              var a3 = p3.alpha * (0.6 + 0.4 * Math.sin(p3.phase)) * 1.8;
+              glowCtx.beginPath(); glowCtx.arc(p3.x, p3.y, p3.r * 1.5, 0, Math.PI * 2);
+              glowCtx.fillStyle = p3.col; glowCtx.globalAlpha = Math.min(1, a3);
+              glowCtx.fill();
+            }
+            glowCtx.globalAlpha = 1;
+          }
+          ctx.filter = 'blur(8px)';
+          ctx.drawImage(glowCv, 0, 0);
+          ctx.filter = 'none';
+
+          // Connections — single batched path, one ctx.stroke() call.
+          // At n=100 there are ≤4950 pairs to check — acceptable O(n²).
+          var CONN_D = 85, CONN_D2 = CONN_D * CONN_D;
+          ctx.beginPath();
+          ctx.lineWidth = 0.4; ctx.strokeStyle = '#3377ee';
+          for (var ci = 0; ci < pts.length; ci++) {
+            for (var cj = ci + 1; cj < pts.length; cj++) {
+              var cdx = pts[ci].x - pts[cj].x, cdy = pts[ci].y - pts[cj].y;
+              if (cdx * cdx + cdy * cdy < CONN_D2) {
+                ctx.moveTo(pts[ci].x, pts[ci].y);
+                ctx.lineTo(pts[cj].x, pts[cj].y);
               }
             }
           }
+          ctx.globalAlpha = 0.07; ctx.stroke(); ctx.globalAlpha = 1;
         }
 
         raf = requestAnimationFrame(draw);
