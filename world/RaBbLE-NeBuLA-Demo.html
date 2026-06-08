@@ -55,7 +55,8 @@
           <p class="applet-desc">Canvas2D rendering with eye tracking, particle nebula, and interactive jolts.</p>
 
           <div class="canvas-container">
-            <canvas id="canvas2d"></canvas>
+            <canvas id="canvas2d-field" style="position:absolute;inset:0;z-index:0;pointer-events:none"></canvas>
+            <canvas id="canvas2d" style="position:absolute;inset:0;z-index:1"></canvas>
           </div>
 
           <div class="control-row">
@@ -138,10 +139,12 @@
 
       // ── Init Canvas2D via NeBuLA.Canvas2dBackend ─────────────────────
       const canvas2d = document.getElementById('canvas2d');
+      const canvas2dField = document.getElementById('canvas2d-field');
       if (canvas2d && typeof NeBuLA !== 'undefined' && NeBuLA.Canvas2dBackend) {
         const dpr = window.devicePixelRatio || 1;
         const isMobile = dpr > 1.5 && (window.innerWidth < 800 || window.innerHeight < 600);
         window.entity = new NeBuLA.Canvas2dBackend(canvas2d, {
+          fieldCanvas:   canvas2dField,
           mode:          'idle',
           particleCount: 480,
           showWaveform:  true,
