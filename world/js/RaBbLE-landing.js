@@ -57,6 +57,15 @@ const ORGANS = [
     status: 'idle',
     detail: 'the skin. canonical visual system. palette, typography, motion, components. every color and glyph in the Collective traces back here. this page runs on it.',
   },
+  {
+    id:     'collective',
+    glyph:  'C',
+    name:   'Collective',
+    role:   'community · understand and join',
+    status: 'online',
+    detail: 'the public front door for people who want to understand RaBbLE, see the member organs, and join the channel with intent.',
+    url:    'world/RaBbLE-Collective.html',
+  },
 ];
 
 /**
@@ -207,6 +216,17 @@ const ORGAN_PANELS = {
       <dt>Key files</dt> <dd>rabble-palette.css · rabble-components.css · rabble-motion.css</dd>
       <dt>Spell</dt>     <dd>cast-aether.sh generates the aether/rabble.css bundle</dd>
       <dt>Rule</dt>      <dd>No hex values outside Aether. All color via CSS vars.</dd>
+    </dl>
+  `,
+  collective: `
+    <div class="op-section-tag">Community Surface · Join Path</div>
+    <p><strong>Collective</strong> is the public front door — a page that helps visitors understand the organism and decide how to participate.</p>
+    <p>It explains the organs, shows the visible signals, and gives visitors a clean path into the chat channel with a starter prompt they can copy.</p>
+    <dl class="op-dl">
+      <dt>Status</dt>      <dd>Epoch 0 · open</dd>
+      <dt>Purpose</dt>     <dd>visitor orientation · joining path · member discovery</dd>
+      <dt>Primary CTA</dt> <dd>open chat and introduce yourself</dd>
+      <dt>Secondary CTA</dt><dd>explore RaBbLE-OS and the Grimoire</dd>
     </dl>
   `,
 };

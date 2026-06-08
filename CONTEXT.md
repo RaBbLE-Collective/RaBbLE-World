@@ -2,7 +2,7 @@
 
 ```
 epoch: 0 | status: active
-last session: 2026-05-15 (Session 9)
+last session: 2026-06-08 (Session 52)
 ```
 
 RaBbLE-World is the public-facing surface of the RaBbLE Collective — the browser entry point where the entity lives and speaks.
@@ -52,6 +52,7 @@ Both loaders show a visible failure banner if their bundle fails to load.
 | `index.html` | Landing page — entity stage, WM applet layout, chat input |
 | `world/RaBbLE-Boot.html` | Boot sequence reference (Plymouth spec artifact) |
 | `world/RaBbLE-Chat.html` | Chat surface |
+| `world/RaBbLE-Collective.html` | Community surface — explain the Collective and provide a join path |
 | `world/RaBbLE-OS.html` | RaBbLE-OS bootstrap and expansion cards |
 | `world/RaBbLE-NeBuLA-Demo.html` | NeBuLA Canvas2D + Three.js demo |
 | `world/css/RaBbLE-theme.css` | Aether alias bridge — short names with fallbacks |
@@ -74,12 +75,14 @@ Both loaders show a visible failure banner if their bundle fails to load.
 | `<rabble-entity>` owned by NeBuLA | **Done** — element defined in bundle; `RaBbLE-entity.js` deleted |
 | World as scaffold (no embedded visual logic) | **Done** — CRT overlays, floor, horizon all in Aether |
 | NeBuLA Canvas2D entity on landing | **Done** |
+| RaBbLE-Collective community page | **Done** — visitor orientation + join path on its own page |
 | NeBuLA demo page (Layer 1 + Layer 2) | **Done** |
 | Fonts moved to Aether bundle (all pages) | **Done** — no Google Fonts links in HTML; Aether bundle owns Orbitron, Exo 2, Share Tech Mono |
 | `cast-cdn.sh` spell — build + stage + wrangler deploy | **Done** — `RaBbLE-Grimoire/spells/cast-cdn.sh`; Cloudflare Git integration disconnected |
 | Chat surface wired to sCoRE intent endpoint | Pending (Episode 1 dependency) |
 | Production deploy | Pending — `joinrabble.world` still on pre-refactor code |
 | Audit `RaBbLE-chat.css` / `RaBbLE-OS.css` for visual rules to move to Aether | Pending |
+| Refactor World/Aether/NeBuLA modular boundaries | Pending — see session plan for next decomposition pass |
 
 ## Reading Order for a New Session
 
