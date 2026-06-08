@@ -70,6 +70,7 @@ bash ../RaBbLE-Grimoire/spells/end-session.sh <feature-slug> "<note>"
 ## Rules
 
 - **Colors:** use CSS vars from `rabble-theme.css` only — never raw hex values
+- **Brand name casing:** `RaBbLE`, `NeBuLA`, `sCoRE`, `ScRibLE` — always exact mixed case, never uppercase. Any `--font-hero` element containing a brand name must have `text-transform: none` to prevent inheriting an uppercase nav/label parent. Full rule: `../RaBbLE-Grimoire/RaBbLE-Aether/CLAUDE-DESIGN-GUIDE.md § Brand Name Casing`.
 - **No bundler, no framework.** Files are opened directly in a browser.
 - **No backend logic here.** Chat routing and intent handling belong in RaBbLE-sCoRE.
 - Architecture and roadmap docs live in `../RaBbLE-Grimoire/RaBbLE-World/` — not in this repo.
