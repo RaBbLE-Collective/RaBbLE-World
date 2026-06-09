@@ -37,7 +37,7 @@ var CHAT_B_WORDS = ['Boundless', 'Becoming', 'Brilliant', 'Bold', 'Bespoke', 'Bo
       .filter(function (m) { return m.role !== 'system'; })
       .map(function (m) { return { role: m.role === 'rabble' ? 'assistant' : m.role, content: m.text }; });
 
-    var body = JSON.stringify({ messages: apiMessages, model_tier: 'auto' });
+    var body = JSON.stringify({ messages: apiMessages, model_tier: 'fast' });
     var headers = {
       'Content-Type': 'application/json'
     };
