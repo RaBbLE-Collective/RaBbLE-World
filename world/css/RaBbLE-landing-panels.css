@@ -1,0 +1,550 @@
+/* =========================================================================
+   landing-panels.css — joinrabble.world
+   Organ list, entity log, organ detail panel, mobile nav overlay,
+   mobile log overlay, status dots, inline highlight spans.
+   Part of the landing CSS split (Task 5).
+   See RaBbLE-landing.css for full file history.
+   ========================================================================= */
+
+/* ═══════════════════════════════════════════════════════════════
+   ORGAN LIST — left panel
+   Data: ORGANS constant in RaBbLE-landing.js
+   ═══════════════════════════════════════════════════════════════ */
+.organs {
+  padding: 6px; overflow-y: auto; flex: 1; min-height: 0;
+}
+.organs::-webkit-scrollbar       { width: 2px; }
+.organs::-webkit-scrollbar-track { background: transparent; }
+.organs::-webkit-scrollbar-thumb { background: var(--border); }
+
+.organ {
+  display: grid;
+  grid-template-columns: 28px 1fr auto;
+  align-items: center; gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid transparent; border-radius: 6px;
+  cursor: pointer;
+  transition: all 160ms cubic-bezier(0.2,0.9,0.2,1);
+  outline: none;
+}
+.organ:hover, .organ:focus, .organ.active {
+  background: rgba(255,45,120,0.06);
+  border-color: var(--neon-magenta);
+  box-shadow: 0 0 10px rgba(255,45,120,0.35), inset 0 0 12px rgba(255,45,120,0.04);
+}
+
+.organ .glyph {
+  width: 28px; height: 28px; border-radius: 50%;
+  border: 1px solid var(--text-muted);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-hero); font-weight: 800; font-size: 12px;
+  color: var(--text-primary); background: var(--raised); transition: all 160ms;
+  flex-shrink: 0;
+}
+.organ:hover .glyph, .organ:focus .glyph, .organ.active .glyph {
+  border-color: var(--neon-magenta); color: var(--neon-magenta);
+  text-shadow: 0 0 6px var(--neon-magenta); box-shadow: 0 0 8px var(--neon-magenta);
+}
+
+.organ-info { min-width: 0; }
+
+.organ .name {
+  font-family: var(--font-display); font-weight: 700;
+  font-size: 13px; letter-spacing: 0.08em;
+  /* NO text-transform: organ names have intentional mixed case (sCoRE, NeBuLA, ScRibLE) */
+  color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.organ.you .name::after {
+  content: "here";
+  display: inline-block; margin-left: 6px;
+  padding: 1px 5px; border-radius: 2px;
+  font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--neon-cyan); border: 1px solid var(--neon-cyan);
+  box-shadow: 0 0 5px var(--neon-cyan); text-shadow: 0 0 4px var(--neon-cyan); vertical-align: 2px;
+}
+.organ .role {
+  font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); margin-top: 2px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+/* Right side of organ row: keyboard hint + status dot */
+.organ-right {
+  display: flex; align-items: center; gap: 7px; flex-shrink: 0;
+}
+.organ-key {
+  font-family: var(--font-mono); font-size: 9px; color: var(--text-muted);
+  opacity: 0.45; letter-spacing: 0;
+}
+.organ .status-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+}
+.organ .status-dot.online   { background: var(--success);  box-shadow: 0 0 6px var(--success); }
+.organ .status-dot.idle     { background: var(--text-dim); }
+.organ .status-dot.offline  { background: var(--text-dimmer); opacity: 0.4; }
+.organ .status-dot.degraded { background: var(--warning); box-shadow: 0 0 6px var(--warning); }
+
+
+/* ═══════════════════════════════════════════════════════════════
+   ENTITY LOG — right panel
+   Structured three-column format: timestamp | tag | message
+   ═══════════════════════════════════════════════════════════════ */
+.log {
+  flex: 1; min-height: 0; padding: 10px 14px;
+  font-family: var(--font-mono); font-size: 12px; line-height: 1.8;
+  overflow: hidden; display: flex; flex-direction: column-reverse;
+}
+.log-inner { display: flex; flex-direction: column; gap: 1px; }
+
+.log-line {
+  display: flex; align-items: baseline; gap: 6px;
+  animation: line-in 220ms cubic-bezier(0.2,0.9,0.2,1);
+}
+@keyframes line-in { from { opacity: 0; transform: translateX(-4px); } to { opacity: 1; transform: none; } }
+
+/* Timestamp column — hidden when empty via x-show */
+.log-ts {
+  flex-shrink: 0; width: 78px;
+  font-size: 10px; letter-spacing: 0.02em; color: var(--text-dimmer);
+  text-align: right;
+}
+/* Tag column — colored by log kind */
+.log-tag {
+  flex-shrink: 0; width: 50px; text-align: center;
+  font-size: 10px; letter-spacing: 0.05em;
+}
+/* Message column — stretches to fill */
+.log-msg { flex: 1; word-break: break-word; white-space: pre-wrap; }
+
+/* Log line kind colors */
+.log-line.sys    .log-msg, .log-line.sys    .log-tag { color: var(--text-muted); }
+.log-line.info   .log-tag { color: var(--neon-cyan);    text-shadow: 0 0 4px var(--neon-cyan); }
+.log-line.info   .log-msg { color: var(--text-secondary); }
+.log-line.ok     .log-tag, .log-line.ok   .log-msg { color: var(--success); text-shadow: 0 0 4px var(--success); }
+.log-line.warn   .log-tag, .log-line.warn .log-msg { color: var(--warning); text-shadow: 0 0 4px var(--warning); }
+.log-line.rbl    .log-tag, .log-line.rbl  .log-msg { color: var(--neon-violet); }
+.log-line.probe  .log-msg { color: var(--neon-cyan); text-shadow: 0 0 4px var(--neon-cyan); }
+.log-line.prompt .log-msg { color: var(--text-primary); }
+.log-line.prompt .log-msg::before { content: "> "; color: var(--neon-magenta); text-shadow: 0 0 4px var(--neon-magenta); }
+.log-line.out    .log-msg { color: var(--text-primary); }
+
+/* Inline highlight spans used in boot log HTML — see BOOT_LOG_LINES in landing.js */
+.hi-m { color: var(--neon-magenta); text-shadow: 0 0 4px var(--neon-magenta); }
+.hi-c { color: var(--neon-cyan);    text-shadow: 0 0 4px var(--neon-cyan); }
+.hi-v { color: var(--neon-violet); }
+.hi-g { color: var(--success); }
+.hi-y { color: var(--warning); }
+
+/* Log links (organ probe URLs) */
+.log-msg a { color: var(--neon-cyan); text-decoration: none; text-shadow: 0 0 4px var(--neon-cyan); }
+.log-msg a:hover { color: var(--neon-magenta); }
+
+.log-foot {
+  padding: 8px 14px; border-top: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); letter-spacing: 0.06em;
+  flex-shrink: 0;
+}
+.log-foot .cur {
+  display: inline-block; width: 6px; height: 11px;
+  background: var(--neon-cyan); box-shadow: 0 0 6px var(--neon-cyan);
+  vertical-align: -1px; margin-left: 6px;
+  animation: blink 1s steps(2) infinite;
+}
+@keyframes blink { 50% { opacity: 0; } }
+
+
+/* ═══════════════════════════════════════════════════════════════
+   ORGAN PANEL — slide-in content panel per Collective member
+   Slides from the LEFT to stay near the Collective members nav.
+   ═══════════════════════════════════════════════════════════════ */
+/*
+ * Organ panel — slide-over content browser within the Collective pane.
+ * Feels like a content layer of the same panel, not a separate modal.
+ * Background matches the panel surface exactly; header/footer just darken slightly.
+ */
+.organ-panel {
+  position: absolute; inset: 0; z-index: 10;
+  display: flex; justify-content: flex-start;
+  /* Very subtle scrim — just enough to de-emphasise the organ list behind */
+  background: rgba(3, 0, 11, 0.20);
+}
+
+.op-inner {
+  width: 100%;
+  height: 100%;
+  /* Match the panel background: rgba(10,0,16,0.5) — feels native to the tile */
+  background: rgba(10, 0, 16, 0.72);
+  backdrop-filter: blur(8px);
+  display: flex; flex-direction: column;
+  overflow: hidden;
+  animation: op-slide-in 0.28s cubic-bezier(0.2,0.9,0.2,1) both;
+}
+@keyframes op-slide-in {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(0); }
+}
+
+.op-head {
+  display: flex; align-items: center; gap: 14px;
+  padding: 16px 20px; flex-shrink: 0;
+  border-bottom: 1px solid var(--border);
+  background: rgba(3, 0, 11, 0.35); /* subtle section distinction within the unified surface */
+}
+.op-icon {
+  width: 42px; height: 42px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-hero); font-weight: 800; font-size: 16px;
+  color: var(--neon-cyan); border: 1px solid var(--neon-cyan);
+  text-shadow: 0 0 8px var(--neon-cyan);
+  box-shadow: 0 0 14px rgba(0,245,255,0.2);
+  flex-shrink: 0;
+}
+.op-title-group { flex: 1; min-width: 0; }
+.op-name {
+  font-family: var(--font-hero); font-weight: 800; font-size: 17px;
+  letter-spacing: 0.10em; color: var(--text-primary); line-height: 1.2;
+}
+.op-role {
+  font-family: var(--font-mono); font-size: 11px;
+  color: var(--text-secondary); letter-spacing: 0.06em; margin-top: 3px;
+}
+.op-status-badge {
+  display: flex; align-items: center; gap: 6px;
+  font-family: var(--font-mono); font-size: 10px;
+  letter-spacing: 0.12em; text-transform: uppercase; flex-shrink: 0;
+}
+.op-status-badge.online  { color: var(--success); }
+.op-status-badge.idle    { color: var(--text-muted); }
+.op-status-badge.offline { color: var(--text-dimmer); }
+.op-dot { width: 6px; height: 6px; border-radius: 50%; }
+.op-status-badge.online  .op-dot { background: var(--success); box-shadow: 0 0 6px var(--success); }
+.op-status-badge.idle    .op-dot { background: var(--text-dim); }
+.op-status-badge.offline .op-dot { background: var(--text-dimmer); opacity: 0.5; }
+.op-close {
+  background: transparent; border: 1px solid var(--border);
+  color: var(--text-muted); font-family: var(--font-mono); font-size: 12px;
+  width: 30px; height: 30px; border-radius: 4px; flex-shrink: 0;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: all 140ms;
+}
+.op-close:hover { color: var(--neon-magenta); border-color: var(--neon-magenta); box-shadow: 0 0 8px var(--neon-magenta); }
+
+.op-body {
+  flex: 1; overflow-y: auto; padding: 28px 24px;
+  font-size: 14px; line-height: 1.85; color: var(--text-primary);
+}
+.op-body::-webkit-scrollbar       { width: 3px; }
+.op-body::-webkit-scrollbar-track { background: transparent; }
+.op-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+.op-body p { margin-bottom: 18px; }
+.op-body p:last-child { margin-bottom: 0; }
+.op-body strong { color: var(--text-primary); font-weight: 700; }
+.op-body code {
+  font-family: var(--font-mono); font-size: 12px;
+  background: rgba(0,245,255,0.06); padding: 2px 7px;
+  border-radius: 3px; color: var(--neon-cyan);
+  border: 1px solid rgba(0,245,255,0.2);
+  word-break: break-all;
+}
+
+.op-dl {
+  display: grid; grid-template-columns: auto 1fr; gap: 8px 20px;
+  margin-top: 22px; padding-top: 18px;
+  border-top: 1px solid var(--border);
+  font-family: var(--font-mono); font-size: 12px; line-height: 1.6;
+}
+.op-dl dt { color: var(--neon-cyan); letter-spacing: 0.08em; white-space: nowrap; }
+.op-dl dd { color: var(--text-secondary); }
+.op-dl dd code { font-size: 11px; }
+
+.op-foot {
+  padding: 16px 24px; border-top: 1px solid var(--border); flex-shrink: 0;
+  background: rgba(3, 0, 11, 0.35);
+}
+.op-link {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.08em;
+  color: var(--neon-violet); text-decoration: none;
+  padding: 9px 18px; border: 1px solid var(--neon-violet); border-radius: 4px;
+  transition: all 160ms;
+}
+.op-link:hover {
+  color: var(--neon-cyan); border-color: var(--neon-cyan);
+  box-shadow: 0 0 12px rgba(0,245,255,0.3);
+}
+
+/* Section tag — matches RaBbLE-OS page .section-label aesthetic */
+.op-section-tag {
+  font-family: var(--font-mono); font-size: 10px;
+  letter-spacing: 0.32em; text-transform: uppercase;
+  color: var(--neon-cyan); text-shadow: 0 0 6px var(--neon-cyan);
+  margin-bottom: 14px;
+}
+
+/* Bootstrap command block — mirrors RaBbLE-OS bootstrap-block */
+.op-cmd-wrap {
+  background: rgba(3,0,11,0.6);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 14px 16px;
+  margin: 18px 0;
+}
+.op-cmd-label {
+  font-family: var(--font-mono); font-size: 9px;
+  letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--text-muted); margin-bottom: 10px;
+}
+.op-cmd-line {
+  display: flex; align-items: center; gap: 10px;
+  background: rgba(3,0,11,0.8);
+  border: 1px solid var(--neon-violet);
+  border-radius: 4px; padding: 10px 14px;
+  box-shadow: 0 0 10px rgba(191,95,255,0.15);
+}
+.op-cmd-prompt {
+  color: var(--neon-magenta);
+  font-family: var(--font-mono); font-size: 13px;
+  text-shadow: 0 0 4px var(--neon-magenta);
+  flex-shrink: 0;
+}
+/* Override .op-body code for command lines */
+.op-cmd-line code {
+  font-family: var(--font-mono); font-size: 11px;
+  color: var(--neon-cyan); text-shadow: 0 0 4px rgba(0,245,255,0.35);
+  background: transparent !important; padding: 0 !important;
+  border: none !important; word-break: break-all;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   MOBILE NAV TOGGLE — floating pill, bottom-left (mobile only)
+   ═══════════════════════════════════════════════════════════════ */
+.nav-toggle {
+  display: none; /* shown at ≤600px */
+  position: fixed; bottom: 36px; left: 16px; z-index: 120;
+  align-items: center; gap: 6px;
+  padding: 7px 14px; border-radius: 999px;
+  border: 1px solid var(--neon-magenta);
+  background: rgba(3,0,11,0.88);
+  color: var(--neon-magenta); font-family: var(--font-mono); font-size: 10px;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  cursor: pointer; box-shadow: 0 0 10px var(--neon-magenta);
+  -webkit-tap-highlight-color: transparent;
+}
+.nav-toggle .dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--neon-magenta); box-shadow: 0 0 6px var(--neon-magenta);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   MOBILE NAV OVERLAY — full-screen Collective nav for mobile
+   ═══════════════════════════════════════════════════════════════ */
+.nav-overlay {
+  display: none;
+  position: fixed;
+  top: var(--sb-height); /* start below Waybar, never cover it */
+  left: 0; right: 0; bottom: 0;
+  z-index: 150;
+  background: rgba(3,0,11,0.94);
+  backdrop-filter: blur(16px);
+  flex-direction: column;
+}
+.nav-overlay-panel {
+  display: flex; flex-direction: column;
+  height: 100%; max-height: 100%;
+}
+.nav-overlay-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 18px; border-bottom: 1px solid var(--border); flex-shrink: 0;
+}
+.nav-overlay-head .label {
+  font-family: var(--font-display); font-weight: 600;
+  font-size: 11px; letter-spacing: 0.32em; text-transform: uppercase;
+  color: var(--neon-magenta); text-shadow: 0 0 6px var(--neon-magenta);
+}
+.nav-overlay-close {
+  background: transparent; border: 1px solid var(--text-muted);
+  color: var(--text-muted); font-family: var(--font-mono);
+  font-size: 10px; padding: 4px 10px; border-radius: 3px;
+  cursor: pointer; letter-spacing: 0.12em; transition: all 140ms;
+  -webkit-tap-highlight-color: transparent;
+}
+.nav-overlay-close:hover { color: var(--neon-magenta); border-color: var(--neon-magenta); }
+.nav-overlay-body { flex: 1; min-height: 0; overflow-y: auto; padding: 8px; }
+
+/* Back button shown in nav overlay detail header */
+.nav-back-btn {
+  background: transparent; border: 1px solid var(--border);
+  color: var(--text-muted); font-family: var(--font-mono); font-size: 10px;
+  padding: 4px 10px; border-radius: 3px; cursor: pointer;
+  letter-spacing: 0.10em; transition: all 140ms; flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+.nav-back-btn:hover { color: var(--neon-cyan); border-color: var(--neon-cyan); }
+
+.nav-detail-head { gap: 10px; }
+.nav-detail-status { font-size: 9px; margin-right: auto; }
+.nav-detail-status .op-dot { width: 5px; height: 5px; }
+
+/* Detail content body inside nav overlay — uses op-body styles */
+.nav-overlay-detail {
+  flex: 1; min-height: 0; overflow-y: auto;
+  padding: 22px 20px;
+  font-size: 13px; line-height: 1.85; color: var(--text-primary);
+}
+.nav-overlay-detail::-webkit-scrollbar       { width: 3px; }
+.nav-overlay-detail::-webkit-scrollbar-track { background: transparent; }
+.nav-overlay-detail::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+.nav-overlay-detail p { margin-bottom: 14px; }
+.nav-overlay-detail p:last-child { margin-bottom: 0; }
+.nav-overlay-detail strong { color: var(--text-primary); font-weight: 700; }
+.nav-overlay-detail code {
+  font-family: var(--font-mono); font-size: 11px;
+  background: rgba(0,245,255,0.06); padding: 2px 6px;
+  border-radius: 3px; color: var(--neon-cyan);
+  border: 1px solid rgba(0,245,255,0.2); word-break: break-all;
+}
+.nav-overlay-detail .op-dl {
+  display: grid; grid-template-columns: auto 1fr; gap: 6px 16px;
+  margin-top: 16px; padding-top: 14px;
+  border-top: 1px solid var(--border);
+  font-family: var(--font-mono); font-size: 11px; line-height: 1.6;
+}
+.nav-overlay-detail .op-cmd-wrap { margin: 14px 0; }
+.nav-overlay-detail .op-cmd-line code {
+  background: transparent !important; padding: 0 !important; border: none !important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   MOBILE LOG TOGGLE — floating button (mobile only)
+   ═══════════════════════════════════════════════════════════════ */
+.log-toggle {
+  display: none; /* shown at ≤600px via media query below */
+  position: fixed; bottom: 36px; right: 16px; z-index: 120;
+  align-items: center; gap: 6px;
+  padding: 7px 14px; border-radius: 999px;
+  border: 1px solid var(--success); background: rgba(3,0,11,0.88);
+  color: var(--success); font-family: var(--font-mono); font-size: 10px;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: 0 0 10px var(--success);
+  animation: pulse-dot 2.4s ease-in-out infinite;
+  -webkit-tap-highlight-color: transparent;
+}
+.log-toggle .dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--success); box-shadow: 0 0 6px var(--success);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   MOBILE LOG OVERLAY — full-screen pop-out log panel
+   ═══════════════════════════════════════════════════════════════ */
+.log-overlay {
+  display: none; /* shown at ≤900px via media query */
+  position: fixed;
+  top: var(--sb-height); /* start below Waybar, never cover it */
+  left: 0; right: 0; bottom: 0;
+  z-index: 150;
+  background: rgba(3,0,11,0.94);
+  backdrop-filter: blur(16px);
+  flex-direction: column;
+  transition: opacity 0.2s ease;
+}
+.log-overlay-panel {
+  display: flex; flex-direction: column;
+  height: 100%; max-height: 100%;
+}
+.log-overlay-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 18px; border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.log-overlay-head .label {
+  font-family: var(--font-display); font-weight: 600;
+  font-size: 10px; letter-spacing: 0.32em; text-transform: uppercase;
+  color: var(--neon-cyan); text-shadow: 0 0 6px var(--neon-cyan);
+}
+.log-overlay-close {
+  background: transparent; border: 1px solid var(--text-muted);
+  color: var(--text-muted); font-family: var(--font-mono);
+  font-size: 10px; padding: 4px 10px; border-radius: 3px;
+  cursor: pointer; letter-spacing: 0.12em; transition: all 140ms;
+  -webkit-tap-highlight-color: transparent;
+}
+.log-overlay-close:hover { color: var(--neon-cyan); border-color: var(--neon-cyan); }
+.log-overlay-body { flex: 1; min-height: 0; overflow-y: auto; }
+
+/* Alpine x-transition classes for log overlay */
+.slide-up-enter  { transition: opacity 0.2s ease, transform 0.2s ease; }
+.slide-up-from   { opacity: 0; transform: translateY(20px); }
+.slide-up-to     { opacity: 1; transform: translateY(0); }
+.overlay-in      { transition: opacity 0.25s ease; }
+.overlay-from    { opacity: 0; }
+.overlay-to      { opacity: 1; }
+
+
+/* ═══════════════════════════════════════════════════════════════
+   RESPONSIVE — panels-level breakpoints
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Tablet — log moves to overlay ─────────────────────────── */
+@media (max-width: 900px) {
+  .log-overlay { display: flex; }
+}
+
+/* ── Mobile portrait ─────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .log-toggle  { display: flex; }
+  .nav-toggle  { display: flex; }
+  .nav-overlay { display: flex; }
+}
+
+
+/* ── Landscape phone — panel-level overrides ───────────────── */
+@media (orientation: landscape) and (max-height: 500px) {
+
+  .log-toggle  { display: flex; }
+  .log-overlay { display: flex; }
+  .nav-toggle  { display: none; } /* collective panel is already visible */
+
+  /* ── Organ detail panel: expand to readable width over the stage ─
+   * The 180px collective column is too narrow for detail text (28px
+   * padding each side leaves ~124px). Break out of the column with
+   * position:fixed and expand to 300px — glass drawer over the stage.
+   * z-index:20 sits above the stage (z:5) but below system overlays.  */
+  .organ-panel {
+    position: fixed;
+    left: 0;
+    top: var(--sb-height);
+    bottom: 0;
+    width: min(300px, 75vw);
+    z-index: 20;
+    background: transparent;  /* scrim is on op-inner */
+  }
+  .op-inner {
+    border-right: 1px solid rgba(191, 95, 255, 0.20);
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.5);
+  }
+  .op-head { padding: 10px 14px; gap: 10px; }
+  .op-icon { width: 32px; height: 32px; font-size: 13px; }
+  .op-name { font-size: 14px; }
+  .op-role { font-size: 10px; margin-top: 1px; }
+  .op-status-badge { display: none; }
+  .op-body { padding: 14px 16px; font-size: 12px; line-height: 1.6; }
+  .op-body p { margin-bottom: 10px; }
+  .op-dl { font-size: 11px; gap: 6px 12px; margin-top: 12px; padding-top: 10px; }
+  .op-foot { padding: 10px 16px; }
+  .op-link { font-size: 11px; padding: 7px 12px; }
+
+  /* Log toggle: top-right in landscape — avoids overlapping the ask-box at bottom */
+  .log-toggle {
+    bottom: auto;
+    top: calc(var(--sb-height) + 8px);
+    right: calc(8px + env(safe-area-inset-right, 0px));
+    border-radius: 4px;
+    padding: 5px 12px;
+  }
+}

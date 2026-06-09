@@ -1,0 +1,281 @@
+/* =========================================================================
+   landing-shell.css — joinrabble.world
+   Shell grid, statusbar extensions, side panel shared rules, hint-strip.
+   Part of the landing CSS split (Task 5).
+   See RaBbLE-landing.css for full file history.
+   ========================================================================= */
+
+/* ── Landing-specific token extensions ──────────────────────────────────── */
+:root {
+  --void-deepest:   var(--bg,      #03000b);
+  --void-deep:      #07001a;
+
+  /* Landing text hierarchy — slightly brighter than Aether muted defaults */
+  --text-primary:   #f0eaf8;
+  --text-secondary: #c0b8d8;
+  --text-muted:     #9890b8;
+
+  /* Neon aliases — prefer these inside this file for readability */
+  --neon-cyan:    var(--cyan,    #00f5ff);
+  --neon-magenta: var(--magenta, #ff2d78);
+  --neon-violet:  var(--violet,  #bf5fff);
+  --success:      var(--green,   #50fa7b);
+  --warning:      #ffbe2e;
+
+  /* Statusbar height — used for overlay top offsets and shell grid row */
+  --sb-height: calc(32px + env(safe-area-inset-top, 0px));
+}
+
+/* ── Base ────────────────────────────────────────────────────────────────── */
+html {
+  height: 100%; width: 100%;
+  overflow: hidden;
+  /* Prevent iOS rubber-band overscroll — keeps the PWA feeling native */
+  overscroll-behavior: none;
+}
+body {
+  height: 100%; width: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+  /* Hard fallback before CSS vars resolve — prevents iOS PWA white flash */
+  background-color: #03000b;
+  background: var(--void-deepest);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  cursor: default;
+}
+
+/* Page-exit fade — keyframe is in Aether motion (page-fade-out) */
+body.boot-departing { animation: page-fade-out 0.55s ease forwards; }
+
+/* Utility: hide on very small screens */
+@media (max-width: 480px) { .hide-xs { display: none !important; } }
+
+
+/* ── CRT screen overlays — provided by Aether components ────────────────── */
+/* .scanlines, .vignette, .chromatic, .floor, .horizon all live in aether.css */
+
+
+/* ═══════════════════════════════════════════════════════════════
+   SHELL — override Aether's flex shell → grid for 3-row landing layout
+   Base shell/statusbar/sb-* styles provided by Aether components.
+   ═══════════════════════════════════════════════════════════════ */
+.shell {
+  display: grid;
+  grid-template-rows:
+    var(--sb-height)                               /* statusbar clears Dynamic Island */
+    1fr                                            /* main tile area */
+    calc(28px + env(safe-area-inset-bottom, 0px)); /* hint-strip + home indicator */
+}
+
+/* ── Center zone interactive state (landing-specific) ─────────────────── */
+.sb-chevron {
+  font-size: 8px; opacity: 0.5;
+  margin-left: 2px;
+  color: var(--neon-violet);
+}
+
+/* ── Entity metrics panel — drops below the Waybar center ───────────────
+   position:fixed so it escapes the statusbar's overflow:hidden context.
+   Top anchored to --sb-height (same value as the grid row).             */
+.sb-metrics-panel {
+  position: fixed;
+  top: var(--sb-height);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 210;
+  min-width: 220px;
+  background: rgba(3, 0, 11, 0.96);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(191, 95, 255, 0.25);
+  border-top: none;
+  border-radius: 0 0 6px 6px;
+  padding: 10px 16px 14px;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.6),
+    0 0 0 1px rgba(0, 245, 255, 0.06),
+    0 0 20px 2px rgba(191, 95, 255, 0.08);
+  animation: metrics-in 0.16s cubic-bezier(0.2, 0.9, 0.2, 1) both;
+}
+@keyframes metrics-in {
+  from { opacity: 0; transform: translateX(-50%) translateY(-6px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+.sb-metrics-head {
+  font-family: var(--font-mono); font-size: 9px;
+  letter-spacing: 0.32em; text-transform: uppercase;
+  color: var(--neon-violet); text-shadow: 0 0 6px var(--neon-violet);
+  padding-bottom: 8px; margin-bottom: 4px;
+  border-bottom: 1px solid rgba(191, 95, 255, 0.15);
+}
+
+.sb-metric {
+  display: flex; justify-content: space-between; align-items: baseline;
+  gap: 20px; padding: 3px 0;
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.05em;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}
+.sb-metric:last-child { border-bottom: none; }
+.sb-mk { color: var(--text-muted); white-space: nowrap; }
+.sb-mv { color: var(--text-secondary); text-align: right; white-space: nowrap; }
+
+/* Metric value color classes — match log highlight scheme */
+.sb-mv.hi-c { color: var(--neon-cyan);    text-shadow: 0 0 4px var(--neon-cyan); }
+.sb-mv.hi-m { color: var(--neon-magenta); text-shadow: 0 0 4px var(--neon-magenta); }
+.sb-mv.hi-v { color: var(--neon-violet); }
+
+
+/* ═══════════════════════════════════════════════════════════════
+   MAIN — three-column console layout
+   Columns: organs | stage | log
+   ═══════════════════════════════════════════════════════════════ */
+.main {
+  display: grid;
+  grid-template-columns: 340px 1fr 340px;
+  min-height: 0;
+  /* overflow and gap set by RaBbLE-wm.css */
+}
+
+
+/* ── Side panels (shared) ────────────────────────────────────────────────── */
+.panel {
+  /* No backdrop-filter — permanent large elements with animated background
+     behind them force full-screen compositor repaint every AmbientField frame.
+     Higher-opacity solid bg gives similar visual without the per-frame cost. */
+  background: rgba(10,0,16,0.88);
+  display: flex; flex-direction: column; min-height: 0;
+}
+/* Side borders removed — applet tile border (RaBbLE-wm.css) replaces them */
+.panel.left  { position: relative; overflow: hidden; }
+.panel.right { /* border handled by .applet in wm.css */ }
+
+.panel-head {
+  padding: 14px 18px 8px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  flex-shrink: 0;
+}
+.panel-head .label {
+  font-family: var(--font-display); font-weight: 600;
+  font-size: 10px; letter-spacing: 0.32em; text-transform: uppercase;
+  color: var(--neon-cyan); text-shadow: 0 0 6px var(--neon-cyan);
+}
+.panel-head .meta { font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); }
+
+/* Explore hint line under panel header */
+.panel-explore {
+  padding: 5px 18px 6px;
+  font-family: var(--font-mono); font-size: 9px;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--text-muted); opacity: 0.6;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+
+/* ── Hint strip ──────────────────────────────────────────────────────────── */
+.hint-strip {
+  display: flex; align-items: center; gap: 12px;
+  padding: 0 18px env(safe-area-inset-bottom, 0px);
+  background: rgba(3,0,11,0.85); border-top: 1px solid var(--border);
+  font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); letter-spacing: 0.08em;
+}
+.hint-strip kbd {
+  display: inline-block; padding: 1px 6px; border-radius: 2px;
+  border: 1px solid var(--neon-cyan); color: var(--neon-cyan);
+  font-family: var(--font-mono); font-size: 10px;
+  box-shadow: 0 0 4px var(--neon-cyan); text-shadow: 0 0 4px var(--neon-cyan);
+}
+.hint-strip .right { margin-left: auto; }
+
+
+/* ═══════════════════════════════════════════════════════════════
+   RESPONSIVE — shell-level breakpoints
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Large tablet / small desktop ────────────────────────────── */
+@media (max-width: 1200px) {
+  .main { grid-template-columns: 240px 1fr 240px; }
+}
+
+/* ── Tablet — collective + stage, log moves to overlay ────────── */
+@media (max-width: 900px) {
+  .main { grid-template-columns: 200px 1fr; }
+  .panel.right { display: none; }
+}
+
+/* ── Mobile portrait — single surface, overlays for navigation ─ */
+@media (max-width: 600px) {
+  .main { grid-template-columns: 1fr; }
+  .panel.left, .panel.right { display: none; }
+
+  /* Shell: collapse to two rows (hint-strip hidden), bottom safe area as padding */
+  .shell {
+    grid-template-rows: auto 1fr;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  /* Statusbar: compact three-zone — hide secondary items, preserve safe area */
+  .statusbar {
+    font-size: 9px;
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+  .sb-left  { padding: 0 10px 5px; gap: 7px; }
+  .sb-center { padding: 0 8px 5px; gap: 5px; }
+  .sb-right { padding: 0 10px 5px; gap: 8px; }
+  .sb-entity-state { display: none; } /* pulse alone is enough at this size */
+
+  /* Keyboard nav strip — irrelevant on touch devices */
+  .hint-strip { display: none; }
+}
+
+
+/* ── Short viewport — reclaim hint-strip row below 720px (any orientation) ─
+   Applies before landscape breakpoint so landscape can still override.        */
+@media (max-height: 720px) {
+  .hint-strip { display: none; }
+  .shell {
+    grid-template-rows: auto 1fr;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+}
+
+
+/* ── Landscape phone — shell-level overrides ───────────────── */
+@media (orientation: landscape) and (max-height: 500px) {
+
+  /* Shell: two rows only — no hint-strip */
+  .shell {
+    grid-template-rows: auto 1fr;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  /* Statusbar: single compact line */
+  .statusbar { font-size: 9px; }
+  .sb-left   { padding: 0 12px 4px; gap: 8px; }
+  .sb-center { padding: 0 10px 4px; gap: 6px; }
+  .sb-right  { padding: 0 12px 4px; gap: 8px; }
+  .sb-entity-state, .sb-uptime { display: none; }
+
+  /* Two-panel layout: Collective (slim) + Stage — override all WM classes */
+  .main {
+    grid-template-columns: 180px 1fr !important;
+    gap: 3px !important;
+    padding: 3px !important;
+  }
+  .panel.left  { display: flex !important; }
+  .panel.right { display: none  !important; }
+  .hint-strip  { display: none; }
+
+  /* Compact collective panel list */
+  .panel-head  { padding: 6px 10px 5px; }
+  .panel-explore { padding: 3px 10px 4px; font-size: 8px; }
+  .organ       { padding: 6px 8px; }
+  .organ .name { font-size: 11px; }
+  .organ .role { font-size: 9px;  }
+
+  /* Metrics panel: no room in landscape */
+  .sb-metrics-panel { display: none !important; }
+  .sb-chevron { display: none; }
+}

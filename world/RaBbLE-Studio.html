@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#03000b">
+<title>NeBuLA Studio · joinrabble.world</title>
+<style>html,body{background:#03000b}</style>
+
+<script src="js/RaBbLE-aether.js"></script>
+<script src="js/RaBbLE-NeBuLA.js"></script>
+
+<link rel="stylesheet" href="css/RaBbLE-theme.css">
+<link rel="stylesheet" href="css/RaBbLE-wm.css">
+<link rel="stylesheet" href="css/RaBbLE-Studio.css">
+</head>
+<body>
+
+<div class="floor"></div>
+<div class="horizon"></div>
+<div class="scanlines"></div>
+<div class="vignette"></div>
+<div class="chromatic"></div>
+
+<div class="shell studio-shell">
+
+  <!-- Statusbar -->
+  <header class="statusbar">
+    <div class="sb-left">
+      <span class="brandmark">ST</span>
+      <span class="sb-sep">/</span>
+      <span class="sb-workspace">nebula studio</span>
+    </div>
+    <div class="sb-center">
+      <span class="sb-glyph">◈</span>
+      <span id="sb-state" class="sb-entity-state">idle</span>
+      <span class="sb-sep">·</span>
+      <span id="sb-fps" class="sb-val">60fps</span>
+      <span class="sb-sep">·</span>
+      <span id="sb-entropy" class="sb-val">e:0.30</span>
+    </div>
+    <div class="sb-right">
+      <span id="sb-backend" class="sb-val sb-hide-sm">Canvas2D</span>
+      <span class="sb-sep sb-hide-sm">·</span>
+      <span class="pill"><span class="dot"></span> tuning</span>
+    </div>
+  </header>
+
+  <div class="studio-body">
+
+    <!-- ══ LEFT: Primary Controls ══════════════════════════════ -->
+    <aside class="studio-left applet" data-applet="studio-controls">
+      <div class="studio-section-head">::Entity</div>
+
+      <!-- Entity state -->
+      <div class="studio-ctrl">
+        <div class="ctrl-label">State</div>
+        <div class="ctrl-row">
+          <button class="rabble-btn rabble-btn-ghost rabble-btn-sm studio-state-btn" data-state="idle">idle</button>
+          <button class="rabble-btn rabble-btn-ghost rabble-btn-sm studio-state-btn" data-state="thinking">thinking</button>
+          <button class="rabble-btn rabble-btn-ghost rabble-btn-sm studio-state-btn" data-state="speaking">speaking</button>
+          <button class="rabble-btn rabble-btn-ghost rabble-btn-sm studio-state-btn" data-state="boot">↺ boot</button>
+        </div>
+      </div>
+
+      <!-- Entropy -->
+      <div class="studio-ctrl">
+        <div class="ctrl-label">Entropy — <span class="ctrl-val" id="val-entropy">0.30</span></div>
+        <input id="ctrl-entropy" class="ctrl-slider" type="range" min="0" max="1" step="0.01" value="0.30">
+      </div>
+
+      <!-- Waveform -->
+      <div class="studio-ctrl ctrl-row-inline">
+        <div class="ctrl-label">Waveform</div>
+        <label class="studio-toggle">
+          <input id="ctrl-waveform" type="checkbox">
+          <span class="toggle-track"><span class="toggle-thumb"></span></span>
+        </label>
+      </div>
+
+      <!-- Interactive -->
+      <div class="studio-ctrl ctrl-row-inline">
+        <div class="ctrl-label">Interactive (mouse)</div>
+        <label class="studio-toggle">
+          <input id="ctrl-interactive" type="checkbox" checked>
+          <span class="toggle-track"><span class="toggle-thumb"></span></span>
+        </label>
+      </div>
+
+      <!-- Portal -->
+      <div class="studio-ctrl ctrl-row-inline">
+        <div class="ctrl-label">Portal arcs</div>
+        <label class="studio-toggle">
+          <input id="ctrl-portal" type="checkbox" checked>
+          <span class="toggle-track"><span class="toggle-thumb"></span></span>
+        </label>
+      </div>
+
+      <!-- Eye jolt -->
+      <div class="studio-ctrl">
+        <div class="ctrl-label">Eye Jolt</div>
+        <div class="ctrl-row jolt-pad-wrap">
+          <div id="jolt-pad" class="jolt-pad" title="Click to inject eye jolt">
+            <div class="jolt-crosshair-h"></div>
+            <div class="jolt-crosshair-v"></div>
+            <div id="jolt-cursor" class="jolt-cursor"></div>
+          </div>
+          <div class="jolt-actions">
+            <button class="rabble-btn rabble-btn-ghost rabble-btn-sm" id="btn-jolt-left">← left</button>
+            <button class="rabble-btn rabble-btn-ghost rabble-btn-sm" id="btn-jolt-right">right →</button>
+            <button class="rabble-btn rabble-btn-ghost rabble-btn-sm" id="btn-jolt-up">↑ up</button>
+            <button class="rabble-btn rabble-btn-ghost rabble-btn-sm" id="btn-jolt-down">↓ down</button>
+            <button class="rabble-btn rabble-btn-ghost rabble-btn-sm" id="btn-jolt-rand">⚡ rand</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="studio-section-head">::Particles</div>
+
+      <!-- Particle count -->
+      <div class="studio-ctrl">
+        <div class="ctrl-label">Count — <span class="ctrl-val" id="val-particles">480</span></div>
+        <input id="ctrl-particles" class="ctrl-slider" type="range" min="60" max="960" step="60" value="480">
+      </div>
+
+      <!-- Overscan -->
+      <div class="studio-ctrl">
+        <div class="ctrl-label">Overscan — <span class="ctrl-val" id="val-overscan">2.55</span></div>
+        <input id="ctrl-overscan" class="ctrl-slider" type="range" min="1.0" max="4.0" step="0.05" value="2.55">
+      </div>
+
+      <!-- Glow fraction -->
+      <div class="studio-ctrl">
+        <div class="ctrl-label">Glow Fraction — <span class="ctrl-val" id="val-glow-frac">12%</span></div>
+        <input id="ctrl-glow-frac" class="ctrl-slider" type="range" min="0" max="0.5" step="0.01" value="0.12">
+      </div>
+
+      <!-- Orbit speed -->
+      <div class="studio-ctrl">
+        <div class="ctrl-label">Orbit Speed — <span class="ctrl-val" id="val-orbit">1.0×</span></div>
+        <input id="ctrl-orbit" class="ctrl-slider" type="range" min="0.1" max="5.0" step="0.1" value="1.0">
+      </div>
+
+      <!-- Particle size range -->
+      <div class="studio-ctrl">
+        <div class="ctrl-label">Size min — <span class="ctrl-val" id="val-size-min">0.8px</span></div>
+        <input id="ctrl-size-min" class="ctrl-slider" type="range" min="0.1" max="5.0" step="0.1" value="0.8">
+      </div>
+      <div class="studio-ctrl">
+        <div class="ctrl-label">Size max — <span class="ctrl-val" id="val-size-max">11.8px</span></div>
+        <input id="ctrl-size-max" class="ctrl-slider" type="range" min="1.0" max="30.0" step="0.5" value="11.8">
+      </div>
+
+      <!-- Bloom radius -->
+      <div class="studio-ctrl">
+        <div class="ctrl-label">Bloom Radius — <span class="ctrl-val" id="val-bloom">6px</span></div>
+        <input id="ctrl-bloom" class="ctrl-slider" type="range" min="0" max="20" step="1" value="6">
+      </div>
+
+      <!-- Entity palette gallery -->
+      <div class="studio-section-head">::Palettes</div>
+      <div id="studio-entity-strip" class="studio-mini-strip"></div>
+
+    </aside><!-- /studio-left -->
+
+    <!-- ══ CENTER: Canvas Stage ═════════════════════════════════ -->
+    <main class="studio-center applet" data-applet="studio-stage">
+
+      <!-- Entity canvas -->
+      <div class="studio-canvas-wrap">
+        <div class="entity-wrap" aria-hidden="true">
+          <rabble-entity
+            id="studio-entity"
+            mode="boot"
+            particle-count="480"
+            overscan="2.55"
+            show-waveform="false">
+          </rabble-entity>
+        </div>
+      </div>
+
+      <!-- Boot timeline bar -->
+      <div class="boot-timeline" id="boot-timeline" title="Boot sequence timeline">
+        <div class="boot-timeline-track">
+          <div id="boot-progress-fill" class="boot-timeline-fill"></div>
+          <div class="boot-phase-marker" style="left:8.3%" title="Portals start (T=0.4s)"></div>
+          <div class="boot-phase-marker" style="left:23.3%" title="Eyes start (T=1.4s)"></div>
+          <div class="boot-phase-marker" style="left:53.3%" title="Portals end / Eyes open (T=2.6s)"></div>
+          <div class="boot-phase-marker" style="left:82.3%" title="Eyes full (T=3.2s)"></div>
+        </div>
+        <div class="boot-timeline-labels">
+          <span>boot</span>
+          <span>portals</span>
+          <span>eyes</span>
+          <span>settle</span>
+        </div>
+      </div>
+
+      <!-- Live metric row -->
+      <div class="studio-metrics-row">
+        <div class="studio-metric"><span class="sm-key">fps</span><span id="metric-fps" class="sm-val hi-c">—</span></div>
+        <div class="studio-metric"><span class="sm-key">pulse</span><span id="metric-pulse" class="sm-val hi-c">—</span></div>
+        <div class="studio-metric"><span class="sm-key">entropy</span><span id="metric-entropy" class="sm-val hi-m">—</span></div>
+        <div class="studio-metric"><span class="sm-key">particles</span><span id="metric-particles" class="sm-val hi-v">—</span></div>
+        <div class="studio-metric"><span class="sm-key">glow</span><span id="metric-glow" class="sm-val hi-v">—</span></div>
+        <div class="studio-metric"><span class="sm-key">backend</span><span id="metric-backend" class="sm-val">Canvas2D</span></div>
+      </div>
+
+    </main><!-- /studio-center -->
+
+    <!-- ══ RIGHT: Inspector Tabs ════════════════════════════════ -->
+    <aside class="studio-right applet" data-applet="studio-inspector">
+
+      <!-- Tab strip -->
+      <div class="studio-tabs" role="tablist">
+        <button class="studio-tab active" data-tab="eyes" role="tab">Eyes</button>
+        <button class="studio-tab" data-tab="anim" role="tab">Anim</button>
+        <button class="studio-tab" data-tab="perf" role="tab">Perf</button>
+        <button class="studio-tab" data-tab="log" role="tab">Log</button>
+        <button class="studio-tab" data-tab="export" role="tab">Export</button>
+      </div>
+
+      <!-- ── Tab: Eyes ── -->
+      <div id="tab-eyes" class="studio-tab-panel active">
+        <div class="studio-section-head">::Eye Tuning</div>
+
+        <!-- Saccade mode -->
+        <div class="studio-ctrl">
+          <div class="ctrl-label">Saccade Mode</div>
+          <div class="ctrl-row">
+            <button class="rabble-btn rabble-btn-ghost rabble-btn-sm studio-saccade-btn" data-mode="calm">calm</button>
+            <button class="rabble-btn rabble-btn-ghost rabble-btn-sm studio-saccade-btn active" data-mode="normal">normal</button>
+            <button class="rabble-btn rabble-btn-ghost rabble-btn-sm studio-saccade-btn" data-mode="alert">alert</button>
+            <button class="rabble-btn rabble-btn-ghost rabble-btn-sm studio-saccade-btn" data-mode="chaotic">chaotic</button>
+          </div>
+        </div>
+
+        <!-- Blink interval -->
+        <div class="studio-ctrl">
+          <div class="ctrl-label">Blink Interval — <span class="ctrl-val" id="val-blink">100fr</span></div>
+          <input id="ctrl-blink" class="ctrl-slider" type="range" min="20" max="300" step="5" value="100">
+        </div>
+
+        <!-- Distraction frequency -->
+        <div class="studio-ctrl">
+          <div class="ctrl-label">Distraction Freq — <span class="ctrl-val" id="val-distract">120fr</span></div>
+          <input id="ctrl-distract" class="ctrl-slider" type="range" min="30" max="600" step="10" value="120">
+        </div>
+
+        <!-- Spring strength -->
+        <div class="studio-ctrl">
+          <div class="ctrl-label">Spring Strength — <span class="ctrl-val" id="val-spring">0.12</span></div>
+          <input id="ctrl-spring" class="ctrl-slider" type="range" min="0.02" max="0.40" step="0.01" value="0.12">
+        </div>
+
+        <!-- Damping factor -->
+        <div class="studio-ctrl">
+          <div class="ctrl-label">Damping — <span class="ctrl-val" id="val-damp">0.72</span></div>
+          <input id="ctrl-damp" class="ctrl-slider" type="range" min="0.40" max="0.98" step="0.01" value="0.72">
+        </div>
+
+        <!-- Jolt decay -->
+        <div class="studio-ctrl">
+          <div class="ctrl-label">Jolt Decay — <span class="ctrl-val" id="val-jolt-decay">0.94</span></div>
+          <input id="ctrl-jolt-decay" class="ctrl-slider" type="range" min="0.70" max="0.99" step="0.01" value="0.94">
+        </div>
+
+        <div class="studio-section-head">::Waveform</div>
+
+        <!-- Per-state waveform sliders — idle -->
+        <div class="waveform-state-block">
+          <div class="ctrl-label waveform-state-label hi-v">idle</div>
+          <div class="studio-ctrl">
+            <div class="ctrl-label">Amplitude — <span class="ctrl-val" id="val-wf-idle-amp">2.0</span></div>
+            <input id="ctrl-wf-idle-amp" class="ctrl-slider" type="range" min="0" max="20" step="0.5" value="2.0" data-wf-state="idle" data-wf-prop="amplitude">
+          </div>
+          <div class="studio-ctrl">
+            <div class="ctrl-label">Frequency — <span class="ctrl-val" id="val-wf-idle-freq">0.09</span></div>
+            <input id="ctrl-wf-idle-freq" class="ctrl-slider" type="range" min="0.01" max="0.5" step="0.01" value="0.09" data-wf-state="idle" data-wf-prop="frequency">
+          </div>
+        </div>
+
+        <!-- thinking -->
+        <div class="waveform-state-block">
+          <div class="ctrl-label waveform-state-label hi-m">thinking</div>
+          <div class="studio-ctrl">
+            <div class="ctrl-label">Amplitude — <span class="ctrl-val" id="val-wf-thinking-amp">4.5</span></div>
+            <input id="ctrl-wf-thinking-amp" class="ctrl-slider" type="range" min="0" max="20" step="0.5" value="4.5" data-wf-state="thinking" data-wf-prop="amplitude">
+          </div>
+          <div class="studio-ctrl">
+            <div class="ctrl-label">Frequency — <span class="ctrl-val" id="val-wf-thinking-freq">0.13</span></div>
+            <input id="ctrl-wf-thinking-freq" class="ctrl-slider" type="range" min="0.01" max="0.5" step="0.01" value="0.13" data-wf-state="thinking" data-wf-prop="frequency">
+          </div>
+        </div>
+
+        <!-- speaking -->
+        <div class="waveform-state-block">
+          <div class="ctrl-label waveform-state-label hi-c">speaking</div>
+          <div class="studio-ctrl">
+            <div class="ctrl-label">Amplitude — <span class="ctrl-val" id="val-wf-speaking-amp">7.5</span></div>
+            <input id="ctrl-wf-speaking-amp" class="ctrl-slider" type="range" min="0" max="20" step="0.5" value="7.5" data-wf-state="speaking" data-wf-prop="amplitude">
+          </div>
+          <div class="studio-ctrl">
+            <div class="ctrl-label">Frequency — <span class="ctrl-val" id="val-wf-speaking-freq">0.20</span></div>
+            <input id="ctrl-wf-speaking-freq" class="ctrl-slider" type="range" min="0.01" max="0.5" step="0.01" value="0.20" data-wf-state="speaking" data-wf-prop="frequency">
+          </div>
+        </div>
+      </div><!-- /tab-eyes -->
+
+      <!-- ── Tab: Animation Sequencer ── -->
+      <div id="tab-anim" class="studio-tab-panel">
+        <div class="studio-section-head">::Animation Sequencer</div>
+
+        <!-- Sequence player controls -->
+        <div class="anim-transport">
+          <button id="btn-seq-play" class="rabble-btn rabble-btn-ghost rabble-btn-sm">▶ play</button>
+          <button id="btn-seq-stop" class="rabble-btn rabble-btn-ghost rabble-btn-sm">■ stop</button>
+          <button id="btn-seq-loop" class="rabble-btn rabble-btn-ghost rabble-btn-sm">↺ loop</button>
+          <span id="seq-time" class="sm-val hi-c">0.0s</span>
+        </div>
+
+        <!-- Keyframe timeline -->
+        <div class="seq-timeline-wrap">
+          <canvas id="seq-timeline-canvas" class="seq-timeline-canvas" height="60"></canvas>
+        </div>
+
+        <!-- Add keyframe -->
+        <div class="studio-ctrl">
+          <div class="ctrl-label">Add Keyframe at <span id="seq-cursor-time">0.0s</span></div>
+          <div class="ctrl-row">
+            <select id="kf-state-select" class="studio-select">
+              <option value="idle">idle</option>
+              <option value="thinking">thinking</option>
+              <option value="speaking">speaking</option>
+              <option value="boot">boot</option>
+            </select>
+            <input id="kf-duration" class="studio-input" type="number" min="0.1" max="30" step="0.1" value="2.0" title="Duration (s)">
+            <button id="btn-add-kf" class="rabble-btn rabble-btn-ghost rabble-btn-sm">+ add</button>
+          </div>
+        </div>
+
+        <!-- Keyframe list -->
+        <div id="kf-list" class="kf-list"></div>
+
+        <!-- Loop settings -->
+        <div class="studio-ctrl ctrl-row-inline">
+          <div class="ctrl-label">Loop sequence</div>
+          <label class="studio-toggle">
+            <input id="ctrl-seq-loop" type="checkbox">
+            <span class="toggle-track"><span class="toggle-thumb"></span></span>
+          </label>
+        </div>
+
+        <div class="studio-ctrl">
+          <div class="ctrl-label">Transition — <span class="ctrl-val" id="val-transition">800ms</span></div>
+          <input id="ctrl-transition" class="ctrl-slider" type="range" min="100" max="5000" step="100" value="800">
+        </div>
+
+        <div class="studio-section-head">::Presets</div>
+        <div class="ctrl-row" style="padding: 8px 16px;">
+          <button class="rabble-btn rabble-btn-ghost rabble-btn-sm" id="btn-preset-idle-loop">idle loop</button>
+          <button class="rabble-btn rabble-btn-ghost rabble-btn-sm" id="btn-preset-speaking">speaking burst</button>
+          <button class="rabble-btn rabble-btn-ghost rabble-btn-sm" id="btn-preset-boot-full">full boot</button>
+        </div>
+      </div><!-- /tab-anim -->
+
+      <!-- ── Tab: Performance ── -->
+      <div id="tab-perf" class="studio-tab-panel">
+        <div class="studio-section-head">::Frame Budget</div>
+
+        <!-- FPS graph -->
+        <canvas id="perf-graph" class="perf-graph" height="80"></canvas>
+
+        <!-- Budget breakdown -->
+        <div class="perf-row"><span class="perf-key">target</span><span id="perf-target" class="perf-val">14ms</span></div>
+        <div class="perf-row"><span class="perf-key">eyes+portals</span><span id="perf-eyes" class="perf-val">—</span></div>
+        <div class="perf-row"><span class="perf-key">particles</span><span id="perf-field" class="perf-val">—</span></div>
+        <div class="perf-row"><span class="perf-key">glow pass</span><span id="perf-glow" class="perf-val">—</span></div>
+        <div class="perf-row"><span class="perf-key">total rAF</span><span id="perf-total" class="perf-val">—</span></div>
+        <div class="perf-row"><span class="perf-key">adaptive glow</span><span id="perf-adaptive" class="perf-val">—</span></div>
+        <div class="perf-row"><span class="perf-key">DPR</span><span id="perf-dpr" class="perf-val">—</span></div>
+        <div class="perf-row"><span class="perf-key">canvas size</span><span id="perf-canvas" class="perf-val">—</span></div>
+
+        <div class="studio-section-head">::Entity State History</div>
+        <canvas id="entropy-graph" class="perf-graph" height="60"></canvas>
+        <div class="perf-row"><span class="perf-key">current entropy</span><span id="perf-entropy" class="perf-val hi-m">—</span></div>
+
+        <div class="studio-section-head">::Substrate</div>
+        <div class="perf-row"><span class="perf-key">device</span><span id="perf-substrate" class="perf-val">—</span></div>
+        <div class="perf-row"><span class="perf-key">backend</span><span id="perf-backend" class="perf-val">—</span></div>
+      </div><!-- /tab-perf -->
+
+      <!-- ── Tab: Log ── -->
+      <div id="tab-log" class="studio-tab-panel">
+        <div class="studio-section-head">::Studio Log</div>
+        <div class="studio-ctrl ctrl-row-inline">
+          <div class="ctrl-label">Auto-scroll</div>
+          <label class="studio-toggle">
+            <input id="ctrl-log-scroll" type="checkbox" checked>
+            <span class="toggle-track"><span class="toggle-thumb"></span></span>
+          </label>
+        </div>
+        <div style="padding: 0 16px 8px;">
+          <button id="btn-log-clear" class="rabble-btn rabble-btn-ghost rabble-btn-sm">clear log</button>
+        </div>
+        <div id="studio-log" class="studio-log-output rabble-terminal"></div>
+      </div><!-- /tab-log -->
+
+      <!-- ── Tab: Export ── -->
+      <div id="tab-export" class="studio-tab-panel">
+        <div class="studio-section-head">::Snapshot</div>
+        <p class="ctrl-label" style="padding: 0 16px; line-height:1.5">Capture the current entity configuration as a JSON preset. Import to restore, or paste into World pages.</p>
+
+        <div class="ctrl-row" style="padding: 8px 16px;">
+          <button id="btn-snapshot" class="rabble-btn rabble-btn-sm">⬇ snapshot</button>
+          <button id="btn-copy-snapshot" class="rabble-btn rabble-btn-ghost rabble-btn-sm">copy JSON</button>
+        </div>
+
+        <div style="padding: 0 16px;">
+          <textarea id="snapshot-output" class="studio-textarea" rows="12" placeholder='// snapshot appears here...' spellcheck="false" readonly></textarea>
+        </div>
+
+        <div class="studio-section-head">::Import</div>
+        <div style="padding: 0 16px;">
+          <textarea id="import-input" class="studio-textarea" rows="6" placeholder='// paste preset JSON here...' spellcheck="false"></textarea>
+          <button id="btn-import" class="rabble-btn rabble-btn-ghost rabble-btn-sm">↑ apply preset</button>
+        </div>
+
+        <div class="studio-section-head">::HTML Embed</div>
+        <p class="ctrl-label" style="padding: 0 16px; line-height:1.5">Entity element with current attributes.</p>
+        <div style="padding: 0 16px;">
+          <textarea id="embed-output" class="studio-textarea" rows="5" spellcheck="false" readonly></textarea>
+          <button id="btn-copy-embed" class="rabble-btn rabble-btn-ghost rabble-btn-sm">copy HTML</button>
+        </div>
+
+        <div class="studio-section-head">::Pages</div>
+        <div id="studio-nav" class="studio-nav-grid"></div>
+      </div><!-- /tab-export -->
+
+    </aside><!-- /studio-right -->
+
+  </div><!-- /studio-body -->
+
+</div><!-- /shell -->
+
+<script defer src="js/RaBbLE-bg.js"></script>
+<script defer src="js/RaBbLE-wm.js"></script>
+<script defer src="js/RaBbLE-page-runtime.js"></script>
+<script defer src="js/RaBbLE-pages.js"></script>
+<script defer src="js/RaBbLE-landing-metrics.js"></script>
+<script defer src="js/RaBbLE-Studio.js"></script>
+
+</body>
+</html>

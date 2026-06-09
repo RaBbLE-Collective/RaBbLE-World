@@ -1,0 +1,179 @@
+/* =========================================================================
+   landing-login.css — joinrabble.world
+   Login modal, field groups, submit button, form footer, iOS entry prompt.
+   Part of the landing CSS split (Task 5).
+   See RaBbLE-landing.css for full file history.
+   ========================================================================= */
+
+/* ═══════════════════════════════════════════════════════════════
+   LOGIN MODAL — supersedes RaBbLE-Boot.html for web flow
+   See landing.js openLogin() / submitLogin()
+   ═══════════════════════════════════════════════════════════════ */
+/* Alpine controls display via x-show — these just set flex properties when shown */
+.login-overlay {
+  position: fixed; inset: 0; z-index: 200;
+  background: rgba(3,0,11,0.88);
+  backdrop-filter: blur(14px);
+  align-items: center; justify-content: center;
+  /* display controlled by Alpine x-show */
+}
+[x-show] { }  /* keep specificity neutral */
+
+.login-modal {
+  width: min(440px, 92vw);
+  background: var(--void-deep);
+  border: 1px solid var(--neon-magenta);
+  border-radius: 8px;
+  box-shadow: 0 0 28px var(--neon-magenta), 0 0 64px rgba(255,45,120,0.25);
+  overflow: hidden;
+  animation: modal-rise 280ms cubic-bezier(0.2,0.9,0.2,1);
+}
+@keyframes modal-rise {
+  from { opacity: 0; transform: translateY(12px) scale(0.97); }
+  to   { opacity: 1; transform: none; }
+}
+
+.login-head {
+  display: flex; align-items: center; gap: 12px;
+  padding: 13px 16px; border-bottom: 1px solid var(--border);
+  background: var(--void-deepest);
+}
+.login-icon {
+  width: 32px; height: 32px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-hero); font-weight: 800; font-size: 14px;
+  color: var(--neon-magenta); border: 1px solid var(--neon-magenta);
+  text-shadow: 0 0 6px var(--neon-magenta); box-shadow: 0 0 8px var(--neon-magenta);
+  flex-shrink: 0;
+}
+.login-title {
+  font-family: var(--font-hero); font-weight: 800; font-size: 14px;
+  letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-primary);
+}
+.login-close {
+  margin-left: auto; background: transparent; border: 1px solid var(--text-muted);
+  color: var(--text-muted); font-family: var(--font-mono); font-size: 10px;
+  padding: 4px 10px; border-radius: 3px; cursor: pointer; letter-spacing: 0.12em;
+  transition: all 140ms; flex-shrink: 0;
+}
+.login-close:hover { color: var(--neon-magenta); border-color: var(--neon-magenta); box-shadow: 0 0 6px var(--neon-magenta); }
+
+.login-body {
+  padding: 22px 24px 20px;
+  display: flex; flex-direction: column; align-items: center; gap: 0;
+}
+
+/* Entity reaction micro-text */
+.login-reaction {
+  min-height: 18px; margin-bottom: 12px; width: 100%; max-width: 340px;
+  font-size: 11px; font-family: var(--font-mono); color: var(--neon-violet);
+  letter-spacing: 0.06em; text-align: center;
+  opacity: 0; transition: opacity 0.35s ease;
+}
+.login-reaction.show { opacity: 1; }
+
+.field-group { margin-bottom: 10px; width: 100%; max-width: 340px; }
+.field-label {
+  display: block; font-size: 10px; font-family: var(--font-mono);
+  color: var(--text-muted); letter-spacing: 0.12em; text-transform: uppercase;
+  margin-bottom: 6px; text-align: center;
+}
+.field-input {
+  width: 100%; padding: 12px 14px;
+  background: var(--rabble-raised-85);
+  border: 1px solid var(--border); border-radius: 8px;
+  color: var(--text-primary); font-family: var(--font-mono); font-size: 16px;
+  outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+  letter-spacing: 0.04em; caret-color: var(--neon-violet); text-align: center;
+}
+.field-input::placeholder { color: var(--text-dimmer); }
+.field-input:focus {
+  border-color: var(--rabble-violet-40);
+  box-shadow: 0 0 18px var(--rabble-violet-10);
+}
+.field-input.typing {
+  border-color: var(--rabble-cyan-20);
+  box-shadow: 0 0 18px var(--rabble-cyan-10);
+}
+
+.submit-btn {
+  width: 100%; max-width: 340px; padding: 14px; margin-top: 8px;
+  border: none; border-radius: 10px;
+  background: var(--rabble-gradient-primary);
+  color: var(--text-primary); font-family: var(--font-ui); font-size: 16px; font-weight: 600;
+  letter-spacing: 0.08em; cursor: pointer;
+  box-shadow: 0 0 20px rgba(255,45,120,0.25);
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+.submit-btn:hover { box-shadow: 0 0 32px rgba(255,45,120,0.45); transform: translateY(-1px); }
+.submit-btn:active { transform: translateY(0); }
+
+.form-footer {
+  margin-top: 16px; font-size: 11px; font-family: var(--font-mono);
+  color: var(--text-dimmer); letter-spacing: 0.06em; text-align: center;
+  width: 100%; max-width: 340px;
+}
+.form-footer a { color: var(--neon-violet); text-decoration: none; }
+.form-footer a:hover { color: var(--neon-cyan); }
+
+
+/* ═══════════════════════════════════════════════════════════════
+   IOS NON-PWA ENTRY PROMPT
+   Full-screen overlay shown in mobile Safari (not standalone).
+   Tapping dismisses it and triggers iOS chrome auto-hide.
+   ═══════════════════════════════════════════════════════════════ */
+.ios-entry {
+  position: fixed; inset: 0; z-index: 300;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(3,0,11,0.96);
+  backdrop-filter: blur(20px);
+  flex-direction: column;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  animation: ios-entry-in 0.6s cubic-bezier(0.2,0.9,0.2,1) both;
+}
+@keyframes ios-entry-in {
+  from { opacity: 0; transform: scale(0.97); }
+  to   { opacity: 1; transform: none; }
+}
+
+.ios-entry-body {
+  display: flex; flex-direction: column; align-items: center; gap: 14px;
+  padding: 32px 24px;
+  text-align: center;
+}
+
+.ios-entry-glyph {
+  font-size: 48px;
+  color: var(--neon-violet);
+  text-shadow: 0 0 24px var(--neon-violet), 0 0 48px rgba(191,95,255,0.4);
+  animation: pulse-dot 2.4s ease-in-out infinite;
+}
+
+.ios-entry-title {
+  /* Font, weight, letter-spacing, gradient, text-transform all from .rabble-brand-flow (Aether) */
+  font-size: clamp(36px, 12vw, 60px);
+}
+
+.ios-entry-cta {
+  font-family: var(--font-mono); font-size: 13px;
+  color: var(--neon-cyan); letter-spacing: 0.14em; text-transform: uppercase;
+  text-shadow: 0 0 8px var(--neon-cyan);
+  animation: pulse-dot 1.8s ease-in-out infinite;
+}
+
+.ios-entry-sub {
+  font-family: var(--font-mono); font-size: 10px;
+  color: var(--text-muted); letter-spacing: 0.08em;
+  max-width: 260px; line-height: 1.6;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   RESPONSIVE — login-level breakpoints
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Mobile portrait ─────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .login-body { padding: 16px 18px 14px; }
+}

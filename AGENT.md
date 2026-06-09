@@ -23,15 +23,21 @@ RaBbLE-World is the public-facing web presence and entity chat surface for the C
 | `world/RaBbLE-Chat.html` | Main chat surface |
 | `world/RaBbLE-Docs.html` | Technical documentation viewer |
 | `world/RaBbLE-OS.html` | RaBbLE-OS intro, bootstrap, and expansion cards |
+| `world/RaBbLE-Studio.html` | NeBuLA Studio — visual playground for entity tuning and page structure reference |
 
 **`world/css/`**
 | Path | What |
 |---|---|
 | `world/css/RaBbLE-theme.css` | Shared identity layer — palette vars, typography, overlays |
 | `world/css/RaBbLE-landing.css` | Landing page styles and CSS custom properties |
+| `world/css/RaBbLE-landing-shell.css` | Shell/statusbar layout, .main grid, .panel shared styles |
+| `world/css/RaBbLE-landing-stage.css` | Entity stage, .entity-wrap sizing, wordmark, CTAs, ask-box |
+| `world/css/RaBbLE-landing-panels.css` | Organ list, log panel, overlays, organ detail panel |
+| `world/css/RaBbLE-landing-login.css` | Login modal, iOS entry surface |
 | `world/css/RaBbLE-boot.css` | Boot sequence layout |
 | `world/css/RaBbLE-chat.css` | Chat surface layout |
 | `world/css/RaBbLE-OS.css` | OS page styles |
+| `world/css/RaBbLE-Studio.css` | NeBuLA Studio page layout |
 
 **`world/js/`**
 | Path | What |
@@ -39,7 +45,12 @@ RaBbLE-World is the public-facing web presence and entity chat surface for the C
 | `world/js/RaBbLE-aether.js` | Aether loader + monitor — injects CSS bundle, shows failure banner |
 | `world/js/RaBbLE-NeBuLA.js` | NeBuLA loader + monitor — injects JS bundle, shows failure banner |
 | `world/js/RaBbLE-bg.js` | Ambient background — particles, grid, cursor effects |
-| `world/js/RaBbLE-landing.js` | Alpine.js component for landing (wakeup sequence, boot, OS nav) |
+| `world/js/RaBbLE-landing.js` | Alpine.js component assembly only — data constants in `RaBbLE-landing-data.js`, boot sequence in `RaBbLE-landing-boot.js`, metrics in `RaBbLE-landing-metrics.js` |
+| `world/js/RaBbLE-landing-data.js` | Data constants for landing page (ORGANS, BOOT_LOG_LINES, etc.) — edit this for content changes |
+| `world/js/RaBbLE-landing-metrics.js` | Pulse measurement loop, entropy computation, substrate detection — exposed as `window.LandingMetrics` |
+| `world/js/RaBbLE-landing-boot.js` | Boot log playback timeline — exposed as `window.LandingBoot` with callback API |
+| `world/js/RaBbLE-pages.js` | Page registry (`window.RaBbLE_PAGES`) — add an entry here when adding a new page |
+| `world/js/RaBbLE-Studio.js` | NeBuLA Studio page logic — vanilla JS, no Alpine |
 | `world/js/RaBbLE-boot.js` | Boot sequence behavior and login |
 | `world/js/RaBbLE-chat.js` | Chat surface behavior |
 | `world/js/RaBbLE-ios-install.js` | iOS PWA install prompt |

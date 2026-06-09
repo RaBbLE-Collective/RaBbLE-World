@@ -1,0 +1,576 @@
+/* =========================================================================
+   RaBbLE-Studio.css — NeBuLA Studio multi-panel layout
+   Layout + Studio-specific structure only. Visual styles (colors, glows,
+   fonts, buttons) come from Aether and RaBbLE-theme.css.
+   ========================================================================= */
+
+
+/* ── Layout ──────────────────────────────────────────────────────────────── */
+
+.studio-shell {
+  display: grid;
+  grid-template-rows: var(--sb-height, 32px) 1fr;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+.studio-body {
+  display: grid;
+  grid-template-columns: 280px 1fr 320px;
+  overflow: hidden;
+  height: 100%;
+}
+
+/* Each sidebar panel scrolls independently */
+.studio-left,
+.studio-right {
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0 0 24px;
+}
+
+.studio-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  overflow: hidden;
+  padding: 16px;
+}
+
+
+/* ── Studio section headers ──────────────────────────────────────────────── */
+
+.studio-section-head {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--neon-violet);
+  padding: 10px 16px 6px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 2px;
+}
+
+
+/* ── Controls ────────────────────────────────────────────────────────────── */
+
+.studio-ctrl {
+  padding: 8px 16px;
+}
+
+.ctrl-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+.ctrl-val {
+  color: var(--neon-cyan);
+}
+
+.ctrl-row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.ctrl-row-inline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.ctrl-row-inline .ctrl-label { margin-bottom: 0; }
+
+/* Active state / saccade mode button */
+.studio-state-btn.active,
+.studio-saccade-btn.active {
+  background: var(--neon-violet-10);
+  border-color: var(--neon-violet);
+  color: var(--neon-violet);
+}
+
+
+/* ── Slider ──────────────────────────────────────────────────────────────── */
+
+.ctrl-slider {
+  width: 100%;
+  height: 3px;
+  appearance: none;
+  background: var(--border);
+  border-radius: 2px;
+  cursor: pointer;
+  outline: none;
+}
+.ctrl-slider::-webkit-slider-thumb {
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--neon-cyan);
+  box-shadow: 0 0 5px var(--neon-cyan);
+  cursor: pointer;
+}
+.ctrl-slider::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--neon-cyan);
+  box-shadow: 0 0 5px var(--neon-cyan);
+  cursor: pointer;
+  border: none;
+}
+.ctrl-slider:focus-visible {
+  outline: 1px solid var(--neon-cyan);
+  outline-offset: 4px;
+}
+
+
+/* ── Toggle switch ───────────────────────────────────────────────────────── */
+
+.studio-toggle {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  gap: 6px;
+  user-select: none;
+}
+.studio-toggle input { display: none; }
+
+.toggle-track {
+  width: 32px;
+  height: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  position: relative;
+  transition: background 0.2s, border-color 0.2s;
+}
+.toggle-thumb {
+  position: absolute;
+  left: 2px;
+  top: 2px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--text-muted);
+  transition: transform 0.2s, background 0.2s;
+}
+.studio-toggle input:checked + .toggle-track {
+  background: var(--neon-cyan-10);
+  border-color: var(--neon-cyan);
+}
+.studio-toggle input:checked + .toggle-track .toggle-thumb {
+  transform: translateX(16px);
+  background: var(--neon-cyan);
+  box-shadow: 0 0 5px var(--neon-cyan);
+}
+
+
+/* ── Jolt Pad ────────────────────────────────────────────────────────────── */
+
+.jolt-pad-wrap {
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.jolt-pad {
+  width: 72px;
+  height: 72px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  position: relative;
+  cursor: crosshair;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+.jolt-crosshair-h,
+.jolt-crosshair-v {
+  position: absolute;
+  background: var(--border);
+  pointer-events: none;
+}
+.jolt-crosshair-h {
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1px;
+  transform: translateY(-50%);
+}
+.jolt-crosshair-v {
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 1px;
+  transform: translateX(-50%);
+}
+.jolt-cursor {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: var(--neon-magenta);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  left: 50%;
+  top: 50%;
+  box-shadow: 0 0 5px var(--neon-magenta);
+  pointer-events: none;
+  transition: left 0.08s, top 0.08s;
+}
+.jolt-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+
+/* ── Entity canvas wrapper ───────────────────────────────────────────────── */
+
+.studio-canvas-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+}
+
+/* Entity canvases — all transparent to prevent pre-rAF flash.
+   Field + glow use screen blend so black (cleared) pixels are invisible.
+   Entity canvas (eyes/portals) must NOT use screen — portal fill is opaque
+   #000 which screen turns transparent, letting glow canvas bleed through. */
+.rabble-entity-canvas {
+  background: transparent !important;
+}
+.rabble-entity-canvas--field,
+.rabble-entity-canvas--glow {
+  mix-blend-mode: screen;
+}
+
+/* Entity canvas host — sized for 460×320 internal coordinates */
+.entity-wrap {
+  width: min(36vw, 460px);
+  aspect-ratio: 23 / 16;   /* 460:320 simplified */
+  flex-shrink: 0;
+  overflow: visible;        /* particles drift beyond layout box */
+}
+.entity-wrap rabble-entity { width: 100%; height: 100%; display: block; }
+
+
+/* ── Boot timeline ───────────────────────────────────────────────────────── */
+
+.boot-timeline {
+  width: 100%;
+  max-width: 460px;
+}
+.boot-timeline-track {
+  height: 4px;
+  background: var(--surface);
+  border-radius: 2px;
+  position: relative;
+  overflow: visible;
+}
+.boot-timeline-fill {
+  height: 100%;
+  background: var(--neon-cyan);
+  border-radius: 2px;
+  box-shadow: 0 0 4px var(--neon-cyan);
+  width: 0%;
+  transition: width 0.1s linear;
+}
+.boot-phase-marker {
+  position: absolute;
+  top: -2px;
+  width: 2px;
+  height: 8px;
+  background: var(--neon-violet);
+  border-radius: 1px;
+  opacity: 0.7;
+}
+.boot-timeline-labels {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 8px;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+
+/* ── Live metrics row ────────────────────────────────────────────────────── */
+
+.studio-metrics-row {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.studio-metric {
+  display: flex;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+.sm-key { color: var(--text-muted); }
+.sm-val { color: var(--text-primary); min-width: 40px; }
+
+
+/* ── Tabs ────────────────────────────────────────────────────────────────── */
+
+.studio-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+}
+.studio-tab {
+  flex: 1;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 8px 4px;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+.studio-tab:hover { color: var(--neon-cyan); }
+.studio-tab.active {
+  color: var(--neon-cyan);
+  border-bottom-color: var(--neon-cyan);
+}
+
+.studio-tab-panel { display: none; }
+.studio-tab-panel.active { display: block; }
+
+
+/* ── Performance graph ───────────────────────────────────────────────────── */
+
+.perf-graph {
+  width: 100%;
+  height: 80px;
+  display: block;
+  margin: 8px 0;
+  background: var(--surface);
+  border-radius: 3px;
+}
+
+.perf-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 3px 16px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+.perf-key { color: var(--text-muted); }
+.perf-val { color: var(--text-primary); }
+
+
+/* ── Animation sequencer ─────────────────────────────────────────────────── */
+
+.anim-transport {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  padding: 8px 16px;
+  flex-wrap: wrap;
+}
+.seq-timeline-wrap {
+  padding: 8px 16px;
+}
+.seq-timeline-canvas {
+  width: 100%;
+  display: block;
+  background: var(--surface);
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.kf-list {
+  max-height: 140px;
+  overflow-y: auto;
+  padding: 0 16px;
+  margin: 4px 0;
+}
+.kf-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--surface);
+  font-family: var(--font-mono);
+  font-size: 10px;
+}
+.kf-item .kf-state { color: var(--neon-cyan); min-width: 56px; }
+.kf-item .kf-dur   { color: var(--text-muted); flex: 1; }
+.kf-item .kf-del {
+  color: var(--text-muted);
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 2px 4px;
+  font-size: 10px;
+}
+.kf-item .kf-del:hover { color: var(--neon-magenta); }
+
+
+/* ── Select / input ──────────────────────────────────────────────────────── */
+
+.studio-select {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  padding: 4px 6px;
+  border-radius: 3px;
+  cursor: pointer;
+}
+.studio-input {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--neon-cyan);
+  padding: 4px 6px;
+  border-radius: 3px;
+  width: 60px;
+  text-align: right;
+}
+
+
+/* ── Waveform state blocks ───────────────────────────────────────────────── */
+
+.waveform-state-block {
+  border-left: 2px solid var(--border);
+  padding-left: 10px;
+  margin: 8px 16px;
+}
+.waveform-state-label {
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+
+/* ── Export textarea ─────────────────────────────────────────────────────── */
+
+.studio-textarea {
+  width: 100%;
+  box-sizing: border-box;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--neon-cyan);
+  padding: 8px;
+  border-radius: 3px;
+  resize: vertical;
+  margin: 8px 0;
+  display: block;
+}
+.studio-textarea:focus {
+  outline: 1px solid var(--neon-cyan);
+  border-color: var(--neon-cyan);
+}
+
+
+/* ── Log output ──────────────────────────────────────────────────────────── */
+
+.studio-log-output {
+  height: 280px;
+  overflow-y: auto;
+  font-size: 10px;
+  padding: 8px;
+  margin: 8px 16px;
+  background: var(--void);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+}
+
+
+/* ── Entity mini strip ───────────────────────────────────────────────────── */
+
+.studio-mini-strip {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 8px 16px;
+}
+.studio-mini-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.15s;
+}
+.studio-mini-wrap:hover,
+.studio-mini-wrap.active { opacity: 1; }
+.studio-mini-label {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+}
+
+
+/* ── Page nav ────────────────────────────────────────────────────────────── */
+
+.studio-nav-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 8px 16px;
+}
+.page-nav-link {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  text-decoration: none;
+  padding: 3px 6px;
+  border-radius: 3px;
+  transition: color 0.15s, background 0.15s;
+}
+.page-nav-link:hover {
+  color: var(--neon-cyan);
+  background: var(--neon-cyan-10);
+}
+.page-nav-link--current {
+  color: var(--neon-violet);
+  pointer-events: none;
+}
+
+
+/* ── Color helpers ───────────────────────────────────────────────────────── */
+
+.hi-c { color: var(--neon-cyan); }
+.hi-m { color: var(--neon-magenta); }
+.hi-v { color: var(--neon-violet); }
+
+
+/* ── Responsive ──────────────────────────────────────────────────────────── */
+
+@media (max-width: 960px) {
+  .studio-body {
+    grid-template-columns: 240px 1fr 280px;
+  }
+}
+
+@media (max-width: 700px) {
+  .studio-body {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr auto;
+  }
+  .studio-left  { max-height: 30vh; }
+  .studio-right { max-height: 40vh; }
+  .entity-wrap  { width: min(60vw, 320px); }
+}
