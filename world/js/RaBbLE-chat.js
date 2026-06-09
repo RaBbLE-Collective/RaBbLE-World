@@ -75,7 +75,8 @@ var CHAT_B_WORDS = ['Boundless', 'Becoming', 'Brilliant', 'Bold', 'Bespoke', 'Bo
         if (line.startsWith('data:')) {
           var data = line.slice(5).trim();
           if (data && data !== '[DONE]') {
-            if (onChunk) onChunk(data);
+            try { if (onChunk) onChunk(JSON.parse(data)); }
+            catch (e) { if (onChunk) onChunk(data); }
           }
         }
       }
