@@ -1,0 +1,278 @@
+/* RaBbLE-grimoire-graph.css — Cosmic knowledge graph page */
+
+:root {
+  --sb-height: calc(32px + env(safe-area-inset-top, 0px));
+}
+
+body {
+  margin: 0;
+  overflow: hidden;
+  background: var(--rabble-bg, #0a0010);
+}
+
+/* ── Three.js canvas ──────────────────────────────────────── */
+#graph-canvas-container {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+}
+
+#graph-canvas-container canvas {
+  display: block;
+  background: transparent;
+}
+
+/* ── Node labels — CSS layer over canvas ─────────────────── */
+#graph-labels {
+  position: fixed;
+  inset: 0;
+  z-index: 8;
+  pointer-events: none;
+}
+
+.graph-label {
+  position: absolute;
+  font-family: var(--rabble-font-mono, 'Share Tech Mono', monospace);
+  font-size: 0.6rem;
+  color: var(--rabble-text, #e8e6f0);
+  white-space: nowrap;
+  transform: translate(-50%, 0);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s;
+  text-shadow:
+    0 1px 4px var(--rabble-bg, #0a0010),
+    0 0 10px var(--rabble-bg, #0a0010);
+  letter-spacing: 0.04em;
+}
+
+.graph-label.label-visible {
+  opacity: 0.65;
+}
+
+.graph-label.label-hover {
+  opacity: 1;
+  color: var(--rabble-cyan, #00f5ff);
+  text-shadow: 0 0 8px var(--rabble-cyan, #00f5ff), 0 1px 4px var(--rabble-bg, #0a0010);
+}
+
+/* ── Statusbar — override position for fullscreen layout ─── */
+.statusbar.graph-statusbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 30;
+  height: var(--sb-height);
+}
+
+.statusbar.graph-statusbar a.brandmark {
+  color: var(--rabble-text, #e8e6f0);
+  text-decoration: none;
+}
+
+.statusbar.graph-statusbar a.brandmark:hover {
+  color: var(--rabble-cyan, #00f5ff);
+}
+
+/* ── Doc info panel ─────────────────────────────────────────── */
+.graph-panel {
+  position: fixed;
+  top: var(--sb-height);
+  right: 0;
+  width: 296px;
+  bottom: 0;
+  background: rgba(18, 19, 42, 0.95);
+  backdrop-filter: blur(14px);
+  border-left: 1px solid var(--rabble-border, #2a2840);
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+
+.graph-panel.panel-open {
+  transform: translateX(0);
+}
+
+.graph-panel-header {
+  padding: 14px 14px 12px;
+  border-bottom: 1px solid var(--rabble-border, #2a2840);
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+}
+
+.graph-panel-sigil {
+  font-size: 1.6rem;
+  line-height: 1.1;
+  flex-shrink: 0;
+}
+
+.graph-panel-title-wrap {
+  flex: 1;
+  min-width: 0;
+}
+
+.graph-panel-title {
+  font-family: var(--rabble-font-hero, 'Orbitron', sans-serif);
+  font-size: 0.78rem;
+  color: var(--rabble-text, #e8e6f0);
+  word-break: break-word;
+  line-height: 1.35;
+}
+
+.graph-panel-kind {
+  font-size: 0.63rem;
+  color: var(--rabble-muted, #6b6880);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-top: 4px;
+  font-family: var(--rabble-font-mono, monospace);
+}
+
+.graph-panel-body {
+  padding: 14px 14px 20px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.graph-panel-summary {
+  font-size: 0.79rem;
+  color: var(--rabble-text, #e8e6f0);
+  line-height: 1.65;
+  margin: 0 0 16px;
+  opacity: 0.88;
+}
+
+.graph-panel-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.graph-meta-row {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.graph-meta-key {
+  color: var(--rabble-muted, #6b6880);
+  width: 46px;
+  flex-shrink: 0;
+  font-family: var(--rabble-font-mono, monospace);
+  font-size: 0.63rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+
+.graph-meta-val {
+  color: var(--rabble-text, #e8e6f0);
+  font-family: var(--rabble-font-mono, monospace);
+  font-size: 0.73rem;
+}
+
+.graph-seal-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 1px 7px;
+  border-radius: 3px;
+  border: 1px solid currentColor;
+  font-size: 0.63rem;
+  font-family: var(--rabble-font-mono, monospace);
+  letter-spacing: 0.06em;
+}
+
+.graph-panel-close {
+  background: none;
+  border: none;
+  color: var(--rabble-muted, #6b6880);
+  cursor: pointer;
+  padding: 4px 2px;
+  flex-shrink: 0;
+  font-size: 0.85rem;
+  line-height: 1;
+  transition: color 0.15s;
+}
+
+.graph-panel-close:hover {
+  color: var(--rabble-text, #e8e6f0);
+}
+
+/* ── Graph controls (bottom-left) ────────────────────────── */
+.graph-controls {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.graph-controls-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 4px;
+  background: rgba(18, 19, 42, 0.88);
+  border: 1px solid var(--rabble-border, #2a2840);
+  color: var(--rabble-muted, #6b6880);
+  cursor: pointer;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(8px);
+  transition: color 0.15s, border-color 0.15s, box-shadow 0.15s;
+}
+
+.graph-controls-btn:hover {
+  color: var(--rabble-cyan, #00f5ff);
+  border-color: rgba(0, 245, 255, 0.5);
+  box-shadow: 0 0 8px rgba(0, 245, 255, 0.25);
+}
+
+/* ── Legend ──────────────────────────────────────────────── */
+.graph-legend {
+  position: fixed;
+  bottom: 20px;
+  left: 62px;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 8px 10px;
+  background: rgba(18, 19, 42, 0.85);
+  border: 1px solid var(--rabble-border, #2a2840);
+  border-radius: 5px;
+  backdrop-filter: blur(8px);
+}
+
+.graph-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.6rem;
+  font-family: var(--rabble-font-mono, monospace);
+  color: var(--rabble-muted, #6b6880);
+  letter-spacing: 0.04em;
+}
+
+.graph-legend-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ── Mobile hide legend ──────────────────────────────────── */
+@media (max-width: 600px) {
+  .graph-legend { display: none; }
+  .entity-graph-wrap { width: min(70vw, 320px); }
+  .graph-panel { width: 100%; top: auto; bottom: 0; height: 55vh; transform: translateY(100%); }
+  .graph-panel.panel-open { transform: translateY(0); }
+}

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#03000b">
+<title>Grimoire Graph · RaBbLE</title>
+<style>html,body{background:#03000b;margin:0}</style>
+
+<!-- Bundle loaders — synchronous so globals are ready before deferred scripts -->
+<script src="js/RaBbLE-aether.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+<script src="js/RaBbLE-Grimoire-Data.js"></script>
+
+<link rel="stylesheet" href="css/RaBbLE-theme.css">
+<link rel="stylesheet" href="css/RaBbLE-grimoire-graph.css">
+</head>
+<body>
+
+<!-- CRT ambient layers -->
+<div class="floor"></div>
+<div class="horizon"></div>
+<div class="scanlines"></div>
+<div class="vignette"></div>
+<div class="chromatic"></div>
+
+<!-- Three.js WebGL canvas mount point -->
+<div id="graph-canvas-container"></div>
+
+<!-- CSS-positioned node labels (z:8) -->
+<div id="graph-labels"></div>
+
+<!-- Statusbar -->
+<header class="statusbar graph-statusbar">
+  <div class="sb-left">
+    <a href="../index.html" class="brandmark">RW</a>
+    <span class="sb-sep">/</span>
+    <span class="sb-workspace">grimoire graph</span>
+  </div>
+  <div class="sb-center">
+    <span class="sb-glyph">◈</span>
+    <span class="sb-entity-state">drag · pan · scroll</span>
+  </div>
+  <div class="sb-right">
+    <span class="pill">
+      <span class="dot"></span>
+      <span id="graph-node-count">0</span>&nbsp;nodes
+    </span>
+  </div>
+</header>
+
+<!-- Doc info panel (slide in from right on node click) -->
+<aside id="graph-panel" class="graph-panel" aria-label="Document details">
+  <div class="graph-panel-header">
+    <div class="graph-panel-sigil" id="gp-sigil" aria-hidden="true">◈</div>
+    <div class="graph-panel-title-wrap">
+      <div class="graph-panel-title" id="gp-title"></div>
+      <div class="graph-panel-kind"  id="gp-kind"></div>
+    </div>
+    <button class="graph-panel-close" id="graph-panel-close" aria-label="Close panel">✕</button>
+  </div>
+  <div class="graph-panel-body">
+    <p class="graph-panel-summary" id="gp-summary"></p>
+    <div class="graph-panel-meta">
+      <div class="graph-meta-row">
+        <span class="graph-meta-key">owner</span>
+        <span class="graph-meta-val" id="gp-owner"></span>
+      </div>
+      <div class="graph-meta-row">
+        <span class="graph-meta-key">lines</span>
+        <span class="graph-meta-val" id="gp-lines"></span>
+      </div>
+      <div class="graph-meta-row">
+        <span class="graph-meta-key">cast</span>
+        <span class="graph-meta-val" id="gp-cast"></span>
+      </div>
+      <div class="graph-meta-row">
+        <span class="graph-meta-key">seal</span>
+        <span class="graph-seal-badge" id="gp-seal"></span>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- Zoom + reset controls -->
+<div class="graph-controls" role="group" aria-label="Graph controls">
+  <button class="graph-controls-btn" id="graph-ctrl-zoom-in"  title="Zoom in">+</button>
+  <button class="graph-controls-btn" id="graph-ctrl-zoom-out" title="Zoom out">−</button>
+  <button class="graph-controls-btn" id="graph-ctrl-reset"    title="Reset view">⌂</button>
+</div>
+
+<!-- Member color legend -->
+<div class="graph-legend" id="graph-legend" aria-label="Member color legend"></div>
+
+<script defer src="js/RaBbLE-bg.js"></script>
+<script defer src="js/RaBbLE-page-runtime.js"></script>
+<script defer src="js/RaBbLE-grimoire-graph.js"></script>
+
+</body>
+</html>
