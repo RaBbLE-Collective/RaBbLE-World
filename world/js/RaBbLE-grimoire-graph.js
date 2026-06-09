@@ -90,13 +90,13 @@
   const RING_W  = 19;   // Math.round(18 × 1.08)
   const RING_H  = 56;   // Math.round(52 × 1.08)
 
-  // Portal dark fill: portalScale × dims, portalHeightScale × dims
-  const PRTF_W  = 38;   // Math.round(0.18 × 2.1 × 100)
-  const PRTF_H  = 26;   // Math.round(0.52 × 0.5 × 100)
+  // Portal dark fill: matches portal ring exactly so fill covers the ring interior
+  const PRTF_W  = 60;   // = PRT_RX
+  const PRTF_H  = 16;   // = PRT_RY
   const PRT_Y   = 68;   // offset so portal ring floats just beyond eye edge (EYE_H=52 + PRT_RY=16)
 
   // Portal arc full-ellipse dimensions
-  const PRT_RX  = 45;   // 0.45 × 100
+  const PRT_RX  = 60;   // horizontal spread
   const PRT_RY  = 16;   // 0.16 × 100
 
   // Exclusion zone radius
@@ -211,9 +211,9 @@
   scene.add(leftRingGlow, rightRingGlow);
 
   // Solid ring band (filled annulus — visible thick outline)
-  // inner = eye edge, outer = eye edge + 7px x / 10px y
-  const leftRing  = ellipseRingMesh(EYE_W+7, EYE_H+10, EYE_W, EYE_H, 0x00f5ff, 0.85);
-  const rightRing = ellipseRingMesh(EYE_W+7, EYE_H+10, EYE_W, EYE_H, 0xff2d78, 0.85);
+  // inner = eye edge, outer = eye edge + 5px x / 10px y
+  const leftRing  = ellipseRingMesh(EYE_W+5, EYE_H+10, EYE_W, EYE_H, 0x00f5ff, 0.85);
+  const rightRing = ellipseRingMesh(EYE_W+5, EYE_H+10, EYE_W, EYE_H, 0xff2d78, 0.85);
   leftRing.position.set(-EYE_GAP, EYE_Y, 0); leftRing.renderOrder  = 12;
   rightRing.position.set(EYE_GAP, EYE_Y, 0); rightRing.renderOrder = 12;
   scene.add(leftRing, rightRing);
