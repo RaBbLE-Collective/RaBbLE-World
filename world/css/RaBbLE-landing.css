@@ -140,7 +140,10 @@ body.boot-departing { animation: page-fade-out 0.55s ease forwards; }
 
 /* ── Side panels (shared) ────────────────────────────────────────────────── */
 .panel {
-  background: rgba(10,0,16,0.5); backdrop-filter: blur(6px);
+  /* No backdrop-filter — permanent large elements with animated background
+     behind them force full-screen compositor repaint every AmbientField frame.
+     Higher-opacity solid bg gives similar visual without the per-frame cost. */
+  background: rgba(10,0,16,0.88);
   display: flex; flex-direction: column; min-height: 0;
 }
 /* Side borders removed — applet tile border (RaBbLE-wm.css) replaces them */
@@ -258,15 +261,20 @@ body.boot-departing { animation: page-fade-out 0.55s ease forwards; }
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
   padding: 10px 24px 14px;
-  overflow: hidden; text-align: center; gap: 9px;
+  overflow: visible; text-align: center; gap: 9px;
 }
 
-/* Entity canvas — screen blend makes cleared (black) pixels invisible.
-   This eliminates the canvas box entirely: only bright particle/glow/eye
-   colors register; dark cleared areas contribute nothing to the composite.
-   background: transparent prevents pre-rAF white-flash as a secondary guard. */
+/* Entity canvases — all transparent background to prevent pre-rAF flash.
+   Field + glow use screen blend so black (cleared) pixels are invisible.
+   Entity canvas (eyes/portals) must NOT use screen — the portal fill is
+   opaque #000 which screen turns transparent (screen identity = black),
+   letting the glow canvas bleed through the portal socket. Normal compositing
+   preserves the black fill while still showing background through alpha:0 areas. */
 .rabble-entity-canvas {
   background: transparent !important;
+}
+.rabble-entity-canvas--field,
+.rabble-entity-canvas--glow {
   mix-blend-mode: screen;
 }
 
