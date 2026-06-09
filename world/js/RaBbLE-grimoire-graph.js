@@ -93,7 +93,7 @@
   // Portal dark fill: portalScale × dims, portalHeightScale × dims
   const PRTF_W  = 38;   // Math.round(0.18 × 2.1 × 100)
   const PRTF_H  = 26;   // Math.round(0.52 × 0.5 × 100)
-  const PRT_Y   = 15;   // 0.15 × 100 (y offset from eye center)
+  const PRT_Y   = 68;   // offset so portal ring floats just beyond eye edge (EYE_H=52 + PRT_RY=16)
 
   // Portal arc full-ellipse dimensions
   const PRT_RX  = 45;   // 0.45 × 100
@@ -127,6 +127,20 @@
       depthTest: false, depthWrite: false,
     });
     return new THREE.Line(geo, mat);
+  }
+
+  function ellipseRingMesh(outerRx, outerRy, innerRx, innerRy, color, opacity, segs = 64) {
+    const shape = new THREE.Shape();
+    shape.absellipse(0, 0, outerRx, outerRy, 0, Math.PI * 2, false);
+    const hole = new THREE.Path();
+    hole.absellipse(0, 0, innerRx, innerRy, 0, Math.PI * 2, false);
+    shape.holes.push(hole);
+    const geo = new THREE.ShapeGeometry(shape, segs);
+    const mat = new THREE.MeshBasicMaterial({
+      color, transparent: true, opacity, side: THREE.DoubleSide,
+      depthTest: false, depthWrite: false,
+    });
+    return new THREE.Mesh(geo, mat);
   }
 
   function drawInArc(rx, ry, color, baseOpacity, segs = 80) {
@@ -188,9 +202,18 @@
   rightInner.position.set(EYE_GAP, EYE_Y, 0); rightInner.renderOrder = 11;
   scene.add(leftInner, rightInner);
 
-  // Eye outline rings: 1.08× eye — left = cyan, right = magenta
-  const leftRing  = ringLine(RING_W, RING_H, 0x00f5ff, 0.70);
-  const rightRing = ringLine(RING_W, RING_H, 0xff2d78, 0.70);
+  // Eye outline rings — thick filled annulus band (outer glow + solid band)
+  // Soft glow aura (additive, slightly larger than the solid ring)
+  const leftRingGlow  = ellipseMesh(EYE_W+16, EYE_H+20, 0x00f5ff, 0.20, THREE.AdditiveBlending, 32);
+  const rightRingGlow = ellipseMesh(EYE_W+16, EYE_H+20, 0xff2d78, 0.20, THREE.AdditiveBlending, 32);
+  leftRingGlow.position.set(-EYE_GAP, EYE_Y, 0); leftRingGlow.renderOrder  = 11;
+  rightRingGlow.position.set(EYE_GAP, EYE_Y, 0); rightRingGlow.renderOrder = 11;
+  scene.add(leftRingGlow, rightRingGlow);
+
+  // Solid ring band (filled annulus — visible thick outline)
+  // inner = eye edge, outer = eye edge + 7px x / 10px y
+  const leftRing  = ellipseRingMesh(EYE_W+7, EYE_H+10, EYE_W, EYE_H, 0x00f5ff, 0.85);
+  const rightRing = ellipseRingMesh(EYE_W+7, EYE_H+10, EYE_W, EYE_H, 0xff2d78, 0.85);
   leftRing.position.set(-EYE_GAP, EYE_Y, 0); leftRing.renderOrder  = 12;
   rightRing.position.set(EYE_GAP, EYE_Y, 0); rightRing.renderOrder = 12;
   scene.add(leftRing, rightRing);
@@ -425,8 +448,8 @@
     }
 
     const sy = eyeScaleY * bootAlpha;
-    for (const m of [leftEye, leftInner, leftCorona, leftRing]) m.scale.y = sy;
-    for (const m of [rightEye, rightInner, rightCorona, rightRing]) m.scale.y = sy;
+    for (const m of [leftEye, leftInner, leftCorona, leftRingGlow, leftRing]) m.scale.y = sy;
+    for (const m of [rightEye, rightInner, rightCorona, rightRingGlow, rightRing]) m.scale.y = sy;
 
     // Portal fills fade in
     leftPortalFill.material.opacity  = 0.95 * bootAlpha;
@@ -454,9 +477,11 @@
     rightInner.material.opacity  = gi * bootAlpha;
 
     // Eye ring breathing
-    const rb = 0.60 + 0.12 * Math.sin(t * 0.028 + 0.5);
-    leftRing.material.opacity  = rb * bootAlpha;
-    rightRing.material.opacity = rb * bootAlpha;
+    const rb = 0.75 + 0.12 * Math.sin(t * 0.028 + 0.5);
+    leftRing.material.opacity      = rb * bootAlpha;
+    rightRing.material.opacity     = rb * bootAlpha;
+    leftRingGlow.material.opacity  = rb * 0.22 * bootAlpha;
+    rightRingGlow.material.opacity = rb * 0.22 * bootAlpha;
 
     // Iris lerp — eye whites + inner tint drift toward mouse
     irisX += (irisTargX - irisX) * 0.07;
