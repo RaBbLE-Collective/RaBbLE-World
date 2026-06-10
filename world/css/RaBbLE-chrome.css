@@ -1,0 +1,89 @@
+/**
+ * RaBbLE-chrome.css — shared page chrome (global nav)
+ *
+ * World-local shared chrome for every page. Colors come from
+ * RaBbLE-theme.css aliases only — no raw hex here.
+ *
+ * Components:
+ *   .pgnav — global page navigator. Fixed bottom-right ◈ toggle that opens
+ *   a panel listing every live World surface (from RaBbLE-pages.js).
+ *   Mounted by RaBbLE-page-runtime.js when <body data-page-id="…"> is set.
+ *
+ * Post-EP1: this should graduate into an Aether/NeBuLA.ui component
+ * (see Grimoire log/FABLE-GAP-ANALYSIS-S57.md § World Chrome Unification).
+ */
+
+.pgnav {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 900;
+  font-family: var(--font-mono);
+}
+
+.pgnav-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-dim);
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.pgnav-toggle:hover,
+.pgnav[data-open="true"] .pgnav-toggle {
+  color: var(--cyan);
+  border-color: var(--cyan);
+}
+
+.pgnav-panel {
+  position: absolute;
+  right: 0;
+  bottom: 46px;
+  min-width: 210px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  backdrop-filter: blur(12px);
+}
+
+.pgnav-head {
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-dimmer);
+  padding: 2px 6px 6px;
+}
+
+.pgnav-link {
+  font-size: 11px;
+  color: var(--text-dim);
+  text-decoration: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: color 0.15s, background 0.15s;
+}
+
+.pgnav-link:hover {
+  color: var(--cyan);
+  background: var(--raised);
+}
+
+.pgnav-link--current {
+  color: var(--violet);
+  pointer-events: none;
+}
+
+/* Page-specific clearances — keep the toggle off busy bottom edges */
+body.chat-entry .pgnav { bottom: 86px; }

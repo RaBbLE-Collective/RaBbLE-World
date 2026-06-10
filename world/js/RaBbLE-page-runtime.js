@@ -93,6 +93,78 @@
     }).join('\n');
   }
 
+  // Global page navigator — fixed ◈ toggle, panel lists live pages from
+  // RaBbLE-pages.js. Styles in css/RaBbLE-chrome.css. Auto-mounted when
+  // <body data-page-id="…"> is present (see DOMContentLoaded below).
+  function mountGlobalNav(opts) {
+    var o = opts || {};
+    var pages = (window.RaBbLE_PAGES || []).filter(function (p) {
+      return p.status !== 'reference';
+    });
+    if (!pages.length || document.querySelector('.pgnav')) return null;
+
+    var nav = document.createElement('nav');
+    nav.className = 'pgnav';
+    nav.setAttribute('data-open', 'false');
+    nav.setAttribute('aria-label', 'World pages');
+
+    var toggle = document.createElement('button');
+    toggle.className = 'pgnav-toggle';
+    toggle.setAttribute('aria-expanded', 'false');
+    toggle.title = 'World pages';
+    toggle.textContent = '◈';
+
+    var panel = document.createElement('div');
+    panel.className = 'pgnav-panel';
+    panel.hidden = true;
+    panel.innerHTML = '<div class="pgnav-head">:: surfaces</div>' +
+      pages.map(function (p) {
+        var isCurrent = p.id === o.currentPageId;
+        var cls = 'pgnav-link' + (isCurrent ? ' pgnav-link--current' : '');
+        return '<a class="' + cls + '" href="' + p.url + '">' + p.title + '</a>';
+      }).join('');
+
+    function setOpen(open) {
+      panel.hidden = !open;
+      nav.setAttribute('data-open', String(open));
+      toggle.setAttribute('aria-expanded', String(open));
+    }
+    toggle.addEventListener('click', function () { setOpen(panel.hidden); });
+    document.addEventListener('click', function (e) {
+      if (!panel.hidden && !nav.contains(e.target)) setOpen(false);
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && !panel.hidden) setOpen(false);
+    });
+
+    nav.appendChild(toggle);
+    nav.appendChild(panel);
+    document.body.appendChild(nav);
+    return nav;
+  }
+
+  // Entity minis: NeBuLA bundle loads async — retry briefly, then fall
+  // back to mountEntityMini's text fallback.
+  function autoMountMinis(attempt) {
+    var hosts = document.querySelectorAll('[data-mini-auto]');
+    if (!hosts.length) return;
+    var ready = window.NeBuLA && window.NeBuLA.ui;
+    if (!ready && (attempt || 0) < 20) {
+      window.setTimeout(function () { autoMountMinis((attempt || 0) + 1); }, 250);
+      return;
+    }
+    hosts.forEach(function (host) {
+      mountEntityMini(host, host.getAttribute('data-mini-auto'), {});
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    if (document.body.hasAttribute('data-page-id')) {
+      mountGlobalNav({ currentPageId: document.body.getAttribute('data-page-id') });
+    }
+    autoMountMinis(0);
+  });
+
   window.RaBbLEPageRuntime = {
     startBackground,
     setReadyClass,
@@ -100,5 +172,6 @@
     mountEntityMini,
     mountStatusbar,
     mountPageNav,
+    mountGlobalNav,
   };
 })();

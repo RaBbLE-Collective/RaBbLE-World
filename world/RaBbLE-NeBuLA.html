@@ -13,6 +13,7 @@
 <script src="js/RaBbLE-NeBuLA.js"></script>
 
 <link rel="stylesheet" href="css/RaBbLE-theme.css">
+<link rel="stylesheet" href="css/RaBbLE-chrome.css">
 <link rel="stylesheet" href="css/RaBbLE-wm.css">
 
 <style>
@@ -94,11 +95,13 @@
 </style>
 
 <script defer src="js/RaBbLE-bg.js"></script>
+<script defer src="js/RaBbLE-pages.js"></script>
+<script defer src="js/RaBbLE-page-runtime.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
 <script defer src="https://unpkg.com/alpinejs@3.14.1/dist/cdn.min.js"></script>
 </head>
 
-<body x-data="nebulaDemo" x-init="init()">
+<body data-page-id="nebula" x-data="nebulaDemo" x-init="init()">
 
   <!-- Ambient background layers -->
   <div class="floor"></div>

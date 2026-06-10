@@ -10,12 +10,13 @@
 <link rel="manifest" href="../manifest.json">
 <link rel="apple-touch-icon" href="../icons/icon-192.png">
 <link rel="icon" type="image/x-icon" href="../icons/favicon.ico">
-<!-- Fonts owned by Aether — loaded via aether.css -->
-<link rel="stylesheet" href="/aether/v0.0.0.0/aether.css">
+<!-- Fonts owned by Aether — loader injects aether.css + failure banner -->
+<script src="js/RaBbLE-aether.js"></script>
 <link rel="stylesheet" href="css/RaBbLE-theme.css">
+<link rel="stylesheet" href="css/RaBbLE-chrome.css">
 <link rel="stylesheet" href="css/RaBbLE-OS.css">
 </head>
-<body>
+<body data-page-id="os">
 
 <div class="rabble-scanlines"></div>
 <div class="rabble-vignette"></div>
@@ -169,6 +170,8 @@
 </div>
 
 <script src="js/RaBbLE-bg.js"></script>
+<script src="js/RaBbLE-pages.js"></script>
+<script src="js/RaBbLE-page-runtime.js"></script>
 <script>
 if (window.RaBbLEBackground) {
   window.bg = new window.RaBbLEBackground({ particles: true, grid: true, cursorTrail: false, clickRipples: false });

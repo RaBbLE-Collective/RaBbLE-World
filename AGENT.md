@@ -29,6 +29,8 @@ RaBbLE-World is the public-facing web presence and entity chat surface for the C
 | Path | What |
 |---|---|
 | `world/css/RaBbLE-theme.css` | Shared identity layer — palette vars, typography, overlays |
+| `world/css/RaBbLE-chrome.css` | Shared page chrome — global ◈ page navigator (all pages) |
+| `world/css/RaBbLE-docs.css` | Docs page layout |
 | `world/css/RaBbLE-landing.css` | Landing page styles and CSS custom properties |
 | `world/css/RaBbLE-landing-shell.css` | Shell/statusbar layout, .main grid, .panel shared styles |
 | `world/css/RaBbLE-landing-stage.css` | Entity stage, .entity-wrap sizing, wordmark, CTAs, ask-box |
@@ -50,6 +52,7 @@ RaBbLE-World is the public-facing web presence and entity chat surface for the C
 | `world/js/RaBbLE-landing-metrics.js` | Pulse measurement loop, entropy computation, substrate detection — exposed as `window.LandingMetrics` |
 | `world/js/RaBbLE-landing-boot.js` | Boot log playback timeline — exposed as `window.LandingBoot` with callback API |
 | `world/js/RaBbLE-pages.js` | Page registry (`window.RaBbLE_PAGES`) — add an entry here when adding a new page |
+| `world/js/RaBbLE-page-runtime.js` | Shared page runtime — background, copy buttons, entity minis, global ◈ nav (auto-mounts when `<body data-page-id="…">` is set) |
 | `world/js/RaBbLE-Studio.js` | NeBuLA Studio page logic — vanilla JS, no Alpine |
 | `world/js/RaBbLE-boot.js` | Boot sequence behavior and login |
 | `world/js/RaBbLE-chat.js` | Chat surface behavior |

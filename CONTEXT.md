@@ -11,7 +11,7 @@ RaBbLE-World is the public-facing surface of the RaBbLE Collective — the brows
 
 ## What We Are Building
 
-A static web presence: landing page with full WM applet layout, chat interface, boot sequence reference, OS page, and NeBuLA demo. No bundler, no framework. All pages served via `dev-serve.sh` locally or deployed to Cloudflare Workers.
+A static web presence: landing page with full WM applet layout, chat interface, boot sequence reference, OS page, and NeBuLA demo. No bundler, no framework. Serve locally with `python -m http.server 8000` from the repo root; deployed to Cloudflare Workers.
 
 ## What Good Looks Like
 
@@ -20,7 +20,7 @@ A static web presence: landing page with full WM applet layout, chat interface, 
 - The entity renders through NeBuLA — `<rabble-entity>` is defined in the NeBuLA bundle, not in World
 - Bundle loaders (`RaBbLE-aether.js`, `RaBbLE-NeBuLA.js`) own CDN injection and failure detection — no inline scripts in HTML
 - Architecture and heavy docs live in Grimoire, not in this repo
-- `dev-serve.sh` is the only dev entry point — never run server processes manually
+- Serve locally with `python -m http.server 8000` from the repo root (no other server processes)
 
 ## What to Avoid
 
@@ -37,10 +37,15 @@ A static web presence: landing page with full WM applet layout, chat interface, 
 <script src="world/js/RaBbLE-aether.js"></script>   <!-- injects /aether/v0.0.0.0/aether.css -->
 <script src="world/js/RaBbLE-NeBuLA.js"></script>   <!-- injects /nebula/v0.0.0.0/nebula.iife.js -->
 
-<!-- CSS (Aether injected above; theme + page load here) -->
+<!-- CSS (Aether injected above; theme + chrome + page load here) -->
 <link rel="stylesheet" href="[path/]css/RaBbLE-theme.css">   <!-- alias bridge -->
+<link rel="stylesheet" href="[path/]css/RaBbLE-chrome.css">  <!-- shared chrome: global ◈ nav -->
 <link rel="stylesheet" href="[path/]css/RaBbLE-[page].css">  <!-- layout only -->
 ```
+
+Every page sets `<body data-page-id="…">` (ids from `RaBbLE-pages.js`) and loads
+`RaBbLE-pages.js` + `RaBbLE-page-runtime.js` — the runtime auto-mounts the global
+◈ page navigator (bottom-right) with the current page highlighted.
 
 `aether.css` is the dev file (built by `build:watch`). `aether.min.css` is production-only.
 Both loaders show a visible failure banner if their bundle fails to load.
@@ -78,6 +83,8 @@ Both loaders show a visible failure banner if their bundle fails to load.
 | NeBuLA Canvas2D entity on landing | **Done** |
 | RaBbLE-Collective community page | **Done** — visitor orientation + join path on its own page |
 | Shared page runtime for World pages | **Done** — start background, copy CTA text, mount NeBuLA minis |
+| Global ◈ page nav on every surface | **Done** — `RaBbLE-chrome.css` + runtime auto-mount via `data-page-id` |
+| Docs page on standard stack | **Done** — rebuilt: Aether loader, theme vars, current content (was rogue React-prototype docs) |
 | NeBuLA demo page (Layer 1 + Layer 2) | **Done** |
 | Fonts moved to Aether bundle (all pages) | **Done** — no Google Fonts links in HTML; Aether bundle owns Orbitron, Exo 2, Share Tech Mono |
 | `cast-cdn.sh` spell — build + stage + wrangler deploy | **Done** — `RaBbLE-Grimoire/spells/cast-cdn.sh`; Cloudflare Git integration disconnected |

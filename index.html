@@ -23,6 +23,7 @@
 <script src="world/js/RaBbLE-NeBuLA.js"></script>
 
 <link rel="stylesheet" href="world/css/RaBbLE-theme.css">
+<link rel="stylesheet" href="world/css/RaBbLE-chrome.css">
 <link rel="stylesheet" href="world/css/RaBbLE-Grimoire.css">
 <link rel="stylesheet" href="world/css/RaBbLE-landing-shell.css">
 <link rel="stylesheet" href="world/css/RaBbLE-landing-stage.css">
@@ -37,6 +38,8 @@
 <script src="world/js/RaBbLE-landing.js"></script>
 <script defer src="world/js/RaBbLE-bg.js"></script>
 <script defer src="world/js/RaBbLE-wm.js"></script>
+<script defer src="world/js/RaBbLE-pages.js"></script>
+<script defer src="world/js/RaBbLE-page-runtime.js"></script>
 <script defer src="https://unpkg.com/alpinejs@3.14.1/dist/cdn.min.js"></script>
 
 <!-- Grimoire applet — data must load before component -->
@@ -45,6 +48,7 @@
 </head>
 
 <body
+  data-page-id="landing"
   x-data="landing"
   x-init="init()"
   @keydown.window="handleKey($event)">
