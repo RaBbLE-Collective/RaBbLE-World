@@ -88,6 +88,7 @@ Both loaders show a visible failure banner if their bundle fails to load.
 | NeBuLA demo page (Layer 1 + Layer 2) | **Done** |
 | Fonts moved to Aether bundle (all pages) | **Done** — no Google Fonts links in HTML; Aether bundle owns Orbitron, Exo 2, Share Tech Mono |
 | `cast-cdn.sh` spell — build + stage + wrangler deploy | **Done** — `RaBbLE-Grimoire/spells/cast-cdn.sh`; Cloudflare Git integration disconnected |
+| Episode 2 landing — The Liminal (`world/RaBbLE-Liminal.html`) | In progress — branch `ep2/liminal-world`: orbit engine, transmissions feed, entity state machine |
 | Chat surface wired to sCoRE intent endpoint | Pending (Episode 1 dependency) |
 | Production deploy | Pending — `joinrabble.world` still on pre-refactor code |
 | Audit `RaBbLE-chat.css` / `RaBbLE-OS.css` for visual rules to move to Aether | Pending |

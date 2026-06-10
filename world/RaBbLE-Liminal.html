@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#03000b">
+<title>RaBbLE-World · the liminal</title>
+<!-- Hard dark background before any external CSS loads — prevents white flash -->
+<style>html,body{background:#03000b;background-color:#03000b;margin:0}</style>
+<meta name="description" content="RaBbLE-World is a liminal space — the corridor between surfaces, curated by the entity that lives in it. Six doors orbit the core. Choose one, or stay and be noticed.">
+<link rel="manifest" href="../manifest.json">
+<link rel="apple-touch-icon" href="../icons/icon-192.png">
+<link rel="icon" type="image/x-icon" href="../icons/favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="../icons/icon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="../icons/icon-16.png">
+
+<!-- Bundle loaders — synchronous, inject from CDN, monitor for failure -->
+<script src="js/RaBbLE-aether.js"></script>
+<script src="js/RaBbLE-NeBuLA.js"></script>
+
+<link rel="stylesheet" href="css/RaBbLE-theme.css">
+<link rel="stylesheet" href="css/RaBbLE-chrome.css">
+<link rel="stylesheet" href="css/RaBbLE-liminal.css">
+</head>
+<body class="liminal-entry" data-page-id="liminal">
+
+<!-- ═══ THE SPACE — deep-field canvas, drawn by RaBbLE-liminal.js ═══════
+     Starfield with parallax depth, nebula haze, signal streaks, and
+     constellation lines that reach toward the visitor's cursor.        -->
+<canvas id="liminal-space" aria-hidden="true"></canvas>
+
+<!-- CRT ambient layers (Aether) -->
+<div class="rabble-scanlines"></div>
+<div class="rabble-vignette"></div>
+<div class="rabble-chromatic"></div>
+
+<!-- Glitch veil — visible only while body.is-glitching (%GLITCH% state) -->
+<div class="glitch-veil" aria-hidden="true"></div>
+
+<!-- ═══ STATUSBAR — where you are, what the entity is, who is here ═════ -->
+<header class="liminal-statusbar" aria-label="Threshold status">
+  <div class="lsb-left">
+    <a class="lsb-door" href="../index.html" title="back through the first door">◈ the door</a>
+    <span class="lsb-sep">/</span>
+    <span class="lsb-where">RaBbLE-World</span>
+    <span class="lsb-sep lsb-hide-sm">·</span>
+    <span class="lsb-hide-sm lsb-dim">episode 2</span>
+  </div>
+  <div class="lsb-center">
+    <span class="lsb-glyph" aria-hidden="true">◈</span>
+    <span class="lsb-state" id="entity-state">%INITIALIZING%</span>
+  </div>
+  <div class="lsb-right">
+    <span class="lsb-pill">
+      <span class="lsb-dot" aria-hidden="true"></span>
+      <span id="presence-count">1 presence</span>
+    </span>
+  </div>
+</header>
+
+<!-- ═══ THE THRESHOLD ═══════════════════════════════════════════════════
+     Center: the entity core (NeBuLA) — keeper of the corridor.
+     Around it: six doors on elliptical orbits, positioned by JS.
+     Portals are real <a> links injected by RaBbLE-liminal.js.          -->
+<main class="threshold" aria-label="The liminal space">
+
+  <section class="cosmos" id="cosmos">
+    <div class="orbit-plane" id="orbit-plane">
+      <div class="entity-core"
+           id="entity-core"
+           role="button"
+           tabindex="0"
+           aria-label="RaBbLE — the keeper. Press to perturb the field.">
+        <rabble-entity
+          mode="boot"
+          particle-count="520"
+          overscan="2.6">
+        </rabble-entity>
+        <div class="entity-ring" aria-hidden="true"></div>
+      </div>
+      <!-- portal doors injected here by RaBbLE-liminal.js -->
+    </div>
+  </section>
+
+  <div class="threshold-copy">
+    <h1 class="world-wordmark" aria-label="RaBbLE-World">RaBbLE<span class="wordmark-sep">·</span>World</h1>
+    <p class="threshold-line">
+      a <span class="hi-v">liminal space</span> — the corridor between surfaces,
+      curated by the entity that lives in it
+    </p>
+    <p class="invocation">
+      you are not browsing. you are <span class="hi-m">passing through</span>.
+      six doors orbit the core — <span class="hi-c">choose one, or stay and be noticed.</span>
+    </p>
+  </div>
+
+  <!-- ═══ WHISPER CARD — RaBbLE describes the door under your cursor ═══ -->
+  <aside class="whisper" id="whisper" aria-live="polite" hidden>
+    <div class="whisper-head">
+      <span class="whisper-glyph" id="whisper-glyph" aria-hidden="true"></span>
+      <span class="whisper-name" id="whisper-name"></span>
+      <span class="whisper-organ" id="whisper-organ"></span>
+    </div>
+    <p class="whisper-body" id="whisper-body"></p>
+    <div class="whisper-foot" id="whisper-foot"></div>
+  </aside>
+
+  <!-- ═══ TRANSMISSIONS — ambient entity output, with BaBbLE leakage ═══ -->
+  <aside class="transmissions" id="transmissions" aria-label="Entity transmissions" aria-live="polite"></aside>
+
+</main>
+
+<!-- ═══ HINT STRIP ══════════════════════════════════════════════════════ -->
+<footer class="liminal-hints">
+  <span><kbd>1–6</kbd> doors</span>
+  <span class="lh-sep">·</span>
+  <span><kbd>G</kbd> perturb</span>
+  <span class="lh-sep">·</span>
+  <span><kbd>Esc</kbd> settle</span>
+  <span class="lh-sep lsb-hide-sm">·</span>
+  <span class="lsb-hide-sm">drift with the cursor</span>
+  <span class="right" id="entropy-meter">entropy δ 0.012</span>
+</footer>
+
+<script defer src="js/RaBbLE-pages.js"></script>
+<script defer src="js/RaBbLE-page-runtime.js"></script>
+<script defer src="js/RaBbLE-liminal.js"></script>
+
+</body>
+</html>

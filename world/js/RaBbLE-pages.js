@@ -14,6 +14,14 @@
       status: 'live',
     },
     {
+      id: 'liminal',
+      title: 'The Liminal',
+      url: '/world/RaBbLE-Liminal.html',
+      description: 'Episode 2 landing — liminal corridor housing the entity, orbiting doors to the Collective',
+      tags: ['entry', 'entity', 'ep2'],
+      status: 'live',
+    },
+    {
       id: 'collective',
       title: 'RaBbLE-Collective',
       url: '/world/RaBbLE-Collective.html',

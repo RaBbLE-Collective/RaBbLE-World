@@ -1,0 +1,526 @@
+/**
+ * RaBbLE-liminal.css — The Liminal (Episode 2 landing)
+ *
+ * RaBbLE-World as a place: a cosmic corridor between surfaces, kept by
+ * the entity. Layout + page-scoped expression only — every color goes
+ * through RaBbLE-theme.css aliases; no raw hex here.
+ *
+ * Post-EP2: candidates for Aether graduation — .portal orb treatment,
+ * .tx transmission feed, .glitch-veil (same path as RaBbLE-chrome.css).
+ *
+ * z-map: canvas 0 · copy 15 · portals 10/30 (JS) · core 20 · chrome 40
+ *        transmissions 45 · whisper 50 · glitch veil 60 · pgnav 900
+ */
+
+html, body {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-ui);
+}
+
+/* ════ THE SPACE — deep-field canvas ═══════════════════════════════════ */
+
+#liminal-space {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* ════ STATUSBAR ═══════════════════════════════════════════════════════ */
+
+.liminal-statusbar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 18px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--text-dim);
+  background: linear-gradient(to bottom, var(--bg), transparent);
+}
+
+.lsb-left, .lsb-center, .lsb-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.lsb-door {
+  color: var(--cyan);
+  text-decoration: none;
+  transition: text-shadow 0.2s;
+}
+.lsb-door:hover { text-shadow: 0 0 10px var(--cyan); }
+
+.lsb-sep { color: var(--text-dimmer); }
+.lsb-dim { color: var(--text-dimmer); }
+.lsb-where { color: var(--text); }
+.lsb-glyph { color: var(--magenta); }
+
+.lsb-state {
+  color: var(--violet);
+  letter-spacing: 0.12em;
+  transition: color 0.3s;
+}
+body[data-entity-state="resonant"] .lsb-state { color: var(--cyan); }
+body[data-entity-state="glitch"] .lsb-state { color: var(--magenta); }
+body[data-entity-state="genius_resonance"] .lsb-state {
+  color: var(--green);
+  text-shadow: 0 0 12px var(--green);
+}
+
+.lsb-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+}
+.lsb-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 8px var(--green);
+  animation: lsb-breathe 3.2s ease-in-out infinite;
+}
+@keyframes lsb-breathe {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.45; }
+}
+
+/* ════ THRESHOLD LAYOUT ════════════════════════════════════════════════ */
+
+.threshold {
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+}
+
+.cosmos {
+  position: absolute;
+  inset: 0;
+  perspective: 900px;
+}
+
+.orbit-plane {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+/* ── the keeper ── */
+
+.entity-core {
+  position: absolute;
+  left: 50%; top: 50%;
+  z-index: 20;
+  width: min(48vmin, 440px);
+  height: min(48vmin, 440px);
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  outline: none;
+}
+.entity-core rabble-entity {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.entity-core:focus-visible .entity-ring { border-color: var(--cyan); }
+
+.entity-ring {
+  position: absolute;
+  left: 50%; top: 50%;
+  width: 118%;
+  height: 50%;
+  transform: translate(-50%, -50%) rotateX(72deg);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  opacity: 0.55;
+  pointer-events: none;
+  animation: ring-drift 26s linear infinite;
+}
+@keyframes ring-drift {
+  from { transform: translate(-50%, -50%) rotateX(72deg) rotateZ(0deg); }
+  to   { transform: translate(-50%, -50%) rotateX(72deg) rotateZ(360deg); }
+}
+
+/* ── the doors ── */
+
+.portal {
+  position: absolute;
+  left: 0; top: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  text-decoration: none;
+  will-change: transform, opacity;
+  transition: filter 0.2s;
+}
+.portal:hover, .portal:focus-visible {
+  filter: drop-shadow(0 0 14px var(--portal-accent));
+  outline: none;
+}
+
+.portal-orb {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px; height: 52px;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: var(--surface);
+  box-shadow:
+    inset 0 0 18px var(--bg),
+    0 0 12px transparent;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.portal:hover .portal-orb,
+.portal:focus-visible .portal-orb {
+  border-color: var(--portal-accent);
+  box-shadow:
+    inset 0 0 18px var(--bg),
+    0 0 18px var(--portal-accent);
+}
+
+.portal-glyph {
+  font-size: 20px;
+  color: var(--portal-accent);
+  text-shadow: 0 0 10px var(--portal-accent);
+}
+
+.portal-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  font-family: var(--font-mono);
+  text-align: center;
+}
+.portal-name {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--text);
+}
+.portal-organ {
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+/* ════ THRESHOLD COPY ══════════════════════════════════════════════════ */
+
+.threshold-copy {
+  position: absolute;
+  top: 7.5vh;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 15;
+  width: min(92vw, 760px);
+  text-align: center;
+  pointer-events: none;
+}
+
+.world-wordmark {
+  margin: 0;
+  font-family: var(--font-hero);
+  /* brand casing rule — RaBbLE must keep its mixed case */
+  text-transform: none;
+  font-size: clamp(30px, 5.4vw, 54px);
+  font-weight: 700;
+  letter-spacing: 0.10em;
+  color: var(--text);
+  text-shadow:
+    0 0 22px var(--magenta),
+    0 0 60px var(--violet);
+}
+.wordmark-sep {
+  color: var(--magenta);
+  text-shadow: 0 0 18px var(--magenta);
+}
+
+.threshold-line {
+  margin: 10px 0 0;
+  font-family: var(--font-mono);
+  font-size: clamp(11px, 1.5vw, 13px);
+  letter-spacing: 0.10em;
+  color: var(--text-dim);
+}
+
+.invocation {
+  margin: 6px 0 0;
+  font-family: var(--font-mono);
+  font-size: clamp(10px, 1.3vw, 12px);
+  letter-spacing: 0.08em;
+  color: var(--text-dimmer);
+}
+
+.hi-m { color: var(--magenta); }
+.hi-c { color: var(--cyan); }
+.hi-v { color: var(--violet); }
+
+/* ════ WHISPER CARD — RaBbLE describes the door under your cursor ═════ */
+
+.whisper {
+  position: fixed;
+  right: 22px;
+  top: 50%;
+  transform: translateY(-50%) translateX(10px);
+  z-index: 50;
+  width: min(310px, 78vw);
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-left: 2px solid var(--portal-accent, var(--magenta));
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  backdrop-filter: blur(10px);
+  opacity: 0;
+  transition: opacity 0.22s ease, transform 0.22s ease;
+  pointer-events: none;
+}
+.whisper.whisper-in {
+  opacity: 1;
+  transform: translateY(-50%) translateX(0);
+}
+
+.whisper-head {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-family: var(--font-mono);
+}
+.whisper-glyph {
+  font-size: 15px;
+  color: var(--portal-accent, var(--magenta));
+  text-shadow: 0 0 8px var(--portal-accent, var(--magenta));
+}
+.whisper-name {
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  color: var(--text);
+}
+.whisper-organ {
+  margin-left: auto;
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.whisper-body {
+  margin: 10px 0 0;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.65;
+  color: var(--text-dim);
+}
+
+.whisper-foot {
+  margin-top: 10px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.10em;
+  color: var(--cyan);
+}
+
+/* ════ TRANSMISSIONS — ambient feed, bottom-left ═══════════════════════ */
+
+.transmissions {
+  position: fixed;
+  left: 18px;
+  bottom: 52px;
+  z-index: 45;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  width: min(440px, 86vw);
+  pointer-events: none;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  line-height: 1.5;
+  letter-spacing: 0.04em;
+}
+
+.tx {
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+.tx.tx-in { opacity: 1; transform: translateY(0); }
+.tx.tx-out { opacity: 0; }
+
+.tx-pulse { color: var(--text-dim); }
+.tx-sys { color: var(--cyan); }
+.tx-babble {
+  color: var(--pink);
+  font-style: italic;
+}
+
+/* ════ HINT STRIP ══════════════════════════════════════════════════════ */
+
+.liminal-hints {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 18px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--text-dimmer);
+  background: linear-gradient(to top, var(--bg), transparent);
+}
+.liminal-hints kbd {
+  padding: 1px 5px;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  background: var(--raised);
+  color: var(--text-dim);
+  font-family: inherit;
+}
+.liminal-hints .lh-sep { color: var(--text-dimmer); }
+.liminal-hints .right {
+  margin-left: auto;
+  color: var(--text-dim);
+}
+body[data-entity-state="glitch"] .liminal-hints .right { color: var(--magenta); }
+
+/* ════ GLITCH — %GLITCH% state expression ══════════════════════════════ */
+
+.glitch-veil {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  opacity: 0;
+  background:
+    linear-gradient(105deg,
+      color-mix(in srgb, var(--magenta) 10%, transparent) 0%,
+      transparent 30%,
+      transparent 64%,
+      color-mix(in srgb, var(--cyan) 9%, transparent) 100%);
+  mix-blend-mode: screen;
+}
+
+body.is-glitching .glitch-veil {
+  animation: veil-stutter 0.42s steps(2, jump-none) infinite;
+}
+@keyframes veil-stutter {
+  0%   { opacity: 0; transform: translateX(0); }
+  35%  { opacity: 0.9; transform: translateX(-6px); }
+  60%  { opacity: 0.25; transform: translateX(4px); }
+  100% { opacity: 0.7; transform: translateX(0); }
+}
+
+body.is-glitching .world-wordmark {
+  animation: word-shudder 0.18s steps(2, jump-none) infinite;
+}
+@keyframes word-shudder {
+  0%   { text-shadow: -3px 0 var(--cyan), 3px 0 var(--magenta), 0 0 60px var(--violet); }
+  100% { text-shadow: 3px 0 var(--cyan), -3px 0 var(--magenta), 0 0 60px var(--violet); }
+}
+
+body.is-glitching .entity-ring {
+  border-color: var(--magenta);
+  opacity: 1;
+}
+
+/* ════ COMPACT (≤700px) — the disc folds into a column ═════════════════ */
+
+@media (max-width: 700px) {
+  html, body { overflow: auto; }
+
+  .threshold {
+    position: relative;
+    inset: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    padding: 64px 16px 88px;
+    box-sizing: border-box;
+  }
+
+  .threshold-copy {
+    position: static;
+    transform: none;
+    order: 1;
+    margin-bottom: 8px;
+  }
+
+  .cosmos {
+    position: static;
+    order: 2;
+    width: 100%;
+    perspective: none;
+  }
+
+  .orbit-plane {
+    position: static;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+    transform: none !important;
+  }
+
+  .entity-core {
+    position: static;
+    transform: none;
+    width: min(72vw, 300px);
+    height: min(72vw, 300px);
+  }
+
+  /* doors become a constellation grid */
+  .orbit-plane { flex-flow: column; }
+  .portal {
+    position: static;
+    flex-direction: row;
+    gap: 12px;
+    width: min(330px, 88vw);
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: color-mix(in srgb, var(--surface) 80%, transparent);
+  }
+  .portal-label { align-items: flex-start; text-align: left; }
+
+  .whisper {
+    right: 50%;
+    top: auto;
+    bottom: 78px;
+    transform: translateX(50%) translateY(8px);
+  }
+  .whisper.whisper-in { transform: translateX(50%) translateY(0); }
+
+  .transmissions { bottom: 44px; font-size: 10px; }
+  .liminal-hints span:not(.right) { display: none; }
+}
+
+/* ════ REDUCED MOTION ══════════════════════════════════════════════════ */
+
+@media (prefers-reduced-motion: reduce) {
+  .entity-ring,
+  .lsb-dot,
+  body.is-glitching .glitch-veil,
+  body.is-glitching .world-wordmark {
+    animation: none;
+  }
+  .tx, .whisper { transition: opacity 0.2s; }
+}
