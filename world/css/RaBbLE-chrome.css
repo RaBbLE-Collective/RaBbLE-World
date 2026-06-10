@@ -43,6 +43,9 @@
   border-color: var(--cyan);
 }
 
+/* author display:flex would defeat the UA [hidden] rule — restore it */
+.pgnav-panel[hidden] { display: none; }
+
 .pgnav-panel {
   position: absolute;
   right: 0;
