@@ -23,12 +23,17 @@ html, body {
 
 /* ════ THE SPACE — deep-field canvas ═══════════════════════════════════ */
 
-#liminal-space {
+#liminal-space,
+.liminal-haze {
   position: fixed;
   inset: 0;
-  z-index: 0;
+  width: 100%;
+  height: 100%;
   pointer-events: none;
 }
+/* haze backing store is 1/8 resolution (RaBbLE-liminal.js) — CSS upscales it */
+.liminal-haze { z-index: 0; }
+#liminal-space { z-index: 1; }
 
 /* ════ STATUSBAR ═══════════════════════════════════════════════════════ */
 
@@ -117,7 +122,8 @@ body[data-entity-state="genius_resonance"] .lsb-state {
 .orbit-plane {
   position: absolute;
   inset: 0;
-  transform-style: preserve-3d;
+  /* flattened on purpose — preserve-3d forces plane splitting; the doors
+     should lie on the tilted disc anyway */
   will-change: transform;
 }
 
@@ -404,6 +410,8 @@ body[data-entity-state="glitch"] .liminal-hints .right { color: var(--magenta); 
 /* ════ GLITCH — %GLITCH% state expression ══════════════════════════════ */
 
 .glitch-veil {
+  /* display:none keeps the blend layer out of the compositor until needed */
+  display: none;
   position: fixed;
   inset: 0;
   z-index: 60;
@@ -419,6 +427,7 @@ body[data-entity-state="glitch"] .liminal-hints .right { color: var(--magenta); 
 }
 
 body.is-glitching .glitch-veil {
+  display: block;
   animation: veil-stutter 0.42s steps(2, jump-none) infinite;
 }
 @keyframes veil-stutter {

@@ -222,7 +222,8 @@
 
   var space = {
     canvas: null, ctx: null,
-    w: 0, h: 0, dpr: 1,
+    haze: null, hctx: null,   // low-res nebula layer, GPU-upscaled by CSS
+    w: 0, h: 0, dpr: 1, frame: 0,
     stars: [], streaks: [], blobs: [],
   };
 
@@ -238,16 +239,25 @@
     return c;
   }
 
+  function solidColor(hexOrColor) {
+    var c = hexOrColor;
+    if (c[0] === '#') {
+      return 'rgb(' + parseInt(c.slice(1, 3), 16) + ',' +
+        parseInt(c.slice(3, 5), 16) + ',' + parseInt(c.slice(5, 7), 16) + ')';
+    }
+    return c;
+  }
+
   function seedSpace() {
     space.stars = [];
-    var count = compactQuery.matches ? 140 : 240;
+    var count = compactQuery.matches ? 100 : 180;
     var tints = [palette.text, palette.text, palette.text, palette.cyan, palette.magenta, palette.violet];
     for (var i = 0; i < count; i++) {
       space.stars.push({
         x: Math.random(), y: Math.random(),
         z: 0.15 + Math.random() * 0.85,          // depth: parallax + size
         tw: Math.random() * Math.PI * 2,          // twinkle phase
-        tint: tints[Math.floor(Math.random() * tints.length)],
+        solid: solidColor(tints[Math.floor(Math.random() * tints.length)]),
       });
     }
     space.blobs = [
@@ -259,23 +269,29 @@
 
   function sizeSpace() {
     var c = space.canvas;
-    space.dpr = Math.min(window.devicePixelRatio || 1, 2);
+    // ambient atmosphere, not text — keep the backing store cheap
+    space.dpr = Math.min(window.devicePixelRatio || 1, 1.25);
     space.w = window.innerWidth;
     space.h = window.innerHeight;
     c.width = space.w * space.dpr;
     c.height = space.h * space.dpr;
     space.ctx.setTransform(space.dpr, 0, 0, space.dpr, 0, 0);
+    // nebula haze renders at 1/8 resolution — CSS stretches it for free
+    space.haze.width = Math.max(2, Math.round(space.w / 8));
+    space.haze.height = Math.max(2, Math.round(space.h / 8));
+    // orbit bounds cached here — never measure layout inside the frame loop
+    if (orbit.plane) {
+      var r = orbit.plane.getBoundingClientRect();
+      orbit.w = r.width;
+      orbit.h = r.height;
+    }
   }
 
-  function drawSpace(t) {
-    var ctx = space.ctx;
-    var w = space.w, h = space.h;
-    ctx.clearRect(0, 0, w, h);
-
+  function drawHaze(t) {
+    var ctx = space.hctx;
+    var w = space.haze.width, h = space.haze.height;
     var glitching = state.entity === 'GLITCH';
-    var px = (state.pointer.x - 0.5), py = (state.pointer.y - 0.5);
-
-    // ── nebula haze — three slow-drifting tinted fields ──
+    ctx.clearRect(0, 0, w, h);
     for (var b = 0; b < space.blobs.length; b++) {
       var blob = space.blobs[b];
       var bx = (blob.x + Math.sin(t * 0.00003 + b * 2.1) * 0.04 * blob.dx * 250) * w;
@@ -287,8 +303,18 @@
       ctx.fillStyle = grad;
       ctx.fillRect(0, 0, w, h);
     }
+  }
+
+  function drawSpace(t) {
+    var ctx = space.ctx;
+    var w = space.w, h = space.h;
+    ctx.clearRect(0, 0, w, h);
+
+    var glitching = state.entity === 'GLITCH';
+    var px = (state.pointer.x - 0.5), py = (state.pointer.y - 0.5);
 
     // ── stars — depth parallax against the cursor, gentle twinkle ──
+    // globalAlpha + precomputed solid fill: no rgba string churn per star
     var drift = prefersStill ? 0 : t * 0.0000045;
     for (var i = 0; i < space.stars.length; i++) {
       var s = space.stars[i];
@@ -296,10 +322,12 @@
       var sy = s.y * h - py * 24 * s.z;
       var twinkle = 0.45 + 0.55 * Math.abs(Math.sin(s.tw + t * 0.0011 * s.z));
       var size = s.z * 1.7;
-      ctx.fillStyle = alphaColor(s.tint, 0.18 + twinkle * 0.5 * s.z);
+      ctx.globalAlpha = 0.18 + twinkle * 0.5 * s.z;
+      ctx.fillStyle = s.solid;
       ctx.fillRect(sx, sy, size, size);
       s._sx = sx; s._sy = sy;
     }
+    ctx.globalAlpha = 1;
 
     // ── constellation reach — the space notices the cursor ──
     if (state.pointer.seen && !prefersStill) {
@@ -349,7 +377,8 @@
 
   var orbit = {
     plane: null,
-    nodes: [],   // { el, portal, theta, omega, radius }
+    w: 0, h: 0,  // cached plane bounds — refreshed on resize only
+    nodes: [],   // { el, portal, theta, omega, ring }
   };
 
   function buildPortals() {
@@ -384,9 +413,8 @@
   }
 
   function layoutOrbits(dt) {
-    var rect = orbit.plane.getBoundingClientRect();
-    var cx = rect.width / 2, cy = rect.height / 2;
-    var base = Math.min(rect.width * 0.40, rect.height * 0.55);
+    var cx = orbit.w / 2, cy = orbit.h / 2;
+    var base = Math.min(orbit.w * 0.40, orbit.h * 0.55);
 
     state.slow += (state.slowTarget - state.slow) * 0.06;
     var glitching = state.entity === 'GLITCH';
@@ -404,8 +432,11 @@
       var scale = 0.78 + depth * 0.30;
 
       n.el.style.transform = 'translate3d(' + (x | 0) + 'px,' + (y | 0) + 'px,0) translate(-50%,-50%) scale(' + scale.toFixed(3) + ')';
-      n.el.style.zIndex = depth > 0.5 ? 30 : 10;
-      n.el.style.opacity = (0.55 + depth * 0.45).toFixed(3);
+      // z-index and opacity dirty paint — only touch them on real change
+      var zi = depth > 0.5 ? 30 : 10;
+      if (n._zi !== zi) { n._zi = zi; n.el.style.zIndex = zi; }
+      var op = (0.55 + depth * 0.45).toFixed(2);
+      if (n._op !== op) { n._op = op; n.el.style.opacity = op; }
     }
   }
 
@@ -547,14 +578,22 @@
     var dt = Math.min((t - lastFrame) / 1000, 0.05);
     lastFrame = t;
 
+    space.frame++;
+    // haze drifts slowly — repaint it on every 4th frame only
+    if (space.frame % 4 === 1 || state.entity === 'GLITCH') drawHaze(t);
     drawSpace(t);
     if (!compactQuery.matches) layoutOrbits(dt);
 
-    // parallax tilt on the orbit plane — the disc leans toward the cursor
+    // parallax tilt on the orbit plane — the disc leans toward the cursor;
+    // skip the style write entirely while the pointer is still
     if (!prefersStill && !compactQuery.matches) {
-      var rx = (state.pointer.y - 0.5) * -5;
-      var ry = (state.pointer.x - 0.5) * 5;
-      orbit.plane.style.transform = 'rotateX(' + rx.toFixed(2) + 'deg) rotateY(' + ry.toFixed(2) + 'deg)';
+      var rx = ((state.pointer.y - 0.5) * -5).toFixed(2);
+      var ry = ((state.pointer.x - 0.5) * 5).toFixed(2);
+      var tilt = rx + '/' + ry;
+      if (orbit._tilt !== tilt) {
+        orbit._tilt = tilt;
+        orbit.plane.style.transform = 'rotateX(' + rx + 'deg) rotateY(' + ry + 'deg)';
+      }
     }
 
     // glitch decay
@@ -625,6 +664,11 @@
 
     space.canvas = document.getElementById('liminal-space');
     space.ctx = space.canvas.getContext('2d');
+    space.haze = document.createElement('canvas');
+    space.haze.className = 'liminal-haze';
+    space.haze.setAttribute('aria-hidden', 'true');
+    document.body.insertBefore(space.haze, space.canvas);
+    space.hctx = space.haze.getContext('2d');
     orbit.plane = document.getElementById('orbit-plane');
     feed.host = document.getElementById('transmissions');
 
