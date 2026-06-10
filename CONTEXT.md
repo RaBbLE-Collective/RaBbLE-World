@@ -11,7 +11,7 @@ RaBbLE-World is the public-facing surface of the RaBbLE Collective — the brows
 
 ## What We Are Building
 
-A static web presence: landing page with full WM applet layout, chat interface, boot sequence reference, OS page, and NeBuLA demo. No bundler, no framework. Serve locally with `python -m http.server 8000` from the repo root; deployed to Cloudflare Workers.
+A static web presence: landing page with full WM applet layout, chat interface, boot sequence reference, OS page, and NeBuLA demo. No bundler, no framework. Serve locally with `node ../RaBbLE-Grimoire/spells/dev-cdn.js` (maps `/aether/*` and `/nebula/*` CDN routes to member `dist/` folders; `DEV_PORT` env, default 8080); deployed to Cloudflare Workers.
 
 ## What Good Looks Like
 
@@ -20,7 +20,7 @@ A static web presence: landing page with full WM applet layout, chat interface, 
 - The entity renders through NeBuLA — `<rabble-entity>` is defined in the NeBuLA bundle, not in World
 - Bundle loaders (`RaBbLE-aether.js`, `RaBbLE-NeBuLA.js`) own CDN injection and failure detection — no inline scripts in HTML
 - Architecture and heavy docs live in Grimoire, not in this repo
-- Serve locally with `python -m http.server 8000` from the repo root (no other server processes)
+- Serve locally with `node ../RaBbLE-Grimoire/spells/dev-cdn.js` — plain `http.server` cannot serve the `/aether/*` / `/nebula/*` CDN routes (Aether failure banner)
 
 ## What to Avoid
 
