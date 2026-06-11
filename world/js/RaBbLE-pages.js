@@ -30,6 +30,22 @@
       status: 'live',
     },
     {
+      id: 'summon',
+      title: 'Summon',
+      url: '/world/summon.html',
+      description: 'Summoning ceremony — invite-token registration and identity claim',
+      tags: ['auth', 'entry'],
+      status: 'live',
+    },
+    {
+      id: 'account',
+      title: 'Account',
+      url: '/world/account.html',
+      description: 'Account management — profile, backend, session history, pair info',
+      tags: ['auth', 'account'],
+      status: 'live',
+    },
+    {
       id: 'chat',
       title: 'RaBbLE-Chat',
       url: '/world/RaBbLE-Chat.html',

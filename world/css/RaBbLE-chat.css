@@ -76,6 +76,22 @@ body.chat-entry.chat-ready { opacity: 1; }
   box-shadow: var(--rabble-glow-cyan-sm);
 }
 
+/* ── Account button (top-right) ──────────────────────────────────────── */
+.chat-account-btn {
+  position: absolute; top: max(10px, env(safe-area-inset-top)); right: 12px;
+  font-family: var(--font-mono);
+  font-size: var(--rabble-fs-nano, 10px); letter-spacing: 0.12em;
+  color: var(--text-dimmer); text-decoration: none;
+  padding: 4px 10px; border: 1px solid var(--border); border-radius: var(--rabble-radius-sm, 3px);
+  background: var(--rabble-void);
+  transition: all var(--rabble-t-fast, 140ms) var(--rabble-ease-snap);
+  z-index: 5; -webkit-tap-highlight-color: transparent;
+}
+.chat-account-btn:hover {
+  color: var(--violet); border-color: var(--violet);
+  box-shadow: 0 0 8px var(--rabble-violet-20);
+}
+
 /* ── Brand lockup ────────────────────────────────────────────────────── */
 .brand-text {
   font-family: var(--font-hero);

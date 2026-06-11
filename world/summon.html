@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, interactive-widget=resizes-visual">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="manifest" href="../manifest.json">
+  <link rel="apple-touch-icon" href="../icons/icon-192.png">
+  <link rel="icon" type="image/x-icon" href="../icons/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="../icons/icon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../icons/icon-16.png">
+  <title>RaBbLE — Summoning Ceremony</title>
+  <script src="js/RaBbLE-aether.js"></script>
+  <link rel="stylesheet" href="css/RaBbLE-theme.css">
+  <link rel="stylesheet" href="css/RaBbLE-chrome.css">
+  <link rel="stylesheet" href="css/RaBbLE-summon.css">
+</head>
+<body class="summon-entry" data-page-id="summon">
+
+  <canvas id="bgCanvas"></canvas>
+  <div class="rabble-scanlines"></div>
+  <div class="rabble-vignette"></div>
+  <div class="rabble-chromatic"></div>
+
+  <div id="root">
+
+    <header class="summon-header">
+      <div class="summon-wordmark">RaBbLE</div>
+      <div class="summon-tagline">Summoning Ceremony · You have been invited</div>
+    </header>
+
+    <div class="summon-entity-stage">
+      <rabble-entity id="entityHost" class="summon-entity" mode="idle" particle-count="320" overscan="2.2"></rabble-entity>
+    </div>
+
+    <div class="summon-card" id="summonCard">
+      <div class="summon-card-inner">
+
+        <!-- No-token state -->
+        <div id="noTokenView" class="summon-no-token" style="display:none;">
+          <p>You need an invitation to join RaBbLE.<br>Ask a member for an invite link.</p>
+          <span class="summon-hint">joinrabble.world/summon?token=…</span>
+        </div>
+
+        <!-- Summoning form -->
+        <div id="summonForm" style="display:none;">
+          <p class="summon-title">╸ Claim your identity ╺</p>
+
+          <div class="field-group">
+            <label class="field-label" for="fieldHandle">Handle</label>
+            <input id="fieldHandle" class="field-input" type="text"
+              placeholder="your-slug" autocomplete="username" spellcheck="false"
+              maxlength="24">
+            <span class="field-hint">Lowercase letters, numbers, hyphens · max 24 chars · permanent</span>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label" for="fieldDisplayName">Display name</label>
+            <input id="fieldDisplayName" class="field-input" type="text"
+              placeholder="How you want to appear" autocomplete="name" spellcheck="false">
+          </div>
+
+          <div class="field-group">
+            <label class="field-label" for="fieldIntention">Intention</label>
+            <textarea id="fieldIntention" class="field-textarea"
+              placeholder="What brings you to RaBbLE? What are you trying to build, learn, or become? (≤500 chars)"
+              maxlength="500" rows="4"></textarea>
+            <span class="char-counter" id="intentionCounter">0 / 500</span>
+            <span class="field-hint">Loaded into every conversation — shapes how RaBbLE speaks with you.</span>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label" for="fieldBackend">LLM backend</label>
+            <select id="fieldBackend" class="field-select">
+              <option value="hosted_openrouter">Collective (hosted · OpenRouter)</option>
+              <option value="hosted_groq">Collective (hosted · Groq)</option>
+              <option value="byo_openrouter">Bring your own · OpenRouter</option>
+            </select>
+          </div>
+
+          <div class="byo-panel" id="byoPanel">
+            <div class="field-group">
+              <label class="field-label" for="fieldByoKey">Your API key</label>
+              <input id="fieldByoKey" class="field-input" type="password"
+                placeholder="sk-or-…" autocomplete="off" spellcheck="false">
+              <span class="field-hint">Stored encrypted on the server. Never logged.</span>
+            </div>
+          </div>
+
+          <div class="summon-error" id="summonError"></div>
+          <div class="summon-status" id="summonStatus"></div>
+
+          <button class="summon-btn" id="summonBtn" type="button">
+            Enter the Collective
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <script src="js/RaBbLE-bg.js"></script>
+  <script src="js/RaBbLE-NeBuLA.js"></script>
+  <script src="js/RaBbLE-pages.js"></script>
+  <script src="js/RaBbLE-page-runtime.js"></script>
+  <script src="js/RaBbLE-summon.js"></script>
+
+</body>
+</html>

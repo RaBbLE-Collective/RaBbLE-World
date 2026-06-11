@@ -1,0 +1,252 @@
+/* ── Summon ceremony keyframes ────────────────────────────────────────── */
+@keyframes summonPulse {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50%       { opacity: 1;   transform: scale(1.04); }
+}
+@keyframes summonRise {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes holoShift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* ── Page base ────────────────────────────────────────────────────────── */
+html, body {
+  min-height: 100%;
+  overflow-x: hidden;
+}
+
+body.summon-entry       { opacity: 0; transition: opacity 0.95s ease; }
+body.summon-entry.summon-ready { opacity: 1; }
+
+/* ── Canvas background ───────────────────────────────────────────────── */
+#bgCanvas {
+  position: fixed; inset: 0;
+  z-index: 0; pointer-events: none;
+}
+
+/* ── Root layout ─────────────────────────────────────────────────────── */
+#root {
+  position: relative; z-index: 1;
+  min-height: 100dvh;
+  display: flex; flex-direction: column; align-items: center;
+  padding: max(2rem, env(safe-area-inset-top)) 1rem max(2rem, env(safe-area-inset-bottom));
+}
+
+/* ── Header ──────────────────────────────────────────────────────────── */
+.summon-header {
+  text-align: center; margin-bottom: 2.5rem;
+  animation: summonRise 0.8s ease forwards;
+}
+
+.summon-wordmark {
+  font-family: var(--font-hero);
+  font-size: 2rem; font-weight: 800; letter-spacing: 0.26em;
+  background: var(--rabble-gradient-scan);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 12px var(--rabble-magenta-20));
+  text-transform: none;
+}
+
+.summon-tagline {
+  font-family: var(--font-mono);
+  font-size: 0.65rem; color: var(--violet);
+  letter-spacing: 0.2em; opacity: 0.78;
+  margin-top: 0.35rem;
+}
+
+/* ── Entity stage ────────────────────────────────────────────────────── */
+.summon-entity-stage {
+  display: flex; justify-content: center; align-items: center;
+  margin-bottom: 1.5rem;
+  animation: summonRise 0.9s 0.1s ease both;
+}
+
+.summon-entity {
+  width: min(40vw, 320px); height: min(31.2vw, 250px);
+  aspect-ratio: 1 / 0.78; display: block;
+}
+
+/* ── Card ────────────────────────────────────────────────────────────── */
+.summon-card {
+  width: 100%; max-width: 520px;
+  background: var(--rabble-surface-85);
+  border: 1px solid var(--border);
+  border-radius: var(--rabble-radius-lg, 12px);
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  overflow: hidden;
+  animation: summonRise 1s 0.15s ease both;
+  position: relative;
+}
+
+.summon-card::before {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(135deg,
+    var(--rabble-magenta-10),
+    var(--rabble-violet-10),
+    var(--rabble-cyan-10));
+  background-size: 300% 300%;
+  animation: holoShift 10s ease infinite;
+  pointer-events: none;
+}
+
+.summon-card-inner {
+  position: relative; z-index: 1;
+  padding: 2rem 2rem 2rem;
+}
+
+/* ── Section heading ─────────────────────────────────────────────────── */
+.summon-title {
+  font-family: var(--font-mono);
+  font-size: 0.7rem; letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--magenta);
+  margin: 0 0 1.6rem;
+  text-align: center;
+}
+
+/* ── No-token state ──────────────────────────────────────────────────── */
+.summon-no-token {
+  text-align: center; padding: 1rem 0;
+}
+
+.summon-no-token p {
+  font-family: var(--font-ui);
+  font-size: 0.9rem; color: var(--text-dim);
+  line-height: 1.7; margin: 0 0 1rem;
+}
+
+.summon-no-token .summon-hint {
+  font-family: var(--font-mono);
+  font-size: 0.7rem; color: var(--text-dimmer);
+  letter-spacing: 0.1em;
+}
+
+/* ── Field group ─────────────────────────────────────────────────────── */
+.field-group {
+  margin-bottom: 1.2rem;
+}
+
+.field-label {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.65rem; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--text-dimmer);
+  margin-bottom: 0.45rem;
+}
+
+.field-input,
+.field-textarea,
+.field-select {
+  width: 100%; box-sizing: border-box;
+  background: var(--raised);
+  border: 1px solid var(--border);
+  border-radius: var(--rabble-radius-sm, 6px);
+  color: var(--text);
+  font-family: var(--font-ui); font-size: 0.95rem;
+  padding: 0.65rem 0.9rem;
+  outline: none;
+  transition: border-color var(--rabble-t-med, 200ms), box-shadow var(--rabble-t-med, 200ms);
+  -webkit-appearance: none;
+}
+
+.field-input:focus,
+.field-textarea:focus,
+.field-select:focus {
+  border-color: var(--rabble-violet-40);
+  box-shadow: 0 0 16px var(--rabble-violet-10);
+}
+
+.field-input::placeholder,
+.field-textarea::placeholder { color: var(--text-dimmer); }
+
+.field-textarea {
+  resize: vertical;
+  min-height: 90px; line-height: 1.6;
+}
+
+.field-select {
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b6880' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.9rem center;
+  padding-right: 2.4rem;
+}
+
+.field-hint {
+  display: block; margin-top: 0.35rem;
+  font-family: var(--font-mono);
+  font-size: 0.6rem; letter-spacing: 0.1em;
+  color: var(--text-dimmer);
+}
+
+/* ── BYO key panel (hidden by default) ───────────────────────────────── */
+.byo-panel { display: none; }
+.byo-panel.visible { display: block; margin-top: 1rem; }
+
+/* ── Submit button ───────────────────────────────────────────────────── */
+.summon-btn {
+  width: 100%; padding: 0.85rem;
+  background: var(--rabble-gradient-primary);
+  border: none; border-radius: var(--rabble-radius-sm, 6px);
+  color: var(--text); font-family: var(--font-hero);
+  font-size: 0.8rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: var(--rabble-glow-magenta-md);
+  transition: box-shadow var(--rabble-t-med, 200ms), transform var(--rabble-t-med, 200ms), opacity var(--rabble-t-med, 200ms);
+  margin-top: 0.5rem;
+}
+
+.summon-btn:hover:not(:disabled) {
+  box-shadow: 0 0 28px var(--rabble-magenta-35);
+  transform: translateY(-1px);
+}
+
+.summon-btn:disabled {
+  opacity: 0.5; cursor: not-allowed;
+}
+
+/* ── Error / status messages ─────────────────────────────────────────── */
+.summon-error {
+  margin-top: 1rem;
+  padding: 0.65rem 1rem;
+  background: var(--rabble-magenta-10);
+  border: 1px solid var(--rabble-magenta-20);
+  border-radius: var(--rabble-radius-sm, 6px);
+  font-family: var(--font-mono);
+  font-size: 0.75rem; letter-spacing: 0.06em;
+  color: var(--magenta);
+  display: none;
+}
+
+.summon-error.visible { display: block; }
+
+.summon-status {
+  margin-top: 1rem;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 0.75rem; letter-spacing: 0.1em;
+  color: var(--violet);
+  display: none;
+}
+
+.summon-status.visible { display: block; }
+
+/* ── Char counter ────────────────────────────────────────────────────── */
+.char-counter {
+  display: block; margin-top: 0.35rem; text-align: right;
+  font-family: var(--font-mono);
+  font-size: 0.6rem; letter-spacing: 0.1em;
+  color: var(--text-dimmer);
+}
+
+.char-counter.over { color: var(--magenta); }
+
+/* ── Responsive ──────────────────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .summon-card-inner { padding: 1.5rem 1.2rem; }
+  .summon-wordmark   { font-size: 1.5rem; }
+  .summon-entity     { width: min(56vw, 240px); height: min(43.7vw, 187px); }
+}

@@ -13,6 +13,14 @@
   <link rel="icon" type="image/png" sizes="32x32" href="../icons/icon-32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="../icons/icon-16.png">
   <title>RaBbLE — Boundless Behavioral Learning Engine</title>
+  <!-- Auth gate: redirect to summon.html if no JWT in localStorage -->
+  <script>
+    (function () {
+      if (!localStorage.getItem('rabble_jwt')) {
+        window.location.replace('summon.html');
+      }
+    }());
+  </script>
   <!-- Fonts owned by Aether — loader injects aether.css + failure banner -->
   <script src="js/RaBbLE-aether.js"></script>
   <link rel="stylesheet" href="css/RaBbLE-theme.css">
@@ -30,6 +38,7 @@
   <div id="root">
     <div class="top-panel">
       <a href="../index.html" class="chat-back" onclick="if(history.length>1){history.back();return false;}">← exit</a>
+      <a href="account.html" class="chat-account-btn" id="chatAccountBtn" title="Account">@—</a>
       <div class="brand-text">RaBbLE</div>
       <div class="brand-sub">RaBbLE · a Boundless Behavioral Learning Engine</div>
       <div class="entity-container">

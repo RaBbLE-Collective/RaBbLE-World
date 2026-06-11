@@ -7,20 +7,47 @@ var CHAT_B_WORDS = ['Boundless', 'Becoming', 'Brilliant', 'Bold', 'Bespoke', 'Bo
   'use strict';
 
   var API_CONFIG = {
-    baseUrl: window.RABBLE_API_URL || 'http://localhost:8000',
-    apiKey: window.RABBLE_API_KEY || null
+    baseUrl: window.RABBLE_API_URL || 'http://localhost:8000'
   };
 
   var state = {
-    messages: [
-      { id: 0, role: 'system', text: 'RaBbLE . Boundless mode active . Session 048' }
-    ],
+    messages: [],
     entity: null,
     isProcessing: false,
-    nextId: 1
+    nextId: 1,
+    sessionId: null
   };
 
   var chatContainer, messageInput, sendBtn, entityHost;
+
+  /* ── Auth helpers ─────────────────────────────────────────────────────── */
+
+  function getJwt()       { return localStorage.getItem('rabble_jwt') || ''; }
+  function getApiKey()    { return localStorage.getItem('rabble_api_key') || ''; }
+  function getHandle()    { return localStorage.getItem('rabble_handle') || ''; }
+
+  function authHeaders() {
+    var headers = { 'Content-Type': 'application/json' };
+    var jwt = getJwt();
+    if (jwt) { headers['Authorization'] = 'Bearer ' + jwt; return headers; }
+    var key = getApiKey();
+    if (key) { headers['X-API-Key'] = key; }
+    return headers;
+  }
+
+  function handle401() {
+    localStorage.removeItem('rabble_jwt');
+    localStorage.removeItem('rabble_api_key');
+    localStorage.removeItem('rabble_handle');
+    localStorage.removeItem('rabble_session_id');
+    window.location.replace('summon.html');
+  }
+
+  /* ── URL builder ──────────────────────────────────────────────────────── */
+
+  function apiUrl(path) { return API_CONFIG.baseUrl + path; }
+
+  /* ── Scroll ───────────────────────────────────────────────────────────── */
 
   function scrollToBottom() {
     if (chatContainer) chatContainer.scrollTop = chatContainer.scrollHeight;
@@ -28,41 +55,143 @@ var CHAT_B_WORDS = ['Boundless', 'Becoming', 'Brilliant', 'Bold', 'Bespoke', 'Bo
 
   function nextMsgId() { return state.nextId++; }
 
-  function apiUrl(path) {
-    return API_CONFIG.baseUrl + path;
+  /* ── Session init ─────────────────────────────────────────────────────── */
+
+  async function initSession() {
+    /* Check if we have a stored session_id to resume */
+    var stored = localStorage.getItem('rabble_session_id') || '';
+
+    try {
+      var res = await fetch(apiUrl('/api/v1/sessions'), {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify(stored ? { resume: true } : {})
+      });
+
+      if (res.status === 401) { handle401(); return; }
+
+      if (!res.ok) {
+        /* Fall through to anonymous mode — session creation failed non-fatally */
+        console.warn('[chat] Session init failed:', res.status);
+        appendSystemMessage('RaBbLE · Boundless mode active · anonymous');
+        return;
+      }
+
+      var session = await res.json();
+      state.sessionId = session.session_id;
+      localStorage.setItem('rabble_session_id', session.session_id);
+
+      /* Load history if session has messages */
+      if (session.message_count && session.message_count > 0) {
+        await loadSessionHistory(session.session_id);
+      }
+
+      if (!state.messages.length) {
+        var handle = getHandle();
+        appendSystemMessage('RaBbLE · ' + (handle ? '@' + handle + ' · ' : '') + 'Session active');
+      }
+
+    } catch (err) {
+      console.warn('[chat] Session init error:', err.message);
+      appendSystemMessage('RaBbLE · Boundless mode active');
+    }
   }
 
-  async function callChatApi(messages, onChunk) {
+  /* ── Load session history ─────────────────────────────────────────────── */
+
+  async function loadSessionHistory(sessionId) {
+    try {
+      var res = await fetch(apiUrl('/api/v1/sessions/' + sessionId), {
+        headers: authHeaders()
+      });
+
+      if (res.status === 401) { handle401(); return; }
+      if (!res.ok) return;
+
+      var record = await res.json();
+      var msgs   = record.messages || [];
+
+      if (!msgs.length) return;
+
+      /* Prepend system message, then history */
+      var handle = getHandle();
+      state.messages = [
+        { id: nextMsgId(), role: 'system', text: 'RaBbLE · ' + (handle ? '@' + handle + ' · ' : '') + 'Resuming session' }
+      ];
+
+      msgs.forEach(function (m) {
+        state.messages.push({
+          id:   nextMsgId(),
+          role: m.role === 'assistant' ? 'rabble' : m.role,
+          text: m.content
+        });
+      });
+
+      renderMessages();
+
+    } catch (err) {
+      console.warn('[chat] History load error:', err.message);
+    }
+  }
+
+  /* ── Session-aware streaming API call ─────────────────────────────────── */
+
+  async function callSessionApi(content, onChunk) {
+    var sessionId = state.sessionId;
+
+    /* If we have a session, use the session message endpoint */
+    if (sessionId) {
+      var res = await fetch(apiUrl('/api/v1/sessions/' + sessionId + '/message'), {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify({ content: content, model_tier: 'auto' })
+      });
+
+      if (res.status === 401) { handle401(); return; }
+
+      if (!res.ok) {
+        var errText = await res.text();
+        throw new Error('API error: ' + res.status + ' — ' + errText);
+      }
+
+      return readStream(res, onChunk);
+    }
+
+    /* Fallback: anonymous /api/v1/chat */
+    return callAnonymousApi(state.messages, onChunk);
+  }
+
+  /* ── Fallback: anonymous chat (no session) ────────────────────────────── */
+
+  async function callAnonymousApi(messages, onChunk) {
     var apiMessages = messages
       .filter(function (m) { return m.role !== 'system'; })
       .map(function (m) { return { role: m.role === 'rabble' ? 'assistant' : m.role, content: m.text }; });
 
-    var body = JSON.stringify({ messages: apiMessages, model_tier: 'fast' });
-    var headers = {
-      'Content-Type': 'application/json'
-    };
-    if (API_CONFIG.apiKey) {
-      headers['X-API-Key'] = API_CONFIG.apiKey;
-    }
-
-    var response = await fetch(apiUrl('/api/v1/chat'), {
+    var res = await fetch(apiUrl('/api/v1/chat'), {
       method: 'POST',
-      headers: headers,
-      body: body
+      headers: authHeaders(),
+      body: JSON.stringify({ messages: apiMessages, model_tier: 'fast' })
     });
 
-    if (!response.ok) {
-      var errText = await response.text();
-      throw new Error('API error: ' + response.status + ' — ' + errText);
+    if (res.status === 401) { handle401(); return; }
+
+    if (!res.ok) {
+      var errText = await res.text();
+      throw new Error('API error: ' + res.status + ' — ' + errText);
     }
 
-    if (!response.body) {
-      throw new Error('No response body');
-    }
+    return readStream(res, onChunk);
+  }
 
-    var reader = response.body.getReader();
+  /* ── SSE stream reader ────────────────────────────────────────────────── */
+
+  async function readStream(response, onChunk) {
+    if (!response.body) throw new Error('No response body');
+
+    var reader  = response.body.getReader();
     var decoder = new TextDecoder();
-    var buffer = '';
+    var buffer  = '';
 
     while (true) {
       var result = await reader.read();
@@ -81,6 +210,13 @@ var CHAT_B_WORDS = ['Boundless', 'Becoming', 'Brilliant', 'Bold', 'Bespoke', 'Bo
         }
       }
     }
+  }
+
+  /* ── Render ───────────────────────────────────────────────────────────── */
+
+  function appendSystemMessage(text) {
+    state.messages.push({ id: nextMsgId(), role: 'system', text: text });
+    renderMessages();
   }
 
   function renderMessages() {
@@ -114,6 +250,8 @@ var CHAT_B_WORDS = ['Boundless', 'Becoming', 'Brilliant', 'Bold', 'Bespoke', 'Bo
     scrollToBottom();
   }
 
+  /* ── Send ─────────────────────────────────────────────────────────────── */
+
   function sendMessage() {
     var text = messageInput ? messageInput.value.trim() : '';
     if (!text || state.isProcessing) return;
@@ -132,7 +270,7 @@ var CHAT_B_WORDS = ['Boundless', 'Becoming', 'Brilliant', 'Bold', 'Bespoke', 'Bo
     renderMessages();
 
     var fullResponse = '';
-    callChatApi(state.messages, function (chunk) {
+    callSessionApi(userText, function (chunk) {
       fullResponse += chunk;
       rabbleMsg.text = fullResponse;
       renderMessages();
@@ -158,12 +296,21 @@ var CHAT_B_WORDS = ['Boundless', 'Becoming', 'Brilliant', 'Bold', 'Bespoke', 'Bo
       });
   }
 
+  /* ── Init ─────────────────────────────────────────────────────────────── */
+
   function init() {
     chatContainer = document.querySelector('.chat-container');
-    messageInput = document.querySelector('.input-field');
-    sendBtn = document.querySelector('.send-btn');
-    entityHost = document.getElementById('entityHost');
-    state.entity = entityHost || null;
+    messageInput  = document.querySelector('.input-field');
+    sendBtn       = document.querySelector('.send-btn');
+    entityHost    = document.getElementById('entityHost');
+    state.entity  = entityHost || null;
+
+    /* Populate account button with stored handle */
+    var accountBtn = document.getElementById('chatAccountBtn');
+    if (accountBtn) {
+      var handle = getHandle();
+      accountBtn.textContent = handle ? '@' + handle : '⬡';
+    }
 
     if (window.RaBbLEBackground) {
       window.bg = new window.RaBbLEBackground({
@@ -174,7 +321,8 @@ var CHAT_B_WORDS = ['Boundless', 'Becoming', 'Brilliant', 'Bold', 'Bespoke', 'Bo
       });
     }
 
-    renderMessages();
+    /* Session init (async — messages render when ready) */
+    initSession();
 
     // Two frames: the first rAF fires before paint, so opacity:0 hasn't rendered yet.
     // The second guarantees the browser has committed the initial state before we fade in.

@@ -1,0 +1,304 @@
+/* ── Account page keyframes ───────────────────────────────────────────── */
+@keyframes accountRise {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes holoShift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* ── Page base ────────────────────────────────────────────────────────── */
+html, body {
+  min-height: 100%;
+  overflow-x: hidden;
+}
+
+body.account-entry       { opacity: 0; transition: opacity 0.85s ease; }
+body.account-entry.account-ready { opacity: 1; }
+
+/* ── Canvas background ───────────────────────────────────────────────── */
+#bgCanvas {
+  position: fixed; inset: 0;
+  z-index: 0; pointer-events: none;
+}
+
+/* ── Root layout ─────────────────────────────────────────────────────── */
+#root {
+  position: relative; z-index: 1;
+  min-height: 100dvh;
+  display: flex; flex-direction: column;
+}
+
+/* ── Top bar ─────────────────────────────────────────────────────────── */
+.account-topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: max(0.75rem, env(safe-area-inset-top)) 1.25rem 0.75rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--rabble-surface-85);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  flex-shrink: 0; position: relative; z-index: 2;
+}
+
+.account-topbar::before {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(135deg,
+    var(--rabble-magenta-10),
+    var(--rabble-cyan-10),
+    var(--rabble-violet-10));
+  background-size: 300% 300%;
+  animation: holoShift 9s ease infinite;
+  pointer-events: none;
+}
+
+.account-back {
+  font-family: var(--font-mono);
+  font-size: var(--rabble-fs-nano, 10px); letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--text-dimmer); text-decoration: none;
+  padding: 4px 10px; border: 1px solid var(--border);
+  border-radius: var(--rabble-radius-sm, 3px);
+  background: var(--rabble-void);
+  transition: all var(--rabble-t-fast, 140ms);
+  position: relative; z-index: 3;
+}
+.account-back:hover { color: var(--cyan); border-color: var(--cyan); box-shadow: var(--rabble-glow-cyan-sm); }
+
+.account-wordmark {
+  font-family: var(--font-hero);
+  font-size: 1.1rem; font-weight: 800; letter-spacing: 0.2em;
+  background: var(--rabble-gradient-scan);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 8px var(--rabble-magenta-20));
+  text-transform: none;
+  position: relative; z-index: 3;
+}
+
+.account-handle {
+  font-family: var(--font-mono);
+  font-size: 0.72rem; letter-spacing: 0.14em;
+  color: var(--violet); opacity: 0.85;
+  position: relative; z-index: 3;
+}
+
+/* ── Content area ────────────────────────────────────────────────────── */
+.account-content {
+  flex: 1; overflow-y: auto;
+  padding: 2rem 1rem max(2rem, env(safe-area-inset-bottom));
+  display: flex; flex-direction: column; align-items: center; gap: 1.5rem;
+}
+
+/* ── Section card ────────────────────────────────────────────────────── */
+.account-section {
+  width: 100%; max-width: 620px;
+  background: var(--rabble-surface-85);
+  border: 1px solid var(--border);
+  border-radius: var(--rabble-radius-lg, 12px);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  overflow: hidden;
+  animation: accountRise 0.7s ease both;
+}
+
+.account-section:nth-child(2) { animation-delay: 0.05s; }
+.account-section:nth-child(3) { animation-delay: 0.10s; }
+.account-section:nth-child(4) { animation-delay: 0.15s; }
+.account-section:nth-child(5) { animation-delay: 0.20s; }
+
+.section-header {
+  padding: 0.85rem 1.4rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--rabble-raised-85);
+  display: flex; align-items: center; gap: 0.6rem;
+}
+
+.section-title {
+  font-family: var(--font-mono);
+  font-size: 0.68rem; letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--magenta); margin: 0;
+}
+
+.section-body {
+  padding: 1.25rem 1.4rem;
+}
+
+/* ── Identity row ────────────────────────────────────────────────────── */
+.identity-meta {
+  display: grid; grid-template-columns: auto 1fr; gap: 0.3rem 1rem;
+  margin-bottom: 1.2rem;
+  font-family: var(--font-mono); font-size: 0.78rem;
+}
+
+.identity-meta .meta-label { color: var(--text-dimmer); letter-spacing: 0.1em; }
+.identity-meta .meta-value { color: var(--text); }
+
+/* ── Field group (shared with summon) ────────────────────────────────── */
+.field-group { margin-bottom: 1.1rem; }
+
+.field-label {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.63rem; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--text-dimmer); margin-bottom: 0.4rem;
+}
+
+.field-input,
+.field-textarea,
+.field-select {
+  width: 100%; box-sizing: border-box;
+  background: var(--raised);
+  border: 1px solid var(--border);
+  border-radius: var(--rabble-radius-sm, 6px);
+  color: var(--text);
+  font-family: var(--font-ui); font-size: 0.9rem;
+  padding: 0.6rem 0.85rem;
+  outline: none;
+  transition: border-color var(--rabble-t-med, 200ms), box-shadow var(--rabble-t-med, 200ms);
+  -webkit-appearance: none;
+}
+
+.field-input:focus,
+.field-textarea:focus,
+.field-select:focus {
+  border-color: var(--rabble-violet-40);
+  box-shadow: 0 0 14px var(--rabble-violet-10);
+}
+
+.field-input::placeholder,
+.field-textarea::placeholder { color: var(--text-dimmer); }
+
+.field-textarea {
+  resize: vertical; min-height: 80px; line-height: 1.6;
+}
+
+.field-select {
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b6880' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.85rem center;
+  padding-right: 2.2rem;
+}
+
+/* ── BYO key panel ───────────────────────────────────────────────────── */
+.byo-panel { display: none; }
+.byo-panel.visible { display: block; margin-top: 0.9rem; }
+
+/* ── Save button / action buttons ────────────────────────────────────── */
+.btn-primary {
+  padding: 0.7rem 1.6rem;
+  background: var(--rabble-gradient-primary);
+  border: none; border-radius: var(--rabble-radius-sm, 6px);
+  color: var(--text); font-family: var(--font-hero);
+  font-size: 0.72rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: var(--rabble-glow-magenta-sm);
+  transition: box-shadow var(--rabble-t-med), transform var(--rabble-t-med), opacity var(--rabble-t-med);
+}
+.btn-primary:hover:not(:disabled) {
+  box-shadow: 0 0 24px var(--rabble-magenta-35);
+  transform: translateY(-1px);
+}
+.btn-primary:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.btn-secondary {
+  padding: 0.7rem 1.4rem;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--rabble-radius-sm, 6px);
+  color: var(--text-dim); font-family: var(--font-mono);
+  font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase;
+  cursor: pointer;
+  transition: border-color var(--rabble-t-med), color var(--rabble-t-med);
+}
+.btn-secondary:hover { border-color: var(--cyan); color: var(--cyan); }
+
+.btn-row {
+  display: flex; align-items: center; gap: 0.75rem;
+  margin-top: 1.1rem; flex-wrap: wrap;
+}
+
+/* ── Save feedback ───────────────────────────────────────────────────── */
+.save-feedback {
+  font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.1em;
+  color: var(--green); opacity: 0;
+  transition: opacity 0.4s ease;
+}
+.save-feedback.visible { opacity: 1; }
+
+.save-error {
+  font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.1em;
+  color: var(--magenta); opacity: 0;
+  transition: opacity 0.4s ease;
+}
+.save-error.visible { opacity: 1; }
+
+/* ── Session list ────────────────────────────────────────────────────── */
+.session-list {
+  display: flex; flex-direction: column; gap: 0.6rem;
+}
+
+.session-item {
+  padding: 0.8rem 1rem;
+  background: var(--raised);
+  border: 1px solid var(--border);
+  border-radius: var(--rabble-radius-sm, 6px);
+  cursor: pointer;
+  transition: border-color var(--rabble-t-med), background var(--rabble-t-med);
+  display: flex; align-items: center; justify-content: space-between; gap: 0.75rem;
+}
+.session-item:hover { border-color: var(--violet); background: var(--rabble-violet-10); }
+
+.session-item-left { min-width: 0; }
+
+.session-title {
+  font-family: var(--font-ui); font-size: 0.88rem; color: var(--text);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.session-date {
+  font-family: var(--font-mono); font-size: 0.62rem;
+  color: var(--text-dimmer); letter-spacing: 0.08em; margin-top: 0.25rem;
+}
+
+.session-badge {
+  font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.08em;
+  color: var(--violet); white-space: nowrap; flex-shrink: 0;
+}
+
+.session-empty {
+  font-family: var(--font-mono); font-size: 0.78rem;
+  color: var(--text-dimmer); letter-spacing: 0.1em; text-align: center;
+  padding: 1rem 0;
+}
+
+/* ── Pair info row ───────────────────────────────────────────────────── */
+.pair-info {
+  display: flex; flex-direction: column; gap: 0.6rem;
+}
+.pair-row {
+  display: flex; justify-content: space-between; align-items: center;
+  font-family: var(--font-mono); font-size: 0.78rem;
+  border-bottom: 1px solid var(--border); padding-bottom: 0.6rem;
+}
+.pair-row:last-child { border-bottom: none; padding-bottom: 0; }
+.pair-row .pair-key { color: var(--text-dimmer); letter-spacing: 0.1em; }
+.pair-row .pair-val { color: var(--text); }
+
+/* ── Loading skeleton ────────────────────────────────────────────────── */
+.loading-line {
+  height: 0.85rem; border-radius: 4px;
+  background: linear-gradient(90deg, var(--raised) 25%, var(--border) 50%, var(--raised) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease infinite;
+  margin-bottom: 0.5rem;
+}
+
+@keyframes shimmer {
+  from { background-position: 200% 0; }
+  to   { background-position: -200% 0; }
+}
+
+/* ── Responsive ──────────────────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .account-content { padding: 1.2rem 0.75rem; }
+  .section-body    { padding: 1rem; }
+  .account-wordmark { font-size: 0.95rem; }
+}
