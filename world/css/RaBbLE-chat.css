@@ -218,7 +218,7 @@ body.chat-entry.chat-ready { opacity: 1; }
   border-radius: var(--rabble-radius-md, 10px); border: none;
   background: var(--rabble-gradient-primary); cursor: pointer;
   display: flex; align-items: center; justify-content: center;
-  color: #fff; font-size: 1rem;
+  color: var(--text, #fff); font-size: 1rem;
   box-shadow: var(--rabble-glow-magenta-md);
   flex-shrink: 0;
   transition: box-shadow var(--rabble-t-med, 0.2s), transform var(--rabble-t-med, 0.2s);

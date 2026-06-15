@@ -406,7 +406,7 @@
 .sc-ambient-pupil { animation: sc-pupil 4.2s ease-in-out infinite; transform-origin: 30px 30px; }
 @keyframes sc-pupil {
   0%, 100% { transform: scale(1); }
-  50%      { transform: scale(1.25); filter: drop-shadow(0 0 10px #bf5fff); }
+  50%      { transform: scale(1.25); filter: drop-shadow(0 0 10px var(--violet, #bf5fff)); }
 }
 
 /* Ring caption — sits BELOW the ring so the rotating runes can never
@@ -490,18 +490,18 @@
   font-weight: inherit;
 }
 .sc-holo-glyph::before {
-  color: #00f5ff;
+  color: var(--cyan, #00f5ff);
   transform: translate(-1.5px, 0);
   mix-blend-mode: screen;
   opacity: 0.65;
-  text-shadow: 0 0 4px #00f5ff;
+  text-shadow: 0 0 4px var(--cyan, #00f5ff);
 }
 .sc-holo-glyph::after {
-  color: #ff2d78;
+  color: var(--magenta, #ff2d78);
   transform: translate(1.5px, 0);
   mix-blend-mode: screen;
   opacity: 0.65;
-  text-shadow: 0 0 4px #ff2d78;
+  text-shadow: 0 0 4px var(--magenta, #ff2d78);
 }
 .sc-holo-scan {
   position: absolute; inset: -20% -10%;

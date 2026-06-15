@@ -23,6 +23,8 @@
   --violet:     var(--rabble-violet,   #bf5fff);
   --pink:       var(--rabble-pink,     #ff79c6);
   --green:      var(--rabble-green,    #50fa7b);
+  --yellow:     var(--rabble-yellow,   #f1fa8c);
+  --red:        var(--rabble-red,      #e05c6f);
 
   /* ── Void / backgrounds ─────────────────────────────────────────── */
   --bg:         var(--rabble-void,     #03000b);   /* deepest void — boot screens */

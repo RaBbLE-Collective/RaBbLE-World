@@ -7,20 +7,20 @@
 
 /* ── Landing-specific token extensions ──────────────────────────────────── */
 :root {
-  --void-deepest:   var(--bg,      #03000b);
-  --void-deep:      #07001a;
+  --void-deepest:   var(--bg,         #03000b);
+  --void-deep:      var(--bg-surface, #0a0010);
 
-  /* Landing text hierarchy — slightly brighter than Aether muted defaults */
-  --text-primary:   #f0eaf8;
-  --text-secondary: #c0b8d8;
-  --text-muted:     #9890b8;
+  /* Text hierarchy — Aether-first (was a custom lavender ramp; now canonical tokens) */
+  --text-primary:   var(--text,       #e8e6f0);
+  --text-secondary: var(--text-dim,   #6b6880);
+  --text-muted:     var(--text-dim,   #6b6880);
 
   /* Neon aliases — prefer these inside this file for readability */
   --neon-cyan:    var(--cyan,    #00f5ff);
   --neon-magenta: var(--magenta, #ff2d78);
   --neon-violet:  var(--violet,  #bf5fff);
   --success:      var(--green,   #50fa7b);
-  --warning:      #ffbe2e;
+  --warning:      var(--yellow,  #f1fa8c);
 
   /* Statusbar height — used for overlay top offsets and shell grid row */
   --sb-height: calc(32px + env(safe-area-inset-top, 0px));
