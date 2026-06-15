@@ -14,7 +14,9 @@
 (function () {
   'use strict';
 
-  var AETHER_URL = '/aether/v0.0.0.0/aether.css';
+  // Base URL comes from RaBbLE-config.js (the flip point); fall back to the
+  // local/dev CDN-mock path if config hasn't loaded.
+  var AETHER_URL = window.RABBLE_AETHER_URL || '/aether/v0.0.0.0/aether.css';
 
   var link = document.createElement('link');
   link.rel = 'stylesheet';
