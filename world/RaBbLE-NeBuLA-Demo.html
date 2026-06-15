@@ -13,6 +13,8 @@
   <!-- Aether (visual effects) → theme (aliases) → WM (layout) → Demo (page layout) -->
   <script src="js/RaBbLE-aether.js"></script>
   <script src="js/RaBbLE-NeBuLA.js"></script>
+  <!-- Three.js global — NeBuLA.ThreeJsBackend reads window.THREE (Layer 2 entity) -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
   <link rel="stylesheet" href="css/RaBbLE-theme.css">
   <link rel="stylesheet" href="css/RaBbLE-chrome.css">
   <link rel="stylesheet" href="css/RaBbLE-wm.css">
@@ -86,6 +88,7 @@
           </div>
 
           <div class="control-row">
+            <button class="rabble-btn rabble-btn-ghost" onclick="window.three3d && window.three3d.triggerBoot()">Boot</button>
             <button class="rabble-btn rabble-btn-ghost" onclick="changeState('thinking', 'nebula-l2')">Thinking</button>
             <button class="rabble-btn rabble-btn-ghost" onclick="changeState('idle', 'nebula-l2')">Idle</button>
           </div>
@@ -184,107 +187,35 @@
     }
 
     // ─────────────────────────────────────────────────────────────────────────
-    // Three.js Backend — Layer 2: Quantum Visualization
+    // Layer 2 — Three.js entity, rendered through NeBuLA.ThreeJsBackend.
+    // NeBuLA is the single renderer for the entity on every surface; this panel
+    // no longer carries a throwaway particle cloud. The backend owns the full
+    // entity (palette nebula, connection lines, eyes, portals) plus its own
+    // orbit/zoom controls and resize handling.
     // ─────────────────────────────────────────────────────────────────────────
-    window.addEventListener('load', async () => {
+    window.addEventListener('load', () => {
       const canvas3d = document.getElementById('canvas3d');
+      const statusEl = document.getElementById('status-three');
       if (!canvas3d) return;
 
-      import('https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js').then(THREE => {
-        const scene    = new THREE.Scene();
-        const camera   = new THREE.PerspectiveCamera(60, canvas3d.clientWidth / canvas3d.clientHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ canvas: canvas3d, antialias: true, alpha: true });
-        renderer.setSize(canvas3d.clientWidth, canvas3d.clientHeight);
-        renderer.setClearColor(0x010008, 1);
-        camera.position.z = 8;
+      if (typeof THREE === 'undefined') {
+        statusEl.textContent = '⚠ Three.js failed to load';
+        return;
+      }
+      if (typeof NeBuLA === 'undefined' || !NeBuLA.ThreeJsBackend) {
+        statusEl.textContent = '⚠ NeBuLA bundle not loaded';
+        return;
+      }
 
-        const particleCount = 800;
-        const geometry = new THREE.BufferGeometry();
-        const positions = new Float32Array(particleCount * 3);
-        const colors    = new Float32Array(particleCount * 3);
-        const colorPalette = [
-          { r: 0,    g: 0.96, b: 1    }, // cyan
-          { r: 1,    g: 0.18, b: 0.47 }, // magenta
-          { r: 0.75, g: 0.35, b: 1    }, // violet
-        ];
-
-        for (let i = 0; i < particleCount; i++) {
-          const r = Math.random() * 4, theta = Math.random() * Math.PI * 2;
-          const phi = Math.acos(2 * Math.random() - 1);
-          positions[i*3]   = r * Math.sin(phi) * Math.cos(theta);
-          positions[i*3+1] = r * Math.sin(phi) * Math.sin(theta);
-          positions[i*3+2] = r * Math.cos(phi);
-          const col = colorPalette[i % colorPalette.length];
-          colors[i*3] = col.r; colors[i*3+1] = col.g; colors[i*3+2] = col.b;
-        }
-
-        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-        geometry.setAttribute('color',    new THREE.BufferAttribute(colors,    3));
-        const material = new THREE.PointsMaterial({ size: 0.05, vertexColors: true, sizeAttenuation: true });
-        const particles = new THREE.Points(geometry, material);
-        scene.add(particles);
-        scene.add(new THREE.AmbientLight(0xffffff, 0.3));
-        const ptLight = new THREE.PointLight(0x00f5ff, 0.8, 100);
-        ptLight.position.set(8, 8, 8); scene.add(ptLight);
-
-        // Camera controls
-        let mouseDown = false, mouseX = 0, mouseY = 0;
-        let cameraRotX = 0, cameraRotY = 0, zoom = 8;
-        canvas3d.addEventListener('mousedown', e => { mouseDown = true; mouseX = e.clientX; mouseY = e.clientY; });
-        document.addEventListener('mousemove', e => {
-          if (!mouseDown) return;
-          cameraRotY += (e.clientX - mouseX) * 0.005; cameraRotX += (e.clientY - mouseY) * 0.005;
-          mouseX = e.clientX; mouseY = e.clientY;
-        });
-        document.addEventListener('mouseup', () => { mouseDown = false; });
-        canvas3d.addEventListener('wheel', e => {
-          e.preventDefault(); zoom = Math.max(2, Math.min(15, zoom + (e.deltaY > 0 ? 0.5 : -0.5)));
-        });
-
-        let entropy = 0.3, bootActive = false, bootProgress = 0;
-
-        function animate() {
-          requestAnimationFrame(animate);
-          const posAttr = geometry.getAttribute('position');
-          const pos     = posAttr.array;
-          const bootInfluence = bootActive ? Math.sin(bootProgress * Math.PI) * 0.5 : 0;
-          const scale   = 1 - bootInfluence;
-          for (let i = 0; i < particleCount; i++) {
-            const noise = Math.sin(pos[i*3]*2 + Date.now()*0.0005) * Math.cos(pos[i*3+1]*2 + Date.now()*0.0003);
-            const drift = entropy * 0.02 + bootInfluence * 0.03;
-            pos[i*3]   = pos[i*3]   * scale + noise * drift;
-            pos[i*3+1] = pos[i*3+1] * scale + noise * drift * 0.8;
-            pos[i*3+2] = pos[i*3+2] * scale + noise * drift * 0.6;
-          }
-          posAttr.needsUpdate = true;
-          material.size = 0.03 + entropy * 0.05;
-          camera.position.x = Math.sin(cameraRotY) * zoom;
-          camera.position.y = Math.sin(cameraRotX) * zoom;
-          camera.position.z = Math.cos(cameraRotY) * zoom;
-          camera.lookAt(0, 0, 0);
-          particles.rotation.z += 0.0003 * (1 + entropy);
-          if (bootActive) { bootProgress += 0.015; if (bootProgress >= 1) { bootActive = false; bootProgress = 0; } }
-          renderer.render(scene, camera);
-        }
-        animate();
-
-        window.addEventListener('resize', () => {
-          const w = canvas3d.clientWidth, h = canvas3d.clientHeight;
-          camera.aspect = w / h; camera.updateProjectionMatrix(); renderer.setSize(w, h);
-        });
-
-        window.three3d = {
-          setEntityState(state) { entropy = state === 'idle' ? 0.3 : state === 'thinking' ? 0.6 : 0.8; },
-          triggerBoot()         { bootActive = true; bootProgress = 0; },
-        };
-
-        document.getElementById('status-three').textContent =
-          `Rendering • ${particleCount} particles • Drag to rotate • Scroll to zoom`;
-      }).catch(e => {
-        console.error('Three.js failed:', e);
-        document.getElementById('canvas3d').parentElement.innerHTML =
-          '<div style="color:#ff2d78;padding:20px;font-family:monospace;font-size:12px;">Three.js failed to load</div>';
-      });
+      try {
+        window.three3d = new NeBuLA.ThreeJsBackend(canvas3d, { mode: 'idle' });
+        const m = window.three3d.getPerformanceMetrics();
+        statusEl.textContent =
+          `Rendering • ${m.entityCount} particles • Drag to rotate • Scroll to zoom`;
+      } catch (e) {
+        console.error('NeBuLA Three.js backend failed:', e);
+        statusEl.textContent = '⚠ Three.js backend failed';
+      }
     });
   </script>
 </body>
