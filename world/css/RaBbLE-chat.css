@@ -144,36 +144,40 @@ body.chat-entry.chat-ready { opacity: 1; }
 .message {
   max-width: 85%; padding: 0.8rem 1.2rem;
   border-radius: var(--rabble-radius-lg, 12px);
-  font-size: 0.9rem; line-height: 1.6;
-  animation: msgDrift 0.4s ease forwards; opacity: 0; text-align: center;
+  font-size: 1.05rem; line-height: 1.7;
+  animation: msgDrift 0.4s ease forwards; opacity: 0; text-align: left;
 }
 
 .message.user {
   align-self: flex-end;
-  background: var(--rabble-cyan-10);
-  border: 1px solid var(--rabble-cyan-20);
+  color: var(--text);
+  background: rgba(0, 245, 255, 0.08);
+  border: 1px solid rgba(0, 245, 255, 0.28);
   border-radius: var(--rabble-radius-lg) var(--rabble-radius-sm) var(--rabble-radius-lg) var(--rabble-radius-lg);
 }
 .message.rabble {
   align-self: flex-start;
-  background: var(--rabble-violet-10);
-  border: 1px solid var(--rabble-violet-20);
+  color: var(--text);
+  background: rgba(191, 95, 255, 0.10);
+  border: 1px solid rgba(191, 95, 255, 0.30);
   border-radius: var(--rabble-radius-sm) var(--rabble-radius-lg) var(--rabble-radius-lg) var(--rabble-radius-lg);
 }
 .message.system {
   align-self: center;
-  background: var(--rabble-magenta-10);
-  border: 1px solid rgba(255,45,120,0.15);
+  color: var(--text-dim);
+  background: rgba(255, 45, 120, 0.07);
+  border: 1px solid rgba(255, 45, 120, 0.20);
   border-radius: var(--rabble-radius-md, 8px);
-  font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.08em;
+  font-family: var(--font-mono); font-size: 0.8rem; letter-spacing: 0.08em;
 }
 
 .msg-label {
-  font-size: 0.65rem; font-family: var(--font-mono);
-  letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 0.3rem;
+  font-size: 0.7rem; font-family: var(--font-mono);
+  letter-spacing: 0.14em; text-transform: uppercase;
+  margin-bottom: 0.35rem; opacity: 0.9;
 }
 .message.rabble .msg-label { color: var(--violet); }
-.message.user   .msg-label { color: var(--cyan); text-align: center; }
+.message.user   .msg-label { color: var(--cyan); text-align: right; }
 
 /* ── Typing indicator ────────────────────────────────────────────────── */
 .typing-dots { display: inline-flex; gap: 4px; padding: 0.5rem 0; }
