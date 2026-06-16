@@ -18,9 +18,9 @@
   'use strict';
 
   // ── Production endpoints — edit these as services move/rename ───────────────
-  var PROD_API_URL    = 'https://rabble-score-x7qq.onrender.com';   // sCoRE (Render)
-  var PROD_AETHER_URL = '/aether/v0.0.0.0/aether.css';         // → aether.rabble.world (future subdomain)
-  var PROD_NEBULA_URL = '/nebula/v0.0.0.0/nebula.iife.js';     // → nebula.rabble.world (future subdomain)
+  var PROD_API_URL    = 'https://score.joinrabble.world';             // sCoRE (CF Worker → Render)
+  var PROD_AETHER_URL = 'https://aether.joinrabble.world/v0.0.0.0/aether.min.css'; // Aether CDN — bump version on deploy
+  var PROD_NEBULA_URL = 'https://nebula.joinrabble.world/v0.0.0.0/nebula.iife.js'; // NeBuLA CDN — bump version on deploy
 
   // ── Local endpoints (harness/local.sh + dev-serve.sh CDN mock) ──────────────
   var LOCAL_API_URL    = 'http://localhost:8000';
@@ -40,4 +40,14 @@
   set('RABBLE_AETHER_URL', LOCAL_AETHER_URL, PROD_AETHER_URL);
   set('RABBLE_NEBULA_URL', LOCAL_NEBULA_URL, PROD_NEBULA_URL);
   window.RABBLE_ENV = isLocal ? 'local' : 'production';
+
+  // ── Guest conversation (the curator's live voice) ───────────────────────────
+  // The entity always guides via scripted transmissions (RaBbLE-curator.js).
+  // When guest chat is enabled AND the backend answers, conversation upgrades to
+  // a real LLM via the anonymous /api/v1/chat endpoint; on any failure the
+  // curator degrades gracefully back to scripted — never a broken surface.
+  // Flip RABBLE_GUEST_CHAT=false to force scripted-only (e.g. cost/abuse pause).
+  set('RABBLE_GUEST_CHAT',      true, true);            // attempt live guest conversation
+  set('RABBLE_GUEST_CHAT_PATH', '/api/v1/chat', '/api/v1/chat'); // anonymous chat endpoint
+  set('RABBLE_GUEST_CHAT_TIER', 'fast', 'fast');        // model tier for guest dialogue
 }());
