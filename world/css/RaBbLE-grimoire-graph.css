@@ -276,3 +276,175 @@ body {
   .graph-panel { width: 100%; top: auto; bottom: 0; height: 55vh; transform: translateY(100%); }
   .graph-panel.panel-open { transform: translateY(0); }
 }
+
+/* ════════════════════════════════════════════════════════════════════════
+ * The curator dock — entity conversation + spellbook over the floor.
+ * RaBbLE-realm.js mounts it. Anchored top-left below the statusbar, clear of
+ * the zoom controls + legend (bottom-left) and the doc panel (right).
+ * Colors via Aether --rabble-* vars (palette fallbacks only).
+ * ════════════════════════════════════════════════════════════════════════ */
+.realm-dock {
+  position: fixed;
+  left: 14px;
+  top: calc(var(--sb-height, 44px) + 12px);
+  bottom: 64px;
+  width: 332px;
+  max-width: calc(100vw - 28px);
+  z-index: 25;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--rabble-border, #2a2840);
+  border-radius: 10px;
+  /* Tinted glass (echoes Hyprland transparency on RaBbLE-OS) — gentle blur */
+  background: color-mix(in srgb, var(--rabble-raised, #1a1b2e) 82%, transparent);
+  backdrop-filter: blur(6px);
+  box-shadow: 0 10px 30px -12px var(--rabble-void, #0a0010);
+  font-family: var(--rabble-font-mono, monospace);
+  overflow: hidden;
+}
+.realm-dock--min { bottom: auto; }
+.realm-dock--min .rd-stream,
+.realm-dock--min .rd-spellbook,
+.realm-dock--min .rd-input { display: none; }
+
+.rd-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 11px;
+  border-bottom: 1px solid var(--rabble-border, #2a2840);
+}
+.rd-sigil { color: var(--rabble-cyan, #00f5ff); font-size: 13px; }
+.rd-title {
+  flex: 1;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--rabble-text, #e8e6f0);
+}
+.rd-link {
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--rabble-violet, #bf5fff);
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  padding: 1px 7px;
+}
+.rd-min {
+  background: none; border: none; cursor: pointer;
+  color: var(--rabble-muted, #8a87a0); font-size: 14px; line-height: 1;
+}
+.rd-min:hover { color: var(--rabble-cyan, #00f5ff); }
+
+.rd-stream {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 10px 11px;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+.rd-line {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--rabble-text, #e8e6f0);
+  word-wrap: break-word;
+}
+.rd-who {
+  color: var(--rabble-magenta, #ff2d78);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.rd-line--you {
+  align-self: flex-end;
+  max-width: 88%;
+  color: var(--rabble-cyan, #00f5ff);
+  border: 1px solid color-mix(in srgb, var(--rabble-cyan, #00f5ff) 40%, transparent);
+  border-radius: 8px 8px 2px 8px;
+  padding: 5px 9px;
+}
+.rd-line--system { color: var(--rabble-muted, #8a87a0); font-style: italic; }
+.rd-line--system .rd-who { color: var(--rabble-muted, #8a87a0); }
+
+.rd-spellbook {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  padding: 8px 10px;
+  border-top: 1px solid var(--rabble-border, #2a2840);
+}
+.rd-spell {
+  font-family: inherit;
+  font-size: 10px;
+  letter-spacing: 0.03em;
+  color: var(--rabble-muted, #8a87a0);
+  background: color-mix(in srgb, var(--rabble-violet, #bf5fff) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--rabble-violet, #bf5fff) 30%, transparent);
+  border-radius: 999px;
+  padding: 4px 9px;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+.rd-spell:hover {
+  color: var(--rabble-violet, #bf5fff);
+  border-color: var(--rabble-violet, #bf5fff);
+}
+.rd-spell--summon {
+  color: var(--rabble-magenta, #ff2d78);
+  border-color: color-mix(in srgb, var(--rabble-magenta, #ff2d78) 45%, transparent);
+  background: color-mix(in srgb, var(--rabble-magenta, #ff2d78) 8%, transparent);
+}
+.rd-spell--summon:hover { color: var(--rabble-magenta, #ff2d78); border-color: var(--rabble-magenta, #ff2d78); }
+
+.rd-input {
+  display: flex;
+  gap: 6px;
+  padding: 9px 10px;
+  border-top: 1px solid var(--rabble-border, #2a2840);
+}
+.rd-input input {
+  flex: 1;
+  min-width: 0;
+  font-family: inherit;
+  font-size: 12px;
+  color: var(--rabble-text, #e8e6f0);
+  background: color-mix(in srgb, var(--rabble-bg, #0a0010) 60%, transparent);
+  border: 1px solid var(--rabble-border, #2a2840);
+  border-radius: 7px;
+  padding: 7px 9px;
+}
+.rd-input input:focus { outline: none; border-color: var(--rabble-cyan, #00f5ff); }
+.rd-input button {
+  background: none;
+  border: 1px solid var(--rabble-cyan, #00f5ff);
+  color: var(--rabble-cyan, #00f5ff);
+  border-radius: 7px;
+  width: 34px;
+  cursor: pointer;
+  font-size: 14px;
+}
+.rd-input button:hover { background: var(--rabble-cyan, #00f5ff); color: var(--rabble-void, #0a0010); }
+
+/* The summoned helper — a small travelling eye (theatrical preview) */
+.realm-subentity {
+  position: fixed;
+  width: 14px;
+  height: 22px;
+  margin: -11px 0 0 -7px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff 0%, var(--rabble-cyan, #00f5ff) 55%, transparent 75%);
+  box-shadow: 0 0 14px var(--rabble-cyan, #00f5ff), 0 0 26px color-mix(in srgb, var(--rabble-magenta,#ff2d78) 60%, transparent);
+  z-index: 26;
+  pointer-events: none;
+  transition: left 1s cubic-bezier(.5,0,.3,1), top 1s cubic-bezier(.5,0,.3,1), opacity 0.5s;
+  opacity: 0.4;
+}
+.realm-subentity--active { opacity: 1; }
+.realm-subentity--dissolve { opacity: 0; transform: scale(0.4); }
+
+@media (max-width: 640px) {
+  .realm-dock { width: calc(100vw - 28px); top: auto; bottom: 70px; max-height: 46vh; }
+}

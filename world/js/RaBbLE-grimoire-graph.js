@@ -660,6 +660,10 @@
     sealEl.style.color = seal.color || node.col.css;
     sealEl.style.borderColor = seal.color || node.col.css;
     panel.classList.add('panel-open');
+    // Notify the curator dock so the entity narrates what was selected.
+    if (window.RaBbLERealm && typeof window.RaBbLERealm.onSelect === 'function') {
+      try { window.RaBbLERealm.onSelect(doc); } catch (e) {}
+    }
   }
 
   function deselectNode() { selectedNode = null; panel.classList.remove('panel-open'); }
@@ -730,5 +734,73 @@
   applyCam();
   animate(performance.now());
   setTimeout(() => nodeList.forEach(n => n.label.classList.add('label-visible')), 2800);
+
+  // ── Realm control surface ──────────────────────────────────────────────
+  // Minimal API so the curator dock + spellbook (RaBbLE-realm.js) can drive
+  // the floor without reaching into graph internals. Encapsulation preserved.
+  const realmOwners = [...new Set(docs.map(d => d.owner))].filter(o => MEMBER_UV[o]);
+
+  function ownerNodes(owner) { return nodeList.filter(n => n.doc.owner === owner); }
+  function ownerCentroid(owner) {
+    const ns = ownerNodes(owner);
+    if (!ns.length) return null;
+    let sx = 0, sy = 0;
+    ns.forEach(n => { sx += n.x; sy += n.y; });
+    return { x: sx / ns.length, y: sy / ns.length };
+  }
+  function aimEyesAt(wx, wy) {
+    const dist = Math.sqrt(wx * wx + wy * wy) + 0.01;
+    irisTargX = (wx / dist) * (EYE_W * 0.38);
+    irisTargY = (wy / dist) * (EYE_H * 0.32);
+  }
+  function pulseOwner(owner) {
+    ownerNodes(owner).forEach(n => {
+      n.hMesh.material.opacity = 0.8;
+      setTimeout(() => { n.hMesh.material.opacity = 0.18; }, 520);
+    });
+  }
+  function representativeNode(owner) {
+    const ns = ownerNodes(owner);
+    if (!ns.length) return null;
+    // prefer the node whose id reads as the member's own doc, else most-connected
+    return ns.find(n => String(n.doc.id).toLowerCase().indexOf(String(owner).toLowerCase()) >= 0) || ns[0];
+  }
+
+  window.RaBbLERealm = {
+    onSelect: null, // assigned by RaBbLE-realm.js — fires on node selection
+    owners() { return realmOwners.slice(); },
+    focusOwner(owner) {
+      const c = ownerCentroid(owner);
+      if (!c) return false;
+      camX = c.x; camY = c.y; camZoom = Math.min(MAX_ZOOM, 2.2);
+      applyCam(); aimEyesAt(c.x, c.y); pulseOwner(owner);
+      return true;
+    },
+    traceOwner(owner) {
+      const n = representativeNode(owner);
+      if (!n) return null;
+      selectNode(n); onDoubleClick(n);
+      return n.doc;
+    },
+    narrateRandom(owner) {
+      const ns = owner ? ownerNodes(owner) : nodeList;
+      if (!ns.length) return null;
+      const n = ns[Math.floor(Math.random() * ns.length)];
+      selectNode(n); aimEyesAt(n.x, n.y);
+      return n.doc;
+    },
+    ownerScreenPos(owner) {
+      const c = ownerCentroid(owner);
+      if (!c) return null;
+      const s = worldToScreen(c.x, c.y);
+      return { x: s.sx, y: s.sy };
+    },
+    centerScreenPos() {
+      const s = worldToScreen(0, 0);
+      return { x: s.sx, y: s.sy };
+    },
+    resetView() { camX = 0; camY = 0; camZoom = 1; applyCam(); deselectNode(); },
+  };
+  document.dispatchEvent(new CustomEvent('rabble-realm-ready'));
 
 })();

@@ -13,14 +13,9 @@
   <link rel="icon" type="image/png" sizes="32x32" href="../icons/icon-32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="../icons/icon-16.png">
   <title>RaBbLE — Boundless Behavioral Learning Engine</title>
-  <!-- Auth gate: redirect to summon.html if no JWT in localStorage -->
-  <script>
-    (function () {
-      if (!localStorage.getItem('rabble_jwt')) {
-        window.location.replace('summon.html');
-      }
-    }());
-  </script>
+  <!-- The deep-conversation view. No hard auth gate: guests converse with the
+       curator (live guest LLM when available, scripted fallback otherwise).
+       Authed Pairs (JWT present) get the persistent session/real-LLM tier. -->
   <!-- Flip point: single source for sCoRE / Aether / NeBuLA base URLs. Must precede the loaders. -->
   <script src="js/RaBbLE-config.js"></script>
   <!-- Fonts owned by Aether — loader injects aether.css + failure banner -->
@@ -67,6 +62,8 @@
   <script src="js/RaBbLE-NeBuLA.js"></script>
   <script src="js/RaBbLE-pages.js"></script>
   <script src="js/RaBbLE-page-runtime.js"></script>
+  <script src="js/RaBbLE-curator-transmissions.js"></script>
+  <script src="js/RaBbLE-curator.js"></script>
   <script src="js/RaBbLE-chat.js"></script>
   <script src="js/RaBbLE-ios-install.js"></script>
 

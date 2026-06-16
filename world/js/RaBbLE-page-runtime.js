@@ -143,6 +143,47 @@
     return nav;
   }
 
+  // Wayfinding rail — the single guided journey (threshold → realm → summon →
+  // home), rendered from RaBbLE_JOURNEY (pages carrying an `act`). Marks the
+  // current act and offers a forward "descend deeper" affordance. The ◈
+  // navigator remains the escape hatch to auxiliary surfaces.
+  // Auto-mounted (see DOMContentLoaded) when <body> has a journey page-id.
+  function mountWayfinding(opts) {
+    var o = opts || {};
+    var journey = window.RaBbLE_JOURNEY || [];
+    if (!journey.length || document.querySelector('.wayfind')) return null;
+
+    var currentId = o.currentPageId || null;
+    var current = journey.filter(function (p) { return p.id === currentId; })[0];
+    if (!current) return null; // only render on journey pages
+
+    var next = journey.filter(function (p) { return p.act === current.act + 1; })[0];
+
+    var rail = document.createElement('nav');
+    rail.className = 'wayfind';
+    rail.setAttribute('aria-label', 'The realm');
+
+    var steps = journey.map(function (p) {
+      var state = p.act < current.act ? 'past'
+        : p.act === current.act ? 'current' : 'ahead';
+      var cls = 'wf-step wf-step--' + state;
+      var inner = '<span class="wf-act">' + p.act + '</span>' +
+        '<span class="wf-name">' + p.title + '</span>';
+      return state === 'current'
+        ? '<span class="' + cls + '" aria-current="step">' + inner + '</span>'
+        : '<a class="' + cls + '" href="' + p.url + '">' + inner + '</a>';
+    }).join('<span class="wf-sep">▸</span>');
+
+    rail.innerHTML =
+      '<div class="wf-rail">' + steps + '</div>' +
+      (next ? '<a class="wf-next" href="' + next.url + '">' +
+        '<span class="wf-next-label">' + (o.nextLabel || 'descend') + '</span>' +
+        '<span class="wf-next-arrow">↓</span></a>' : '');
+
+    document.body.appendChild(rail);
+    return rail;
+  }
+
   // Entity minis: NeBuLA bundle loads async — retry briefly, then fall
   // back to mountEntityMini's text fallback.
   function autoMountMinis(attempt) {
@@ -160,7 +201,14 @@
 
   document.addEventListener('DOMContentLoaded', function () {
     if (document.body.hasAttribute('data-page-id')) {
-      mountGlobalNav({ currentPageId: document.body.getAttribute('data-page-id') });
+      var pid = document.body.getAttribute('data-page-id');
+      mountGlobalNav({ currentPageId: pid });
+      // Wayfinding only renders on journey pages, and only when the page has
+      // not opted out via data-no-wayfinding (e.g. immersive full-canvas rooms
+      // that mount their own bespoke wayfinding).
+      if (!document.body.hasAttribute('data-no-wayfinding')) {
+        mountWayfinding({ currentPageId: pid });
+      }
     }
     autoMountMinis(0);
   });
@@ -173,5 +221,6 @@
     mountStatusbar,
     mountPageNav,
     mountGlobalNav,
+    mountWayfinding,
   };
 })();

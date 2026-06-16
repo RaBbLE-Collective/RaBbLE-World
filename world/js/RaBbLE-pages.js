@@ -3,24 +3,64 @@
 
   // Page registry — single source of truth for all World pages.
   // When adding a new page: add an entry here first.
-  // { id, title, url, description, tags: string[], status: 'live'|'reference' }
+  //
+  // { id, title, url, description, tags: string[], status: 'live'|'reference',
+  //   act?: number, role?: 'threshold'|'realm'|'ceremony'|'home' }
+  //
+  // THE GUIDED REALM (RC1) — design canon:
+  //   ../RaBbLE-Grimoire/RaBbLE-Collective/RaBbLE-RC1-Experience.md
+  // Pages carrying `act` form the single guided journey the visitor is walked
+  // through by the entity. Pages without `act` are auxiliary surfaces reachable
+  // via the ◈ navigator (the power-user escape hatch). Wayfinding chrome
+  // (RaBbLE-page-runtime.js → mountWayfinding) renders the journey from `act`.
+  //
+  //   act 1 · threshold → / (liminal)            arrival; entity greets
+  //   act 2 · realm     → grimoire graph         curated centerpiece
+  //   act 3 · ceremony  → summon                 the Pair forms
+  //   act 4 · home      → shell                  inhabited Pair home
   window.RaBbLE_PAGES = [
     {
-      id: 'landing',
-      title: 'joinrabble.world',
+      id: 'liminal',
+      title: 'The Threshold',
       url: '/',
-      description: 'Entity entry point — boot sequence, log, Collective nav',
+      description: 'Arrival — the entity greets at the edge of the realm; cross to descend',
       tags: ['entry', 'entity'],
       status: 'live',
+      act: 1,
+      role: 'threshold',
     },
     {
-      id: 'liminal',
-      title: 'The Liminal',
-      url: '/world/RaBbLE-Liminal.html',
-      description: 'Episode 2 landing — liminal corridor housing the entity, orbiting doors to the Collective',
-      tags: ['entry', 'entity', 'ep2'],
+      id: 'grimoire-graph',
+      title: 'The Realm',
+      url: '/world/RaBbLE-Grimoire-Graph.html',
+      description: 'The Collective made visible — Grimoire graph on a liminal floor, curated by the entity',
+      tags: ['grimoire', 'graph', 'entity', 'realm'],
       status: 'live',
+      act: 2,
+      role: 'realm',
     },
+    {
+      id: 'summon',
+      title: 'The Summoning',
+      url: '/world/summon.html',
+      description: 'Summoning ceremony — invite-token registration; the moment the Pair forms',
+      tags: ['auth', 'entry', 'ceremony'],
+      status: 'live',
+      act: 3,
+      role: 'ceremony',
+    },
+    {
+      id: 'landing',
+      title: 'Home',
+      url: '/world/RaBbLE-Shell.html',
+      description: 'The inhabited home — the realm seen from within, as a Pair',
+      tags: ['entity', 'home'],
+      status: 'live',
+      act: 4,
+      role: 'home',
+    },
+
+    // --- Auxiliary surfaces (reachable via ◈ navigator; not in the guided flow) ---
     {
       id: 'collective',
       title: 'RaBbLE-Collective',
@@ -30,11 +70,11 @@
       status: 'live',
     },
     {
-      id: 'summon',
-      title: 'Summon',
-      url: '/world/summon.html',
-      description: 'Summoning ceremony — invite-token registration and identity claim',
-      tags: ['auth', 'entry'],
+      id: 'chat',
+      title: 'Deep Conversation',
+      url: '/world/RaBbLE-Chat.html',
+      description: 'The entity deep-conversation view — full-screen presence (auth for live LLM tier)',
+      tags: ['chat', 'entity'],
       status: 'live',
     },
     {
@@ -43,14 +83,6 @@
       url: '/world/account.html',
       description: 'Account management — profile, backend, session history, pair info',
       tags: ['auth', 'account'],
-      status: 'live',
-    },
-    {
-      id: 'chat',
-      title: 'RaBbLE-Chat',
-      url: '/world/RaBbLE-Chat.html',
-      description: 'Main chat surface after login',
-      tags: ['chat'],
       status: 'live',
     },
     {
@@ -101,13 +133,10 @@
       tags: ['reference'],
       status: 'reference',
     },
-    {
-      id: 'grimoire-graph',
-      title: 'Grimoire Graph',
-      url: '/world/RaBbLE-Grimoire-Graph.html',
-      description: 'Cosmic knowledge graph — Grimoire docs as force-directed nebula',
-      tags: ['grimoire', 'graph', 'nebula'],
-      status: 'live',
-    },
   ];
+
+  // Helper: the guided journey, ordered by act. Used by wayfinding chrome.
+  window.RaBbLE_JOURNEY = window.RaBbLE_PAGES
+    .filter(function (p) { return typeof p.act === 'number'; })
+    .sort(function (a, b) { return a.act - b.act; });
 })();

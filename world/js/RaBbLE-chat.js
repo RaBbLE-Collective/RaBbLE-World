@@ -15,7 +15,9 @@ var CHAT_B_WORDS = ['Boundless', 'Becoming', 'Brilliant', 'Bold', 'Bespoke', 'Bo
     entity: null,
     isProcessing: false,
     nextId: 1,
-    sessionId: null
+    sessionId: null,
+    curator: null,   // shared curator engine (guest conversation + voice)
+    guest: true      // true until an authed session is established
   };
 
   var chatContainer, messageInput, sendBtn, entityHost;
@@ -250,6 +252,34 @@ var CHAT_B_WORDS = ['Boundless', 'Becoming', 'Brilliant', 'Bold', 'Bespoke', 'Bo
     scrollToBottom();
   }
 
+  /* ── Curator greeting + typewriter ────────────────────────────────────── */
+
+  // Typewriter reveal — the entity presenting, not a buffer filling.
+  function typeInto(msg, fullText, done) {
+    var i = 0;
+    var stride = Math.max(1, Math.round(fullText.length / 64));
+    msg.typing = false;
+    (function step() {
+      i = Math.min(fullText.length, i + stride);
+      msg.text = fullText.slice(0, i);
+      renderMessages();
+      if (i < fullText.length) { window.setTimeout(step, 18); }
+      else { msg.text = fullText; renderMessages(); if (done) done(); }
+    })();
+  }
+
+  // The entity speaks first — opening transmission, so the surface feels alive.
+  function greetOpening() {
+    if (!state.curator) { appendSystemMessage('RaBbLE · Boundless mode active'); return; }
+    if (state.entity && state.entity.setEntityState) state.entity.setEntityState('speaking');
+    var msg = { id: nextMsgId(), role: 'rabble', text: '' };
+    state.messages.push(msg);
+    renderMessages();
+    typeInto(msg, state.curator.greet('chat'), function () {
+      if (state.entity && state.entity.setEntityState) state.entity.setEntityState('idle');
+    });
+  }
+
   /* ── Send ─────────────────────────────────────────────────────────────── */
 
   function sendMessage() {
@@ -261,13 +291,36 @@ var CHAT_B_WORDS = ['Boundless', 'Becoming', 'Brilliant', 'Bold', 'Bespoke', 'Bo
     processMessage(text);
   }
 
+  function setEntity(s) {
+    if (state.entity && state.entity.setEntityState) state.entity.setEntityState(s);
+  }
+
   function processMessage(userText) {
     state.isProcessing = true;
-    if (state.entity) state.entity.setEntityState('thinking');
+    setEntity('thinking');
 
     var rabbleMsg = { id: nextMsgId(), role: 'rabble', text: '', typing: true };
     state.messages.push(rabbleMsg);
     renderMessages();
+
+    /* Guests converse through the curator — live guest LLM when reachable,
+       scripted entity voice when not. Never a dead surface, never auth. */
+    if (state.guest && state.curator) {
+      var acc = '';
+      state.curator.converse(userText, {
+        onState: setEntity,
+        onChunk: function (piece) { acc += piece; rabbleMsg.text = acc; rabbleMsg.typing = false; renderMessages(); }
+      }).then(function () {
+        rabbleMsg.typing = false; renderMessages();
+        state.isProcessing = false;
+      }).catch(function () {
+        rabbleMsg.text = acc || '[the channel wavers — say it again]';
+        rabbleMsg.typing = false; renderMessages();
+        setEntity('idle');
+        state.isProcessing = false;
+      });
+      return;
+    }
 
     var fullResponse = '';
     callSessionApi(userText, function (chunk) {
@@ -305,6 +358,11 @@ var CHAT_B_WORDS = ['Boundless', 'Becoming', 'Brilliant', 'Bold', 'Bespoke', 'Bo
     entityHost    = document.getElementById('entityHost');
     state.entity  = entityHost || null;
 
+    /* Curator engine — drives guest conversation + the entity's opening voice */
+    if (window.RaBbLECurator) {
+      state.curator = window.RaBbLECurator.create({ room: 'chat' });
+    }
+
     /* Populate account button with stored handle */
     var accountBtn = document.getElementById('chatAccountBtn');
     if (accountBtn) {
@@ -321,8 +379,15 @@ var CHAT_B_WORDS = ['Boundless', 'Becoming', 'Brilliant', 'Bold', 'Bespoke', 'Bo
       });
     }
 
-    /* Session init (async — messages render when ready) */
-    initSession();
+    /* Authed Pairs (JWT) resume their persistent session (real-LLM tier).
+       Guests skip the session entirely and converse through the curator —
+       the entity greets first so the surface feels alive, not transactional. */
+    if (getJwt()) {
+      state.guest = false;
+      initSession();
+    } else {
+      greetOpening();
+    }
 
     // Two frames: the first rAF fires before paint, so opacity:0 hasn't rendered yet.
     // The second guarantees the browser has committed the initial state before we fade in.
