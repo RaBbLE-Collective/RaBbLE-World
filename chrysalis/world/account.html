@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, interactive-widget=resizes-visual">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="manifest" href="../manifest.json">
+  <link rel="apple-touch-icon" href="../icons/icon-192.png">
+  <link rel="icon" type="image/x-icon" href="../icons/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="../icons/icon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../icons/icon-16.png">
+  <title>RaBbLE — Account</title>
+  <!-- Auth gate: redirect to summon.html if not logged in -->
+  <script>
+    (function () {
+      if (!localStorage.getItem('rabble_jwt')) {
+        window.location.replace('summon.html');
+      }
+    }());
+  </script>
+  <!-- Flip point: single source for sCoRE / Aether / NeBuLA base URLs. Must precede the loaders. -->
+  <script src="js/RaBbLE-config.js"></script>
+  <script src="js/RaBbLE-aether.js"></script>
+  <link rel="stylesheet" href="css/RaBbLE-theme.css">
+  <link rel="stylesheet" href="css/RaBbLE-chrome.css">
+  <link rel="stylesheet" href="css/RaBbLE-account.css">
+</head>
+<body class="account-entry" data-page-id="account">
+
+  <canvas id="bgCanvas"></canvas>
+  <div class="rabble-scanlines"></div>
+  <div class="rabble-vignette"></div>
+  <div class="rabble-chromatic"></div>
+
+  <div id="root">
+
+    <!-- Top bar -->
+    <div class="account-topbar">
+      <a href="RaBbLE-Chat.html" class="account-back">← chat</a>
+      <div class="account-wordmark">RaBbLE</div>
+      <div class="account-handle" id="topHandle">@—</div>
+    </div>
+
+    <!-- Scrollable content -->
+    <div class="account-content">
+
+      <!-- ── Identity ──────────────────────────────────────────────── -->
+      <section class="account-section" id="sectionIdentity">
+        <div class="section-header">
+          <span class="section-title">Identity</span>
+        </div>
+        <div class="section-body">
+          <div class="identity-meta" id="identityMeta">
+            <span class="meta-label">Handle</span>  <span class="meta-value" id="metaHandle">—</span>
+            <span class="meta-label">Joined</span>  <span class="meta-value" id="metaJoined">—</span>
+            <span class="meta-label">Tier</span>    <span class="meta-value" id="metaTier">—</span>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label" for="fieldDisplayName">Display name</label>
+            <input id="fieldDisplayName" class="field-input" type="text"
+              placeholder="Your display name" spellcheck="false">
+          </div>
+
+          <div class="field-group">
+            <label class="field-label" for="fieldIntention">Intention</label>
+            <textarea id="fieldIntention" class="field-textarea"
+              placeholder="What are you trying to build, learn, or become? (≤500 chars)"
+              maxlength="500" rows="4"></textarea>
+            <span class="char-counter" id="intentionCounter">0 / 500</span>
+          </div>
+
+          <div class="btn-row">
+            <button class="btn-primary" id="btnSaveIdentity">Save</button>
+            <span class="save-feedback" id="identitySavedMsg">Saved.</span>
+            <span class="save-error"   id="identityErrorMsg"></span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Backend ───────────────────────────────────────────────── -->
+      <section class="account-section" id="sectionBackend">
+        <div class="section-header">
+          <span class="section-title">LLM Backend</span>
+        </div>
+        <div class="section-body">
+          <div class="field-group">
+            <label class="field-label" for="fieldBackend">Backend</label>
+            <select id="fieldBackend" class="field-select">
+              <option value="hosted_openrouter">Collective (hosted · OpenRouter)</option>
+              <option value="hosted_groq">Collective (hosted · Groq)</option>
+              <option value="byo_openrouter">Bring your own · OpenRouter</option>
+            </select>
+          </div>
+
+          <div class="byo-panel" id="byoPanel">
+            <div class="field-group">
+              <label class="field-label" for="fieldByoKey">API key</label>
+              <input id="fieldByoKey" class="field-input" type="password"
+                placeholder="sk-or-…" autocomplete="off" spellcheck="false">
+              <span class="field-hint">Leave blank to keep the current key.</span>
+            </div>
+          </div>
+
+          <div class="btn-row">
+            <button class="btn-primary" id="btnSaveBackend">Save backend</button>
+            <span class="save-feedback" id="backendSavedMsg">Saved.</span>
+            <span class="save-error"   id="backendErrorMsg"></span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Session history ───────────────────────────────────────── -->
+      <section class="account-section" id="sectionSessions">
+        <div class="section-header">
+          <span class="section-title">Session History</span>
+        </div>
+        <div class="section-body">
+          <div class="session-list" id="sessionList">
+            <div class="session-empty">Loading sessions…</div>
+          </div>
+          <div class="btn-row" style="margin-top:1rem;">
+            <button class="btn-secondary" id="btnExport">Export JSON</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Pair info ─────────────────────────────────────────────── -->
+      <section class="account-section" id="sectionPair">
+        <div class="section-header">
+          <span class="section-title">Pair</span>
+        </div>
+        <div class="section-body">
+          <div class="pair-info" id="pairInfo">
+            <div class="pair-row">
+              <span class="pair-key">Entity ID</span>
+              <span class="pair-val" id="pairEntityId">—</span>
+            </div>
+            <div class="pair-row">
+              <span class="pair-key">Sessions</span>
+              <span class="pair-val" id="pairSessionCount">—</span>
+            </div>
+            <div class="pair-row">
+              <span class="pair-key">Active session</span>
+              <span class="pair-val" id="pairActiveSession">—</span>
+            </div>
+          </div>
+          <div class="btn-row" style="margin-top:1.2rem;">
+            <button class="btn-secondary" id="btnSignOut">Sign out</button>
+          </div>
+        </div>
+      </section>
+
+    </div><!-- .account-content -->
+  </div><!-- #root -->
+
+  <script src="js/RaBbLE-bg.js"></script>
+  <script src="js/RaBbLE-NeBuLA.js"></script>
+  <script src="js/RaBbLE-pages.js"></script>
+  <script src="js/RaBbLE-page-runtime.js"></script>
+  <script src="js/RaBbLE-account.js"></script>
+
+</body>
+</html>

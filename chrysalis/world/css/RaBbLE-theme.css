@@ -1,0 +1,47 @@
+/**
+ * rabble-theme.css — Aether alias bridge
+ *
+ * This file is World's interface to the Aether design system.
+ * Load AFTER aether/rabble.css, BEFORE any page-specific CSS.
+ *
+ * What this file does:
+ *   - Provides short-name CSS variable aliases for --rabble-* Aether tokens
+ *   - Hex fallbacks so it degrades gracefully if Aether is unavailable
+ *
+ * What this file does NOT do:
+ *   - Define colors, typography, or animations (those live in Aether)
+ *   - Style UI components (those live in Aether's component library)
+ *
+ * World page CSS is structural and behavioral only.
+ * Aether gives it form, look, and feel.
+ */
+
+:root {
+  /* ── Neon identity ──────────────────────────────────────────────── */
+  --magenta:    var(--rabble-magenta,  #ff2d78);
+  --cyan:       var(--rabble-cyan,     #00f5ff);
+  --violet:     var(--rabble-violet,   #bf5fff);
+  --pink:       var(--rabble-pink,     #ff79c6);
+  --green:      var(--rabble-green,    #50fa7b);
+  --yellow:     var(--rabble-yellow,   #f1fa8c);
+  --red:        var(--rabble-red,      #e05c6f);
+
+  /* ── Void / backgrounds ─────────────────────────────────────────── */
+  --bg:         var(--rabble-void,     #03000b);   /* deepest void — boot screens */
+  --bg-surface: var(--rabble-bg,       #0a0010);   /* standard page background */
+  --surface:    var(--rabble-surface,  #12132a);
+  --raised:     var(--rabble-raised,   #1a1b2e);
+  --border:     var(--rabble-border,   #2a2840);
+
+  /* ── Text ───────────────────────────────────────────────────────── */
+  --text:       var(--rabble-text,     #e8e6f0);
+  --text-dim:   var(--rabble-muted,    #6b6880);
+  --text-dimmer: var(--rabble-dimmer,  #3d3860);
+
+  /* ── Typography ─────────────────────────────────────────────────── */
+  --font-mono:    var(--rabble-font-mono, 'Share Tech Mono', 'Space Mono', monospace);
+  --font-ui:      var(--rabble-font-ui,   'Exo 2', 'Rajdhani', sans-serif);
+  --font-hero:    var(--rabble-font-hero, 'Orbitron', 'Exo 2', sans-serif);
+  --font-display: var(--rabble-font-ui,   'Exo 2', 'Rajdhani', sans-serif);
+  --font-body:    var(--rabble-font-ui,   'Exo 2', 'Rajdhani', sans-serif);
+}

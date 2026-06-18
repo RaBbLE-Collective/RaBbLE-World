@@ -1,0 +1,266 @@
+/*
+ * RaBbLE-unified.css — RC1 living surface: design tokens + base layout
+ * Aether tokens only — never raw hex. Source: RaBbLE-theme.css + VSCode Aether theme.
+ * Tinted-glass recipe: color-mix(in srgb, <surface> 80%, transparent) + blur(5–6px)
+ */
+
+/* ── Semantic role aliases (VSCode Aether structure → RC1 surface roles) ─── */
+:root {
+  /* Surfaces */
+  --rc-void:        var(--rabble-void,        #0a0010);
+  --rc-surface:     var(--rabble-surface,     #12132a);
+  --rc-raised:      var(--rabble-raised,      #1a1b2e);
+  --rc-border:      var(--rabble-border,      #2a2840);
+
+  /* Typography */
+  --rc-text:        var(--rabble-text,        #e8e6f0);
+  --rc-muted:       var(--rabble-muted,       #6b6880);
+
+  /* Accents (VSCode Aether role mapping) */
+  --rc-accent-m:    var(--rabble-magenta,     #ff2d78);  /* focus / active / CTA */
+  --rc-accent-c:    var(--rabble-cyan,        #00f5ff);  /* section headers / info */
+  --rc-accent-v:    var(--rabble-violet,      #bf5fff);  /* types / secondary accent */
+  --rc-accent-p:    var(--rabble-pink,        #ff79c6);  /* strings / warm highlight */
+  --rc-accent-g:    var(--rabble-green,       #50fa7b);  /* success / online */
+  --rc-accent-y:    var(--rabble-yellow,      #f1fa8c);  /* warning / caution */
+  --rc-accent-r:    var(--rabble-red,         #e05c6f);  /* error / danger */
+
+  /* Glass recipe */
+  --rc-glass-80:    color-mix(in srgb, var(--rc-raised) 80%, transparent);
+  --rc-glass-78:    color-mix(in srgb, var(--rc-surface) 78%, transparent);
+  --rc-blur:        blur(5px);
+  --rc-blur-light:  blur(3px);
+
+  /* Typography scale */
+  --rc-font-mono:   var(--rabble-font-mono,   'JetBrains Mono', 'Fira Code', monospace);
+  --rc-font-ui:     var(--rabble-font-ui,     'Inter', system-ui, sans-serif);
+  --rc-size-xs:     11px;
+  --rc-size-sm:     13px;
+  --rc-size-md:     15px;
+  --rc-size-lg:     18px;
+  --rc-size-xl:     24px;
+  --rc-size-2xl:    32px;
+
+  /* Spacing */
+  --rc-gap-xs:      4px;
+  --rc-gap-sm:      8px;
+  --rc-gap-md:      16px;
+  --rc-gap-lg:      24px;
+  --rc-gap-xl:      40px;
+
+  /* Transitions */
+  --rc-ease:        cubic-bezier(0.16, 1, 0.3, 1);
+  --rc-dur-fast:    150ms;
+  --rc-dur-mid:     300ms;
+  --rc-dur-slow:    500ms;
+
+  /* Z-layers */
+  --rc-z-floor:     0;
+  --rc-z-panels:    10;
+  --rc-z-entity:    20;
+  --rc-z-dock:      30;
+  --rc-z-rail:      40;
+  --rc-z-overlay:   50;
+}
+
+/* ── Reset + base ─────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--rc-void);
+  color: var(--rc-text);
+  font-family: var(--rc-font-ui);
+  font-size: var(--rc-size-md);
+  line-height: 1.5;
+  overflow: hidden; /* stage controls scroll */
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Stage layout ─────────────────────────────────────────────────────────── */
+#stage {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  /* entity stage left | panel/centerpiece host right */
+  grid-template-columns: 340px 1fr;
+  grid-template-rows: 1fr auto;
+  grid-template-areas:
+    "entity  main"
+    "dock    dock";
+}
+
+@media (max-width: 768px) {
+  #stage {
+    grid-template-columns: 1fr;
+    grid-template-rows: 220px 1fr auto;
+    grid-template-areas:
+      "entity"
+      "main"
+      "dock";
+  }
+}
+
+/* ── Entity stage (persistent left column) ────────────────────────────────── */
+#entity-stage {
+  grid-area: entity;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: var(--rc-z-entity);
+  border-right: 1px solid var(--rc-border);
+}
+
+#entity-stage rabble-entity {
+  width: 220px;
+  height: 220px;
+}
+
+@media (max-width: 768px) {
+  #entity-stage { border-right: none; border-bottom: 1px solid var(--rc-border); }
+  #entity-stage rabble-entity { width: 140px; height: 140px; }
+}
+
+/* ── Panel + centerpiece hosts ────────────────────────────────────────────── */
+#panel-host {
+  grid-area: main;
+  position: relative;
+  overflow-y: auto;
+  padding: var(--rc-gap-lg);
+  z-index: var(--rc-z-panels);
+}
+
+#centerpiece-host {
+  position: absolute;
+  inset: 0;
+  z-index: var(--rc-z-floor);
+  pointer-events: none; /* floor handles its own events */
+}
+
+#centerpiece-host.active {
+  pointer-events: auto;
+}
+
+/* ── Progress rail ────────────────────────────────────────────────────────── */
+#progress-rail {
+  position: fixed;
+  top: 0;
+  left: 340px;
+  right: 0;
+  height: 2px;
+  background: var(--rc-border);
+  z-index: var(--rc-z-rail);
+  overflow: hidden;
+}
+
+#progress-rail .rail-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--rc-accent-m), var(--rc-accent-c));
+  transition: width var(--rc-dur-slow) var(--rc-ease);
+  width: 0%;
+}
+
+@media (max-width: 768px) {
+  #progress-rail { left: 0; top: 220px; }
+}
+
+/* ── Dock host ────────────────────────────────────────────────────────────── */
+#dock-host {
+  grid-area: dock;
+  z-index: var(--rc-z-dock);
+  border-top: 1px solid var(--rc-border);
+  background: var(--rc-glass-80);
+  backdrop-filter: var(--rc-blur);
+  -webkit-backdrop-filter: var(--rc-blur);
+}
+
+/* ── Tinted-glass panel mixin (apply to .rc-panel) ───────────────────────── */
+.rc-panel {
+  background: var(--rc-glass-78);
+  backdrop-filter: var(--rc-blur);
+  -webkit-backdrop-filter: var(--rc-blur);
+  border: 1px solid var(--rc-border);
+  border-radius: 6px;
+  padding: var(--rc-gap-md);
+}
+
+/* ── Section header (cyan, VSCode Aether role) ────────────────────────────── */
+.rc-section-header {
+  font-family: var(--rc-font-mono);
+  font-size: var(--rc-size-sm);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--rc-accent-c);
+  margin: 0 0 var(--rc-gap-sm);
+  padding-bottom: var(--rc-gap-xs);
+  border-bottom: 1px solid var(--rc-border);
+}
+
+/* ── Button primitives ────────────────────────────────────────────────────── */
+.rc-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rc-gap-xs);
+  padding: 6px 14px;
+  border-radius: 4px;
+  border: 1px solid var(--rc-accent-m);
+  background: color-mix(in srgb, var(--rc-accent-m) 12%, transparent);
+  color: var(--rc-accent-m);
+  font-family: var(--rc-font-mono);
+  font-size: var(--rc-size-sm);
+  cursor: pointer;
+  transition: background var(--rc-dur-fast) var(--rc-ease),
+              border-color var(--rc-dur-fast) var(--rc-ease);
+}
+
+.rc-btn:hover {
+  background: color-mix(in srgb, var(--rc-accent-m) 22%, transparent);
+}
+
+.rc-btn.secondary {
+  border-color: var(--rc-border);
+  background: transparent;
+  color: var(--rc-muted);
+}
+
+.rc-btn.secondary:hover {
+  border-color: var(--rc-accent-v);
+  color: var(--rc-text);
+}
+
+/* ── Movement transition ──────────────────────────────────────────────────── */
+.movement-enter {
+  animation: movementFadeIn var(--rc-dur-mid) var(--rc-ease) both;
+}
+
+.movement-exit {
+  animation: movementFadeOut var(--rc-dur-fast) var(--rc-ease) both;
+}
+
+@keyframes movementFadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes movementFadeOut {
+  from { opacity: 1; transform: translateY(0); }
+  to   { opacity: 0; transform: translateY(-4px); }
+}
+
+/* ── Scrollbar theming ────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--rc-border);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--rc-muted); }
+
+/* ── Boot state — hide stage until ready ─────────────────────────────────── */
+body.booting #stage { opacity: 0; }
+body.ready   #stage { opacity: 1; transition: opacity var(--rc-dur-slow) var(--rc-ease); }
