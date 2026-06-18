@@ -141,7 +141,8 @@
     },
   };
 
-  // ── Wire curator once it's available ──────────────────────────────────────
+  // ── Wire curator (sync grab if already loaded, event for dynamic cases) ──
+  if (window.RaBbLECurator) ctx.curator = window.RaBbLECurator;
   document.addEventListener('rabble-curator-ready', () => {
     ctx.curator = window.RaBbLECurator;
   });

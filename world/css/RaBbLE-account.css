@@ -9,6 +9,19 @@
   100% { background-position: 0% 50%; }
 }
 
+/* ── Back-nav link (shared with summon pattern) ───────────────────────── */
+.summon-backnav {
+  display: inline-block;
+  margin: var(--rc-gap-md);
+  font-family: var(--rc-font-mono, monospace);
+  font-size: var(--rc-size-xs, 11px);
+  color: var(--rc-muted);
+  text-decoration: none;
+  opacity: 0.7;
+  transition: color 150ms ease, opacity 150ms ease;
+}
+.summon-backnav:hover { color: var(--rc-accent-c); opacity: 1; }
+
 /* ── Page base ────────────────────────────────────────────────────────── */
 html, body {
   min-height: 100%;

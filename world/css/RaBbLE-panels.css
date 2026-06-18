@@ -1,0 +1,258 @@
+/*
+ * RaBbLE-panels.css — RC1 Aether UI component styles
+ *
+ * Styles for window.RaBbLEUI factory components.
+ * All colours via --rc-* tokens from RaBbLE-unified.css — never raw hex.
+ * Load after RaBbLE-unified.css (which defines the token set and base .rc-panel,
+ * .rc-section-header, .rc-btn primitives that this file extends).
+ *
+ * Components styled here:
+ *   .rc-panel            — tinted-glass container (extended; unified.css is base)
+ *   .rc-section-header   — cyan header (extended; unified.css is base)
+ *   .rc-member-card      — collective member identity card
+ *   .rc-btn              — CTA button (extended; unified.css is base)
+ *   .rc-badge            — inline accent pill
+ *   .rc-stat-row         — label : value data pair
+ *
+ * Mobile breakpoint: 600px
+ */
+
+/* ── Panel — extend the unified.css base ─────────────────────────────────── */
+/*
+ * unified.css already defines .rc-panel with the glass recipe.
+ * Here we add spacing, stacking, and panel-to-panel rhythm.
+ */
+.rc-panel {
+  /* Ensure internal layout is a column flex for stacked content */
+  display: flex;
+  flex-direction: column;
+  gap: var(--rc-gap-sm);
+}
+
+/*
+ * When panels are siblings inside #panel-host they need vertical breathing room.
+ * A movement can override margin by wrapping panels in its own layout container.
+ */
+.rc-panel + .rc-panel {
+  margin-top: var(--rc-gap-md);
+}
+
+/* ── Section header — extend the unified.css base ────────────────────────── */
+/*
+ * unified.css defines the colour, font, and border-bottom.
+ * We ensure the header spans full panel width and has no top margin when it is
+ * the first child (i.e. when produced by panel({ title }) which prepends it).
+ */
+.rc-panel > .rc-section-header:first-child {
+  margin-top: 0;
+}
+
+/* Stand-alone section headers outside a panel retain their bottom margin */
+.rc-section-header {
+  /* Inherited from unified.css; no additions needed at this level */
+}
+
+/* ── Member card ─────────────────────────────────────────────────────────── */
+/*
+ * Visual design:
+ *   - Glass panel surface (same recipe as .rc-panel)
+ *   - 3px left accent stripe driven by --card-accent (set via JS inline style)
+ *   - Name: primary text colour
+ *   - Role: cyan monospace, small — echoes section header role
+ *   - Tagline: muted prose
+ *
+ * The accent stripe is a separate child element (.rc-member-card__accent)
+ * so it can be a full-height block without padding interference.
+ */
+.rc-member-card {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  background: var(--rc-glass-78);
+  backdrop-filter: var(--rc-blur);
+  -webkit-backdrop-filter: var(--rc-blur);
+  border: 1px solid var(--rc-border);
+  border-radius: 6px;
+  overflow: hidden; /* clip the stripe's border-radius corners */
+  transition: border-color var(--rc-dur-fast) var(--rc-ease);
+}
+
+.rc-member-card:hover {
+  border-color: var(--card-accent, var(--rc-accent-v));
+}
+
+/* Coloured left stripe */
+.rc-member-card__accent {
+  width: 3px;
+  flex-shrink: 0;
+  background: var(--card-accent, var(--rc-accent-v));
+}
+
+/* Body container — name, role, tagline */
+.rc-member-card__body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--rc-gap-xs);
+  padding: var(--rc-gap-sm) var(--rc-gap-md);
+}
+
+.rc-member-card__name {
+  font-family: var(--rc-font-ui);
+  font-size: var(--rc-size-md);
+  font-weight: 600;
+  color: var(--rc-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rc-member-card__role {
+  font-family: var(--rc-font-mono);
+  font-size: var(--rc-size-xs);
+  font-weight: 500;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--rc-accent-c);
+}
+
+.rc-member-card__tagline {
+  margin: 0;
+  font-family: var(--rc-font-ui);
+  font-size: var(--rc-size-sm);
+  line-height: 1.5;
+  color: var(--rc-muted);
+}
+
+/* ── Button — extend the unified.css base ────────────────────────────────── */
+/*
+ * unified.css fully defines .rc-btn primary and .rc-btn.secondary.
+ * Extensions here: icon slot spacing, active state, focus ring.
+ */
+.rc-btn:active {
+  transform: translateY(1px);
+}
+
+.rc-btn:focus-visible {
+  outline: 2px solid var(--rc-accent-m);
+  outline-offset: 2px;
+}
+
+.rc-btn.secondary:focus-visible {
+  outline-color: var(--rc-accent-v);
+}
+
+/* Icon element — uniform spacing already handled by gap in unified.css flex row */
+.rc-btn__icon {
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+/* Label — allow truncation on very small containers */
+.rc-btn__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Badge ────────────────────────────────────────────────────────────────── */
+/*
+ * Small inline pill. Accent driven by --badge-accent (set via JS inline style).
+ * Default: violet (--rc-accent-v) — set in JS factory fallback.
+ *
+ * The pill uses the accent for both border colour and a low-opacity background
+ * tint (color-mix), matching the Aether glass tint recipe used elsewhere.
+ */
+.rc-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 7px;
+  border-radius: 999px;
+  border: 1px solid var(--badge-accent, var(--rc-accent-v));
+  background: color-mix(in srgb, var(--badge-accent, var(--rc-accent-v)) 12%, transparent);
+  color: var(--badge-accent, var(--rc-accent-v));
+  font-family: var(--rc-font-mono);
+  font-size: var(--rc-size-xs);
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  line-height: 1.6;
+}
+
+/* ── Stat row ─────────────────────────────────────────────────────────────── */
+/*
+ * A horizontal label : value pair used for data display (status, counts, etc.).
+ * Label: muted, left-aligned.
+ * Value: primary text, right-aligned, monospace for numeric alignment.
+ * Separated by flex space-between.
+ */
+.rc-stat-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--rc-gap-md);
+  padding: var(--rc-gap-xs) 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--rc-border) 60%, transparent);
+}
+
+.rc-stat-row:last-child {
+  border-bottom: none;
+}
+
+.rc-stat-row__label {
+  font-family: var(--rc-font-mono);
+  font-size: var(--rc-size-xs);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--rc-muted);
+  flex-shrink: 0;
+}
+
+.rc-stat-row__value {
+  font-family: var(--rc-font-mono);
+  font-size: var(--rc-size-sm);
+  color: var(--rc-text);
+  text-align: right;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Mobile adaptations ───────────────────────────────────────────────────── */
+@media (max-width: 600px) {
+  /* Panels: tighter padding on small screens */
+  .rc-panel {
+    padding: var(--rc-gap-sm);
+  }
+
+  .rc-panel + .rc-panel {
+    margin-top: var(--rc-gap-sm);
+  }
+
+  /* Member cards: stack full-width, stripe still on left */
+  .rc-member-card {
+    width: 100%;
+  }
+
+  .rc-member-card__body {
+    padding: var(--rc-gap-sm);
+  }
+
+  .rc-member-card__name {
+    font-size: var(--rc-size-sm);
+  }
+
+  /* Stat rows: allow value to wrap on very narrow viewports */
+  .rc-stat-row {
+    flex-wrap: wrap;
+    gap: var(--rc-gap-xs);
+  }
+
+  .rc-stat-row__value {
+    text-align: left;
+  }
+
+  /* Badges: already compact, no change needed */
+}

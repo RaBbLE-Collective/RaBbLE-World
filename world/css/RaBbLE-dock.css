@@ -1,0 +1,330 @@
+/*
+ * RaBbLE-dock.css — persistent curator dock + expand-to-converse surface.
+ *
+ * Mounted into #dock-host (grid-area: dock, z-index: var(--rc-z-dock)).
+ * Colors via --rc-* tokens exclusively — no raw hex.
+ * Companion to world/js/RaBbLE-dock.js (self-injected on mount).
+ *
+ * Bar mode:   min/max-height 48px  · slim tinted-glass strip
+ * Expand mode: max-height 50vh     · full conversation pane slides up
+ */
+
+/* ── Host sizing (bar ↔ expand toggle) ──────────────────────────────────── */
+#dock-host {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: 48px;
+  max-height: 48px;
+  overflow: hidden;
+  transition: max-height var(--rc-dur-mid) var(--rc-ease);
+  /* Glass base already set by RaBbLE-unified.css #dock-host rule;
+     add the border-top here as a belt-and-suspenders in case it's overridden. */
+  background: var(--rc-glass-80);
+  backdrop-filter: var(--rc-blur);
+  -webkit-backdrop-filter: var(--rc-blur);
+  border-top: 1px solid var(--rc-border);
+}
+
+#dock-host.rd2-expanded {
+  max-height: 50vh;
+}
+
+/* ── Bar row ─────────────────────────────────────────────────────────────── */
+.rd2-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--rc-gap-sm);
+  min-height: 48px;
+  padding: 0 var(--rc-gap-md);
+  flex-shrink: 0;
+}
+
+/* ── Sigil ◈ — state indicator ───────────────────────────────────────────── */
+.rd2-sigil {
+  font-family: var(--rc-font-mono);
+  font-size: var(--rc-size-sm);
+  color: var(--rc-accent-c);
+  flex-shrink: 0;
+  line-height: 1;
+  transition: color var(--rc-dur-fast) var(--rc-ease),
+              text-shadow var(--rc-dur-fast) var(--rc-ease);
+}
+
+.rd2-sigil--thinking {
+  color: var(--rc-accent-v);
+  animation: rd2-sigil-pulse 800ms var(--rc-ease) infinite alternate;
+}
+
+.rd2-sigil--speaking {
+  color: var(--rc-accent-m);
+  animation: rd2-sigil-pulse 400ms var(--rc-ease) infinite alternate;
+}
+
+@keyframes rd2-sigil-pulse {
+  from { opacity: 0.5; text-shadow: none; }
+  to   { opacity: 1;   text-shadow: 0 0 8px currentColor; }
+}
+
+/* ── Transmission text (bar) ─────────────────────────────────────────────── */
+.rd2-transmission {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--rc-font-mono);
+  font-size: var(--rc-size-xs);
+  color: var(--rc-text);
+  line-height: 1.4;
+
+  /* Truncate in bar mode — title attr carries the full text for hover */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── ◈ converse affordance button ────────────────────────────────────────── */
+.rd2-converse-btn {
+  flex-shrink: 0;
+  font-family: var(--rc-font-mono);
+  font-size: var(--rc-size-xs);
+  color: var(--rc-accent-c);
+  background: none;
+  border: 1px solid color-mix(in srgb, var(--rc-accent-c) 35%, transparent);
+  border-radius: 4px;
+  padding: 3px 9px;
+  cursor: pointer;
+  letter-spacing: 0.06em;
+  transition: background var(--rc-dur-fast) var(--rc-ease),
+              border-color var(--rc-dur-fast) var(--rc-ease);
+}
+
+.rd2-converse-btn:hover {
+  background: color-mix(in srgb, var(--rc-accent-c) 12%, transparent);
+  border-color: var(--rc-accent-c);
+}
+
+/* ── Expand pane ─────────────────────────────────────────────────────────── */
+.rd2-pane {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+
+  /* Pane slides in from bottom — invisible until expanded */
+  opacity: 0;
+  transform: translateY(8px);
+  pointer-events: none;
+  transition: opacity var(--rc-dur-mid) var(--rc-ease),
+              transform var(--rc-dur-mid) var(--rc-ease);
+  border-top: 1px solid var(--rc-border);
+}
+
+#dock-host.rd2-expanded .rd2-pane {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* ── Pane header ─────────────────────────────────────────────────────────── */
+.rd2-pane-header {
+  display: flex;
+  align-items: center;
+  gap: var(--rc-gap-sm);
+  padding: var(--rc-gap-xs) var(--rc-gap-md);
+  border-bottom: 1px solid var(--rc-border);
+  flex-shrink: 0;
+  min-height: 32px;
+}
+
+.rd2-pane-title {
+  flex: 1;
+  font-family: var(--rc-font-mono);
+  font-size: var(--rc-size-xs);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--rc-muted);
+}
+
+/* Live / scripted badge ─────────────────────────────────────────────────── */
+.rd2-live-badge {
+  font-family: var(--rc-font-mono);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--rc-accent-v);
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  padding: 1px 7px;
+  line-height: 1.4;
+  transition: color var(--rc-dur-fast) var(--rc-ease),
+              border-color var(--rc-dur-fast) var(--rc-ease);
+}
+
+.rd2-live-badge--live {
+  color: var(--rc-accent-g);
+}
+
+/* Collapse × button ─────────────────────────────────────────────────────── */
+.rd2-collapse-btn {
+  background: none;
+  border: none;
+  color: var(--rc-muted);
+  font-size: var(--rc-size-md);
+  line-height: 1;
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 3px;
+  transition: color var(--rc-dur-fast) var(--rc-ease);
+}
+
+.rd2-collapse-btn:hover {
+  color: var(--rc-text);
+}
+
+/* ── Transmission history (scrollable) ───────────────────────────────────── */
+.rd2-history {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--rc-gap-sm) var(--rc-gap-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--rc-gap-sm);
+  scroll-behavior: smooth;
+}
+
+/* Transmission lines ────────────────────────────────────────────────────── */
+.rd2-line {
+  font-family: var(--rc-font-mono);
+  font-size: var(--rc-size-xs);
+  line-height: 1.55;
+  color: var(--rc-text);
+  word-wrap: break-word;
+  white-space: pre-wrap;
+}
+
+/* Entity voice — left-aligned with RaBbLE label */
+.rd2-line--entity .rd2-who {
+  color: var(--rc-accent-m);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-right: 2px;
+}
+
+/* System voice — muted, italic */
+.rd2-line--system {
+  color: var(--rc-muted);
+  font-style: italic;
+}
+
+.rd2-line--system .rd2-who {
+  color: var(--rc-muted);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* User voice — right-aligned bubble in cyan */
+.rd2-line--user {
+  align-self: flex-end;
+  max-width: 88%;
+  color: var(--rc-accent-c);
+  border: 1px solid color-mix(in srgb, var(--rc-accent-c) 35%, transparent);
+  border-radius: 8px 8px 2px 8px;
+  padding: 5px 9px;
+  background: color-mix(in srgb, var(--rc-accent-c) 6%, transparent);
+}
+
+/* ── Input bar ───────────────────────────────────────────────────────────── */
+.rd2-input-row {
+  display: flex;
+  gap: var(--rc-gap-sm);
+  padding: var(--rc-gap-sm) var(--rc-gap-md);
+  border-top: 1px solid var(--rc-border);
+  flex-shrink: 0;
+  background: var(--rc-raised);
+}
+
+.rd2-input {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--rc-font-mono);
+  font-size: var(--rc-size-xs);
+  color: var(--rc-text);
+  background: color-mix(in srgb, var(--rc-void) 55%, transparent);
+  border: 1px solid var(--rc-border);
+  border-radius: 4px;
+  padding: 6px 10px;
+  outline: none;
+  transition: border-color var(--rc-dur-fast) var(--rc-ease),
+              box-shadow var(--rc-dur-fast) var(--rc-ease);
+}
+
+.rd2-input::placeholder {
+  color: var(--rc-muted);
+  opacity: 0.7;
+}
+
+.rd2-input:focus {
+  border-color: var(--rc-accent-m);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--rc-accent-m) 18%, transparent);
+}
+
+.rd2-send-btn {
+  background: none;
+  border: 1px solid var(--rc-accent-c);
+  color: var(--rc-accent-c);
+  border-radius: 4px;
+  width: 34px;
+  flex-shrink: 0;
+  cursor: pointer;
+  font-size: var(--rc-size-md);
+  line-height: 1;
+  transition: background var(--rc-dur-fast) var(--rc-ease),
+              color var(--rc-dur-fast) var(--rc-ease);
+}
+
+.rd2-send-btn:hover {
+  background: var(--rc-accent-c);
+  color: var(--rc-void);
+}
+
+.rd2-send-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ── Mobile overrides ────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .rd2-bar {
+    min-height: 40px;
+    padding: 0 var(--rc-gap-sm);
+  }
+
+  #dock-host {
+    min-height: 40px;
+    max-height: 40px;
+  }
+
+  #dock-host.rd2-expanded {
+    max-height: 60vh;
+  }
+
+  .rd2-converse-btn {
+    /* Shorten label on small screens */
+    font-size: 9px;
+    padding: 2px 6px;
+  }
+}
+
+/* ── Scrollbar theming (pane history) ────────────────────────────────────── */
+.rd2-history::-webkit-scrollbar        { width: 4px; }
+.rd2-history::-webkit-scrollbar-track  { background: transparent; }
+.rd2-history::-webkit-scrollbar-thumb  {
+  background: var(--rc-border);
+  border-radius: 2px;
+}
+.rd2-history::-webkit-scrollbar-thumb:hover { background: var(--rc-muted); }
