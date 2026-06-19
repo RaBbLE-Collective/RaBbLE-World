@@ -50,4 +50,8 @@
   set('RABBLE_GUEST_CHAT',      true, true);            // attempt live guest conversation
   set('RABBLE_GUEST_CHAT_PATH', '/api/v1/chat', '/api/v1/chat'); // anonymous chat endpoint
   set('RABBLE_GUEST_CHAT_TIER', 'fast', 'fast');        // model tier for guest dialogue
+
+  // Render free tier sleeps after inactivity — kick /health immediately so the
+  // backend is warming up during the NeBuLA boot animation, not during first chat.
+  if (!isLocal) fetch(window.RABBLE_API_URL + '/health').catch(function () {});
 }());
