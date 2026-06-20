@@ -96,7 +96,8 @@ html, body {
 @media (max-width: 768px) {
   #stage {
     grid-template-columns: 1fr;
-    grid-template-rows: 220px 1fr auto;
+    /* safe-area-inset-top accounts for iOS notch/dynamic island */
+    grid-template-rows: calc(220px + env(safe-area-inset-top, 0px)) 1fr auto;
     grid-template-areas:
       "entity"
       "main"
@@ -121,7 +122,11 @@ html, body {
 }
 
 @media (max-width: 768px) {
-  #entity-stage { border-right: none; border-bottom: 1px solid var(--rc-border); }
+  #entity-stage {
+    border-right: none;
+    border-bottom: 1px solid var(--rc-border);
+    padding-top: env(safe-area-inset-top, 0px);
+  }
   #entity-stage rabble-entity { width: 140px; height: 140px; }
 }
 
@@ -176,6 +181,8 @@ html, body {
   background: var(--rc-glass-80);
   backdrop-filter: var(--rc-blur);
   -webkit-backdrop-filter: var(--rc-blur);
+  /* iOS home-indicator clearance */
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 /* ── Tinted-glass panel mixin (apply to .rc-panel) ───────────────────────── */
@@ -250,6 +257,18 @@ html, body {
 @keyframes movementFadeOut {
   from { opacity: 1; transform: translateY(0); }
   to   { opacity: 0; transform: translateY(-4px); }
+}
+
+/* Member detail pane pop-in */
+@keyframes memberDetailIn {
+  from { opacity: 0; transform: translateX(12px) scale(0.98); }
+  to   { opacity: 1; transform: translateX(0) scale(1); }
+}
+
+/* Staggered narration line reveal */
+@keyframes memberLineIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 /* ── Scrollbar theming ────────────────────────────────────────────────────── */

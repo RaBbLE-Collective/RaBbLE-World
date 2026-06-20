@@ -224,146 +224,170 @@
     // Activate the centerpiece floor
     ctx.centerpieceHost.classList.add('active');
 
-    // Mount the floor if available
     if (ctx.floor) {
-      try {
-        ctx.floor.mount(ctx.centerpieceHost);
-      } catch (e) {
-        console.warn('[collective] floor.mount error:', e);
-      }
-      // Wire node-select → entity narration
+      try { ctx.floor.mount(ctx.centerpieceHost); } catch (e) { /* ignore */ }
       try {
         ctx.floor.onSelect(function (key) {
-          if (!key) return;
-          var lines = narrations[key];
-          if (lines && lines.length) {
-            var line = lines[Math.floor(Math.random() * lines.length)];
-            ctx.say(line, 'rabble');
-            entityState(ctx, 'speaking');
-            setTimeout(function () { entityState(ctx, 'idle'); }, 1500);
-          } else {
-            // fall back to curator narrate if available
-            var text = '';
-            if (ctx.curator && typeof ctx.curator.narrate === 'function') {
-              text = ctx.curator.narrate(key);
-            }
-            if (text) {
-              ctx.say(text, 'rabble');
-              entityState(ctx, 'speaking');
-              setTimeout(function () { entityState(ctx, 'idle'); }, 1500);
-            }
-          }
+          if (key) selectMember(key);
         });
-      } catch (e) {
-        console.warn('[collective] floor.onSelect error:', e);
-      }
+      } catch (e) { /* ignore */ }
     }
 
-    // Emit intro into dock
     ctx.say(intro, 'rabble');
 
-    // Build the panel — slim instruction + member list
+    // ── Two-column layout ─────────────────────────────────────────────────────
     var wrap = document.createElement('div');
-    wrap.style.cssText = [
-      'display:flex',
-      'flex-direction:column',
-      'gap:var(--rc-gap-md)',
-      'max-width:420px',
-      'padding:var(--rc-gap-md) 0',
-    ].join(';');
+    wrap.className = 'rc-collective-wrap';
+    // Full-height padding from panel-host's own padding
+    wrap.style.height = '100%';
 
-    // Instruction text
+    // ── Left: compact card list ───────────────────────────────────────────────
+    var listCol = document.createElement('div');
+    listCol.className = 'rc-collective-list';
+
     var hint = document.createElement('p');
-    hint.style.cssText = [
-      'font-family:var(--rc-font-mono)',
-      'font-size:var(--rc-size-sm)',
-      'color:var(--rc-muted)',
-      'margin:0',
-      'line-height:1.5',
-    ].join(';');
-    hint.textContent = 'Select a member to illuminate it. The floor responds.';
-    wrap.appendChild(hint);
+    hint.className = 'rc-collective-hint';
+    hint.textContent = 'Select a member — the floor responds.';
+    listCol.appendChild(hint);
 
-    // Member cards
-    var memberKeys = Object.keys(members);
-    memberKeys.forEach(function (key) {
+    // ── Right: detail pane ────────────────────────────────────────────────────
+    var detailCol = document.createElement('div');
+    detailCol.className = 'rc-collective-detail';
+
+    var placeholder = document.createElement('div');
+    placeholder.className = 'rc-collective-placeholder';
+    placeholder.textContent = 'Select a member to reveal its role in the Collective.';
+    detailCol.appendChild(placeholder);
+
+    // ── Member selection ──────────────────────────────────────────────────────
+    var cardEls = {};
+    var currentKey = null;
+
+    function buildDetailCard(key) {
       var m = members[key];
+      if (!m) return null;
+      var lines = narrations[key] || [];
+      var av = accentVar(m.accent);
+
       var card = document.createElement('div');
-      card.className = 'rc-panel';
-      card.style.cssText = [
-        'cursor:pointer',
-        'transition:border-color var(--rc-dur-fast) var(--rc-ease)',
-        'border-left:3px solid ' + accentVar(m.accent),
-        'padding:var(--rc-gap-sm) var(--rc-gap-md)',
-      ].join(';');
+      card.className = 'rc-member-reveal';
+      card.style.setProperty('--reveal-accent', av);
+
+      // Sigil label
+      var sigil = document.createElement('div');
+      sigil.className = 'rc-member-reveal__sigil';
+      sigil.textContent = '◈ member';
+      card.appendChild(sigil);
+
+      // Name
+      var nameEl = document.createElement('div');
+      nameEl.className = 'rc-member-reveal__name';
+      nameEl.textContent = m.name || key;
+      card.appendChild(nameEl);
+
+      // Role badge
+      var roleEl = document.createElement('div');
+      roleEl.className = 'rc-member-reveal__role';
+      roleEl.textContent = m.role || '';
+      card.appendChild(roleEl);
+
+      // Tagline
+      if (m.tagline) {
+        var tagEl = document.createElement('p');
+        tagEl.className = 'rc-member-reveal__tagline';
+        tagEl.textContent = '“' + m.tagline + '”';
+        card.appendChild(tagEl);
+      }
+
+      // Divider
+      var divider = document.createElement('div');
+      divider.className = 'rc-member-reveal__divider';
+      card.appendChild(divider);
+
+      // Narration lines — staggered
+      lines.forEach(function (line, i) {
+        var lineEl = document.createElement('div');
+        lineEl.className = 'rc-member-reveal__line';
+        lineEl.style.animation =
+          'memberLineIn var(--rc-dur-mid) var(--rc-ease) ' + (200 + i * 140) + 'ms both';
+        lineEl.textContent = line;
+        card.appendChild(lineEl);
+      });
+
+      return card;
+    }
+
+    function selectMember(key) {
+      var m = members[key];
+      if (!m) return;
+
+      // Deselect previous card
+      if (currentKey && cardEls[currentKey]) {
+        cardEls[currentKey].classList.remove('active');
+      }
+      currentKey = key;
+      if (cardEls[key]) cardEls[key].classList.add('active');
+
+      // Floor focus
+      if (ctx.floor && typeof ctx.floor.focusOwner === 'function') {
+        try { ctx.floor.focusOwner(key); } catch (e) { /* ignore */ }
+      }
+
+      // Entity reacts
+      entityState(ctx, 'speaking');
+      setTimeout(function () { entityState(ctx, 'idle'); }, 2000);
+
+      // First narration line goes to the dock bar too
+      var lines = narrations[key] || [];
+      if (lines.length) ctx.say(lines[0], 'rabble');
+
+      // Replace detail pane content
+      detailCol.innerHTML = '';
+      var card = buildDetailCard(key);
+      if (card) detailCol.appendChild(card);
+    }
+
+    // Build compact cards
+    Object.keys(members).forEach(function (key) {
+      var m = members[key];
+      var av = accentVar(m.accent);
+
+      var card = document.createElement('div');
+      card.className = 'rc-collective-card';
+      card.style.setProperty('--card-accent', av);
+      cardEls[key] = card;
+
+      var stripe = document.createElement('div');
+      stripe.className = 'rc-collective-card__stripe';
+
+      var body = document.createElement('div');
+      body.className = 'rc-collective-card__body';
 
       var nameEl = document.createElement('div');
-      nameEl.style.cssText = [
-        'font-family:var(--rc-font-mono)',
-        'font-size:var(--rc-size-sm)',
-        'font-weight:700',
-        'color:' + accentVar(m.accent),
-        'text-transform:none',
-        'letter-spacing:0.04em',
-      ].join(';');
+      nameEl.className = 'rc-collective-card__name';
       nameEl.textContent = m.name || key;
 
       var roleEl = document.createElement('div');
-      roleEl.style.cssText = [
-        'font-size:var(--rc-size-xs)',
-        'color:var(--rc-muted)',
-        'margin-top:2px',
-        'font-family:var(--rc-font-mono)',
-      ].join(';');
+      roleEl.className = 'rc-collective-card__role';
       roleEl.textContent = m.role || '';
 
-      var tagEl = document.createElement('div');
-      tagEl.style.cssText = [
-        'font-size:var(--rc-size-sm)',
-        'color:var(--rc-text)',
-        'margin-top:var(--rc-gap-xs)',
-        'line-height:1.5',
-      ].join(';');
-      tagEl.textContent = m.tagline || '';
+      body.appendChild(nameEl);
+      body.appendChild(roleEl);
+      card.appendChild(stripe);
+      card.appendChild(body);
 
-      card.appendChild(nameEl);
-      card.appendChild(roleEl);
-      card.appendChild(tagEl);
-
-      card.addEventListener('mouseenter', function () {
-        card.style.borderLeftColor = 'var(--rc-accent-c)';
-      });
-      card.addEventListener('mouseleave', function () {
-        card.style.borderLeftColor = accentVar(m.accent);
-      });
-
-      card.addEventListener('click', function () {
-        // Focus the floor node if floor supports it
-        if (ctx.floor && typeof ctx.floor.focusOwner === 'function') {
-          try { ctx.floor.focusOwner(key); } catch (e) { /* ignore if no-op */ }
-        }
-        // Narrate the member
-        var lines = narrations[key];
-        if (lines && lines.length) {
-          var line = lines[Math.floor(Math.random() * lines.length)];
-          ctx.say(line, 'rabble');
-          entityState(ctx, 'speaking');
-          setTimeout(function () { entityState(ctx, 'idle'); }, 1500);
-        }
-      });
-
-      wrap.appendChild(card);
+      card.addEventListener('click', function () { selectMember(key); });
+      listCol.appendChild(card);
     });
 
-    // Continue button — advance to converse
+    // Continue button
     var continueBtn = makeBtn('continue');
-    continueBtn.style.cssText = [
-      'margin-top:var(--rc-gap-sm)',
-      'align-self:flex-start',
-    ].join(';');
+    continueBtn.style.cssText = 'margin-top:var(--rc-gap-md);flex-shrink:0;';
     continueBtn.addEventListener('click', function () { Stage.next(); });
-    wrap.appendChild(continueBtn);
+    listCol.appendChild(continueBtn);
 
+    wrap.appendChild(listCol);
+    wrap.appendChild(detailCol);
     ctx.panelHost.appendChild(wrap);
 
     setTimeout(function () { entityState(ctx, 'idle'); }, 1000);
@@ -371,7 +395,6 @@
 
   function collectiveExit(ctx) {
     ctx.centerpieceHost.classList.remove('active');
-    // Unmount floor if supported
     if (ctx.floor && typeof ctx.floor.unmount === 'function') {
       try { ctx.floor.unmount(); } catch (e) { /* ignore */ }
     }
@@ -388,65 +411,66 @@
 
     entityState(ctx, 'speaking');
 
-    // Attempt to expand the dock / seed curator greeting
+    // Expand the dock immediately — conversation is the primary surface here
     if (ctx.dock && typeof ctx.dock.expand === 'function') {
       try { ctx.dock.expand(); } catch (e) { /* ignore */ }
     }
 
-    // If curator is available, emit the greeting for this room
+    // Greeting
     if (ctx.curator && typeof ctx.curator.greet === 'function') {
       ctx.say(ctx.curator.greet(room), 'rabble');
     } else {
       ctx.say(intro, 'rabble');
     }
 
-    // Panel — minimal "in conversation" label + continue
+    setTimeout(function () { entityState(ctx, 'idle'); }, 1200);
+
+    // Panel — channel status card (not the primary interface; dock is)
     var wrap = document.createElement('div');
     wrap.style.cssText = [
       'display:flex',
       'flex-direction:column',
       'align-items:center',
-      'justify-content:center',
+      'justify-content:flex-start',
       'height:100%',
-      'gap:var(--rc-gap-lg)',
-      'padding:var(--rc-gap-xl)',
+      'gap:var(--rc-gap-md)',
+      'padding:var(--rc-gap-lg) var(--rc-gap-xl)',
     ].join(';');
 
-    var label = document.createElement('p');
-    label.style.cssText = [
-      'font-family:var(--rc-font-mono)',
-      'font-size:var(--rc-size-md)',
-      'color:var(--rc-accent-c)',
-      'text-align:center',
-      'margin:0',
-      'line-height:1.6',
+    var statusCard = makePanel(
+      '<div style="display:flex;flex-direction:column;gap:var(--rc-gap-sm)">' +
+        '<div style="font-family:var(--rc-font-mono);font-size:var(--rc-size-xs);' +
+             'color:var(--rc-muted);letter-spacing:0.10em;text-transform:uppercase">' +
+          '◈ transmission channel' +
+        '</div>' +
+        '<div style="font-family:var(--rc-font-mono);font-size:var(--rc-size-md);' +
+             'color:var(--rc-accent-c);line-height:1.5">' +
+          intro +
+        '</div>' +
+        '<div style="height:1px;background:var(--rc-border)"></div>' +
+        '<div style="font-family:var(--rc-font-mono);font-size:var(--rc-size-sm);' +
+             'color:var(--rc-muted);line-height:1.6">' +
+          'The channel below is open. Ask about the Collective, about what I am, or why this exists.' +
+        '</div>' +
+      '</div>'
+    );
+    statusCard.style.cssText = [
       'max-width:480px',
+      'width:100%',
+      'border-color:color-mix(in srgb, var(--rc-accent-c) 30%, transparent)',
     ].join(';');
-    label.textContent = 'The dock below is live. Say what you came to say.';
 
-    var hint = document.createElement('p');
-    hint.style.cssText = [
-      'font-family:var(--rc-font-mono)',
-      'font-size:var(--rc-size-sm)',
-      'color:var(--rc-muted)',
-      'text-align:center',
-      'margin:0',
-      'max-width:420px',
-    ].join(';');
-    hint.textContent = intro;
-
-    var btn = makeBtn('continue');
+    var btn = makeBtn('skip to join ›');
+    btn.className += ' secondary';
+    btn.style.cssText = 'margin-top:auto;align-self:flex-start;';
     btn.addEventListener('click', function () { Stage.next(); });
 
-    wrap.appendChild(label);
-    wrap.appendChild(hint);
+    wrap.appendChild(statusCard);
     wrap.appendChild(btn);
-
     ctx.panelHost.appendChild(wrap);
   }
 
   function converseExit(ctx) {
-    // Collapse dock if supported
     if (ctx.dock && typeof ctx.dock.collapse === 'function') {
       try { ctx.dock.collapse(); } catch (e) { /* ignore */ }
     }

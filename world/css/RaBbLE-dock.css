@@ -27,7 +27,7 @@
 }
 
 #dock-host.rd2-expanded {
-  max-height: 50vh;
+  max-height: 65vh;
 }
 
 /* ── Bar row ─────────────────────────────────────────────────────────────── */
@@ -71,7 +71,7 @@
   flex: 1;
   min-width: 0;
   font-family: var(--rc-font-mono);
-  font-size: var(--rc-size-xs);
+  font-size: var(--rc-size-sm);
   color: var(--rc-text);
   line-height: 1.4;
 
@@ -197,8 +197,8 @@
 /* Transmission lines ────────────────────────────────────────────────────── */
 .rd2-line {
   font-family: var(--rc-font-mono);
-  font-size: var(--rc-size-xs);
-  line-height: 1.55;
+  font-size: var(--rc-size-sm);
+  line-height: 1.6;
   color: var(--rc-text);
   word-wrap: break-word;
   white-space: pre-wrap;
@@ -251,7 +251,7 @@
   flex: 1;
   min-width: 0;
   font-family: var(--rc-font-mono);
-  font-size: var(--rc-size-xs);
+  font-size: var(--rc-size-sm);
   color: var(--rc-text);
   background: color-mix(in srgb, var(--rc-void) 55%, transparent);
   border: 1px solid var(--rc-border);
@@ -300,17 +300,17 @@
 /* ── Mobile overrides ────────────────────────────────────────────────────── */
 @media (max-width: 768px) {
   .rd2-bar {
-    min-height: 40px;
+    min-height: 44px;
     padding: 0 var(--rc-gap-sm);
   }
 
   #dock-host {
-    min-height: 40px;
-    max-height: 40px;
+    min-height: 44px;
+    max-height: 44px;
   }
 
   #dock-host.rd2-expanded {
-    max-height: 60vh;
+    max-height: 72vh;
   }
 
   .rd2-converse-btn {

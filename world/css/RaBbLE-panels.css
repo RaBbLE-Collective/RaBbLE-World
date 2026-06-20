@@ -220,6 +220,211 @@
   white-space: nowrap;
 }
 
+/* ── Collective movement — two-column layout ─────────────────────────────── */
+.rc-collective-wrap {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: var(--rc-gap-md);
+  height: 100%;
+  align-items: start;
+}
+
+/* Compact member list column */
+.rc-collective-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rc-gap-xs);
+  overflow-y: auto;
+  max-height: 100%;
+  padding-right: var(--rc-gap-xs);
+}
+
+.rc-collective-list .rc-collective-hint {
+  font-family: var(--rc-font-mono);
+  font-size: var(--rc-size-xs);
+  color: var(--rc-muted);
+  margin: 0 0 var(--rc-gap-sm);
+  line-height: 1.5;
+}
+
+/* Compact card in the list (tighter than default member-card) */
+.rc-collective-card {
+  display: flex;
+  align-items: stretch;
+  background: color-mix(in srgb, var(--rc-surface) 60%, transparent);
+  border: 1px solid var(--rc-border);
+  border-radius: 5px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: border-color var(--rc-dur-fast) var(--rc-ease),
+              background var(--rc-dur-fast) var(--rc-ease);
+}
+
+.rc-collective-card:hover {
+  background: var(--rc-glass-78);
+  border-color: var(--card-accent, var(--rc-accent-v));
+}
+
+.rc-collective-card.active {
+  border-color: var(--card-accent, var(--rc-accent-v));
+  background: color-mix(in srgb, var(--card-accent, var(--rc-accent-v)) 8%, var(--rc-surface));
+}
+
+.rc-collective-card__stripe {
+  width: 3px;
+  flex-shrink: 0;
+  background: var(--card-accent, var(--rc-accent-v));
+  opacity: 0.6;
+  transition: opacity var(--rc-dur-fast) var(--rc-ease);
+}
+
+.rc-collective-card:hover .rc-collective-card__stripe,
+.rc-collective-card.active .rc-collective-card__stripe {
+  opacity: 1;
+}
+
+.rc-collective-card__body {
+  flex: 1;
+  min-width: 0;
+  padding: 6px var(--rc-gap-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.rc-collective-card__name {
+  font-family: var(--rc-font-mono);
+  font-size: var(--rc-size-sm);
+  font-weight: 700;
+  color: var(--rc-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-transform: none;
+}
+
+.rc-collective-card.active .rc-collective-card__name {
+  color: var(--card-accent, var(--rc-accent-v));
+}
+
+.rc-collective-card__role {
+  font-family: var(--rc-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--rc-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Detail pane — right column */
+.rc-collective-detail {
+  position: relative;
+  min-height: 200px;
+  height: 100%;
+}
+
+.rc-collective-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: var(--rc-gap-sm);
+  color: var(--rc-muted);
+  font-family: var(--rc-font-mono);
+  font-size: var(--rc-size-sm);
+  text-align: center;
+  border: 1px dashed var(--rc-border);
+  border-radius: 8px;
+  padding: var(--rc-gap-xl);
+  opacity: 0.6;
+}
+
+.rc-collective-placeholder::before {
+  content: '◈';
+  font-size: var(--rc-size-xl);
+  opacity: 0.4;
+}
+
+/* The member detail card that pops in */
+.rc-member-reveal {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rc-gap-md);
+  padding: var(--rc-gap-md) var(--rc-gap-lg);
+  background: var(--rc-glass-78);
+  backdrop-filter: var(--rc-blur);
+  -webkit-backdrop-filter: var(--rc-blur);
+  border: 1px solid var(--reveal-accent, var(--rc-border));
+  border-radius: 8px;
+  overflow-y: auto;
+  max-height: 100%;
+  animation: memberDetailIn var(--rc-dur-mid) var(--rc-ease) both;
+}
+
+.rc-member-reveal__sigil {
+  font-family: var(--rc-font-mono);
+  font-size: var(--rc-size-xs);
+  color: var(--rc-muted);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.rc-member-reveal__name {
+  font-family: var(--rc-font-mono);
+  font-size: var(--rc-size-2xl);
+  font-weight: 700;
+  color: var(--reveal-accent, var(--rc-text));
+  line-height: 1.1;
+  text-transform: none;
+  letter-spacing: 0.02em;
+}
+
+.rc-member-reveal__role {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--rc-font-mono);
+  font-size: var(--rc-size-xs);
+  font-weight: 600;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: var(--reveal-accent, var(--rc-text));
+  border: 1px solid color-mix(in srgb, var(--reveal-accent, var(--rc-border)) 45%, transparent);
+  border-radius: 999px;
+  padding: 3px 12px;
+  background: color-mix(in srgb, var(--reveal-accent, var(--rc-surface)) 10%, transparent);
+}
+
+.rc-member-reveal__tagline {
+  font-family: var(--rc-font-ui);
+  font-size: var(--rc-size-md);
+  color: var(--rc-text);
+  margin: 0;
+  line-height: 1.65;
+  font-style: italic;
+  opacity: 0;
+  animation: memberLineIn var(--rc-dur-mid) var(--rc-ease) 80ms both;
+}
+
+.rc-member-reveal__divider {
+  height: 1px;
+  background: color-mix(in srgb, var(--reveal-accent, var(--rc-border)) 35%, transparent);
+  opacity: 0;
+  animation: memberLineIn var(--rc-dur-mid) var(--rc-ease) 160ms both;
+}
+
+.rc-member-reveal__line {
+  font-family: var(--rc-font-mono);
+  font-size: var(--rc-size-sm);
+  color: var(--rc-text);
+  line-height: 1.7;
+  padding-left: var(--rc-gap-sm);
+  border-left: 2px solid color-mix(in srgb, var(--reveal-accent, var(--rc-border)) 55%, transparent);
+  opacity: 0;
+}
+
 /* ── Mobile adaptations ───────────────────────────────────────────────────── */
 @media (max-width: 600px) {
   /* Panels: tighter padding on small screens */
@@ -255,4 +460,37 @@
   }
 
   /* Badges: already compact, no change needed */
+
+  /* Collective: stack vertically on mobile */
+  .rc-collective-wrap {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+    gap: var(--rc-gap-sm);
+  }
+
+  .rc-collective-list {
+    max-height: none;
+    flex-direction: row;
+    flex-wrap: wrap;
+    overflow-x: auto;
+    overflow-y: visible;
+    gap: var(--rc-gap-xs);
+    padding-right: 0;
+  }
+
+  .rc-collective-hint {
+    display: none;
+  }
+
+  .rc-collective-card {
+    flex-shrink: 0;
+  }
+
+  .rc-member-reveal {
+    padding: var(--rc-gap-sm) var(--rc-gap-md);
+  }
+
+  .rc-member-reveal__name {
+    font-size: var(--rc-size-xl);
+  }
 }
