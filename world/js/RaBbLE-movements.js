@@ -324,7 +324,7 @@
           'margin-top:var(--rc-gap-sm)',
           'font-family:var(--rc-font-mono)',
           'font-size:var(--rc-size-sm)',
-          'color:var(--rc-accent-g)',
+          'color:var(--rc-accent-c)',
           'text-decoration:none',
           'letter-spacing:0.04em',
           'transition:opacity var(--rc-dur-fast)',
@@ -585,13 +585,7 @@
       'border-color:color-mix(in srgb, var(--rc-accent-c) 30%, transparent)',
     ].join(';');
 
-    var btn = makeBtn('skip to join ›');
-    btn.className += ' secondary';
-    btn.style.cssText = 'margin-top:auto;align-self:flex-start;';
-    btn.addEventListener('click', function () { Stage.next(); });
-
     wrap.appendChild(statusCard);
-    wrap.appendChild(btn);
     ctx.panelHost.appendChild(wrap);
   }
 
@@ -603,7 +597,8 @@
 
   Stage.registerMovement({ id: 'converse', title: 'converse', enter: converseEnter, exit: converseExit });
 
-  // ── [6] join ─────────────────────────────────────────────────────────────────
+  // ── [6] join — removed from EP1 sequence; no accounts in EP1 ────────────────
+  // Kept here for EP2 when the Pair/summoning flow is rebuilt.
 
   function joinEnter(ctx) {
     var data = D.join || {};
@@ -688,6 +683,6 @@
 
   function joinExit(ctx) { /* final movement — no exit expected */ }
 
-  Stage.registerMovement({ id: 'join', title: 'join', enter: joinEnter, exit: joinExit });
+  // Stage.registerMovement({ id: 'join', ... }); — EP2 when Pair/summoning is ready
 
 })();
