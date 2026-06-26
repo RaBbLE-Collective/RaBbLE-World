@@ -1,12 +1,13 @@
 /* ── RaBbLE-os.css — Developer Preview install guide ──────────────────── */
-/* Aether tokens only — no raw hex. Atmospheric treatment, Chrysalis-tuned. */
+/* Aether tokens only. Atmospheric treatment, Chrysalis-tuned.             */
+/* Gradient borders: background-clip padding-box/border-box technique.     */
 
 @keyframes osPageRise {
   from { opacity: 0; transform: translateY(12px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ── Override stage overflow — this is a scroll page, not a stage ──── */
+/* ── Override stage overflow — scroll page, not a stage ──────────────── */
 html, body {
   min-height: 100%;
   overflow-x: hidden;
@@ -21,7 +22,7 @@ body.os-entry.os-ready { opacity: 1; }
   z-index: 0; pointer-events: none;
 }
 
-/* ── Root layout ────────────────────────────────────────────────────── */
+/* ── Root layout ─────────────────────────────────────────────────────── */
 #root {
   position: relative; z-index: 1;
   min-height: 100dvh;
@@ -48,11 +49,11 @@ body.os-entry.os-ready { opacity: 1; }
 }
 .os-backnav:hover {
   opacity: 1;
-  color: var(--rc-accent-c);
-  text-shadow: 0 0 8px color-mix(in srgb, var(--rc-accent-c) 60%, transparent);
+  color: var(--rc-accent-m);
+  text-shadow: 0 0 10px color-mix(in srgb, var(--rc-accent-m) 55%, transparent);
 }
 
-/* ── Header ─────────────────────────────────────────────────────────── */
+/* ── Header ──────────────────────────────────────────────────────────── */
 .os-header {
   text-align: center;
   margin-bottom: 4rem;
@@ -70,9 +71,12 @@ body.os-entry.os-ready { opacity: 1; }
   text-transform: uppercase;
   color: var(--rc-muted);
   text-decoration: none;
-  transition: color 150ms ease;
+  transition: color 150ms ease, text-shadow 150ms ease;
 }
-.os-wordmark:hover { color: var(--rc-accent-c); }
+.os-wordmark:hover {
+  color: var(--rc-accent-c);
+  text-shadow: 0 0 8px color-mix(in srgb, var(--rc-accent-c) 50%, transparent);
+}
 
 .os-header-title {
   font-size: clamp(2rem, 6vw, 3rem);
@@ -99,14 +103,21 @@ body.os-entry.os-ready { opacity: 1; }
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--rc-accent-y);
-  background: color-mix(in srgb, var(--rc-accent-y) 10%, transparent);
-  border: 1px solid color-mix(in srgb, var(--rc-accent-y) 35%, transparent);
+  /* Gradient border using padding-box/border-box */
+  border: 1px solid transparent;
   border-radius: 999px;
   padding: 0.4rem 1rem;
+  background:
+    color-mix(in srgb, var(--rc-accent-y) 8%, transparent) padding-box,
+    linear-gradient(90deg,
+      color-mix(in srgb, var(--rc-accent-m) 50%, transparent),
+      color-mix(in srgb, var(--rc-accent-y) 70%, transparent),
+      color-mix(in srgb, var(--rc-accent-c) 40%, transparent)
+    ) border-box;
   box-shadow: 0 0 16px color-mix(in srgb, var(--rc-accent-y) 12%, transparent);
 }
 
-/* ── Content container ──────────────────────────────────────────────── */
+/* ── Content container ───────────────────────────────────────────────── */
 .os-content {
   display: flex;
   flex-direction: column;
@@ -122,56 +133,87 @@ body.os-entry.os-ready { opacity: 1; }
 }
 
 .os-section-label {
+  position: relative;
   font-family: var(--rc-font-mono);
   font-size: 0.6rem;
   letter-spacing: 0.32em;
   text-transform: uppercase;
-  color: var(--rc-accent-c);
-  text-shadow: 0 0 8px color-mix(in srgb, var(--rc-accent-c) 50%, transparent);
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid color-mix(in srgb, var(--rc-accent-c) 15%, transparent);
+  color: var(--rc-accent-m);
+  text-shadow: 0 0 10px color-mix(in srgb, var(--rc-accent-m) 55%, transparent);
+  padding-bottom: 0.6rem;
 }
 
-/* ── Glass panel with atmosphere ────────────────────────────────────── */
+/* Gradient bottom line: magenta → violet → cyan → transparent */
+.os-section-label::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg,
+    var(--rc-accent-m),
+    var(--rc-accent-v) 40%,
+    var(--rc-accent-c) 70%,
+    transparent
+  );
+  opacity: 0.45;
+}
+
+/* ── Glass panel — cyan-magenta gradient border ──────────────────────── */
 .os-panel {
   position: relative;
   overflow: hidden;
-  background: color-mix(in srgb, var(--rc-surface) 24%, transparent);
-  border: 1px solid color-mix(in srgb, var(--rc-accent-c) 12%, transparent);
+  border: 1px solid transparent;
   border-radius: 20px;
   padding: 1.5rem 1.75rem;
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+  /* padding-box: glass fill; border-box: gradient border */
+  background:
+    color-mix(in srgb, var(--rc-surface) 28%, transparent) padding-box,
+    linear-gradient(135deg,
+      color-mix(in srgb, var(--rc-accent-m) 60%, transparent) 0%,
+      color-mix(in srgb, var(--rc-accent-v) 45%, transparent) 50%,
+      color-mix(in srgb, var(--rc-accent-c) 60%, transparent) 100%
+    ) border-box;
   box-shadow:
-    0 0 28px color-mix(in srgb, var(--rc-accent-c) 5%, transparent),
-    inset 0 0 24px color-mix(in srgb, var(--rc-accent-c) 2%, transparent);
+    0 0 30px color-mix(in srgb, var(--rc-accent-m) 5%, transparent),
+    0 0 30px color-mix(in srgb, var(--rc-accent-c) 5%, transparent),
+    inset 0 0 24px color-mix(in srgb, var(--rc-accent-v) 2%, transparent);
   transition:
-    border-color var(--rc-dur-mid) ease,
     background var(--rc-dur-mid) ease,
     box-shadow var(--rc-dur-mid) ease;
 }
 
+/* Inner atmospheric wash */
 .os-panel::before {
   content: '';
   position: absolute;
   inset: 0;
   border-radius: 20px;
   background: linear-gradient(135deg,
-    color-mix(in srgb, var(--rc-accent-c) 5%, transparent) 0%,
-    color-mix(in srgb, var(--rc-accent-v) 3%, transparent) 40%,
-    transparent 65%);
+    color-mix(in srgb, var(--rc-accent-m) 4%, transparent) 0%,
+    color-mix(in srgb, var(--rc-accent-v) 3%, transparent) 45%,
+    color-mix(in srgb, var(--rc-accent-c) 4%, transparent) 100%);
   pointer-events: none;
   opacity: 0;
   transition: opacity var(--rc-dur-mid) ease;
 }
 
 .os-panel:hover {
-  border-color: color-mix(in srgb, var(--rc-accent-c) 28%, transparent);
-  background: color-mix(in srgb, var(--rc-surface) 36%, transparent);
+  background:
+    color-mix(in srgb, var(--rc-surface) 38%, transparent) padding-box,
+    linear-gradient(135deg,
+      color-mix(in srgb, var(--rc-accent-m) 80%, transparent) 0%,
+      color-mix(in srgb, var(--rc-accent-v) 60%, transparent) 50%,
+      color-mix(in srgb, var(--rc-accent-c) 80%, transparent) 100%
+    ) border-box;
   box-shadow:
-    0 0 40px color-mix(in srgb, var(--rc-accent-c) 10%, transparent),
-    inset 0 0 32px color-mix(in srgb, var(--rc-accent-c) 4%, transparent);
+    0 0 44px color-mix(in srgb, var(--rc-accent-m) 10%, transparent),
+    0 0 44px color-mix(in srgb, var(--rc-accent-c) 10%, transparent),
+    inset 0 0 32px color-mix(in srgb, var(--rc-accent-v) 4%, transparent);
 }
 .os-panel:hover::before { opacity: 1; }
 
@@ -209,12 +251,12 @@ body.os-entry.os-ready { opacity: 1; }
 
 .os-spec-list li::before {
   content: '◈';
-  color: var(--rc-accent-c);
-  text-shadow: 0 0 8px color-mix(in srgb, var(--rc-accent-c) 60%, transparent);
+  color: var(--rc-accent-m);
+  text-shadow: 0 0 8px color-mix(in srgb, var(--rc-accent-m) 60%, transparent);
   flex-shrink: 0;
 }
 
-/* ── Code block ──────────────────────────────────────────────────────── */
+/* ── Code block — magenta-to-cyan gradient border ────────────────────── */
 .os-code-label {
   font-family: var(--rc-font-mono);
   font-size: var(--rc-size-xs);
@@ -228,16 +270,21 @@ body.os-entry.os-ready { opacity: 1; }
   font-family: var(--rc-font-mono);
   font-size: var(--rc-size-md);
   color: var(--rc-accent-c);
-  background: color-mix(in srgb, var(--rc-surface) 85%, transparent);
-  border: 1px solid color-mix(in srgb, var(--rc-accent-c) 16%, transparent);
+  border: 1px solid transparent;
   border-radius: 14px;
   padding: 1rem 1.25rem;
   overflow-x: auto;
   white-space: pre;
   line-height: 1.6;
+  background:
+    color-mix(in srgb, var(--rc-surface) 85%, transparent) padding-box,
+    linear-gradient(135deg,
+      color-mix(in srgb, var(--rc-accent-c) 50%, transparent),
+      color-mix(in srgb, var(--rc-accent-m) 35%, transparent)
+    ) border-box;
   box-shadow:
-    0 0 20px color-mix(in srgb, var(--rc-accent-c) 6%, transparent),
-    inset 0 0 24px color-mix(in srgb, var(--rc-accent-c) 4%, transparent);
+    0 0 18px color-mix(in srgb, var(--rc-accent-c) 6%, transparent),
+    inset 0 0 20px color-mix(in srgb, var(--rc-accent-c) 4%, transparent);
 }
 
 /* ── Deferred list ───────────────────────────────────────────────────── */
@@ -265,36 +312,40 @@ body.os-entry.os-ready { opacity: 1; }
   flex-shrink: 0;
 }
 
-/* ── Back CTA ────────────────────────────────────────────────────────── */
+/* ── Back CTA — gradient border pill ────────────────────────────────── */
 .os-back-cta {
   display: inline-flex;
   align-items: center;
   gap: 0.6rem;
-  min-height: 40px;
-  padding: 0 1.25rem;
+  min-height: 42px;
+  padding: 0 1.5rem;
   border-radius: 999px;
-  border: 1px solid color-mix(in srgb, var(--rc-accent-c) 30%, transparent);
-  background: color-mix(in srgb, var(--rc-void) 60%, transparent);
-  color: var(--rc-accent-c);
+  border: 1px solid transparent;
   font-family: var(--rc-font-mono);
   font-size: var(--rc-size-xs);
   letter-spacing: 0.1em;
   text-transform: uppercase;
   text-decoration: none;
-  transition: transform 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
+  color: var(--rc-accent-c);
+  background:
+    color-mix(in srgb, var(--rc-void) 55%, transparent) padding-box,
+    linear-gradient(135deg, var(--rc-accent-m), var(--rc-accent-v), var(--rc-accent-c)) border-box;
+  transition: transform 150ms ease, box-shadow 150ms ease, color 150ms ease;
   align-self: flex-start;
 }
 .os-back-cta:hover {
   transform: translateY(-1px);
-  border-color: color-mix(in srgb, var(--rc-accent-c) 55%, transparent);
-  box-shadow: 0 0 20px color-mix(in srgb, var(--rc-accent-c) 15%, transparent);
+  color: var(--rc-accent-m);
+  box-shadow:
+    0 0 20px color-mix(in srgb, var(--rc-accent-m) 18%, transparent),
+    0 0 20px color-mix(in srgb, var(--rc-accent-c) 12%, transparent);
 }
 
-/* ── Footer ──────────────────────────────────────────────────────────── */
+/* ── Footer — gradient top border ───────────────────────────────────── */
 .os-footer {
+  position: relative;
   margin-top: 2rem;
-  padding-top: 2rem;
-  border-top: 1px solid color-mix(in srgb, var(--rc-border) 40%, transparent);
+  padding-top: 2.5rem;
   text-align: center;
   font-family: var(--rc-font-mono);
   font-size: var(--rc-size-xs);
@@ -302,11 +353,30 @@ body.os-entry.os-ready { opacity: 1; }
   letter-spacing: 0.08em;
   line-height: 1.8;
 }
+
+.os-footer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg,
+    transparent,
+    var(--rc-accent-m) 25%,
+    var(--rc-accent-v) 50%,
+    var(--rc-accent-c) 75%,
+    transparent
+  );
+  opacity: 0.4;
+}
+
 .os-footer a {
   color: var(--rc-accent-c);
   text-decoration: none;
-  transition: text-shadow 150ms ease;
+  transition: text-shadow 150ms ease, color 150ms ease;
 }
 .os-footer a:hover {
-  text-shadow: 0 0 8px color-mix(in srgb, var(--rc-accent-c) 60%, transparent);
+  color: var(--rc-accent-m);
+  text-shadow: 0 0 10px color-mix(in srgb, var(--rc-accent-m) 55%, transparent);
 }
