@@ -1,6 +1,6 @@
 /* ── RaBbLE-os.css — Developer Preview install guide ──────────────────── */
 /* Aether tokens only. Atmospheric treatment, Chrysalis-tuned.             */
-/* Gradient borders: background-clip padding-box/border-box technique.     */
+/* Gradient borders: mask-composite exclude technique (works with glass).  */
 
 @keyframes osPageRise {
   from { opacity: 0; transform: translateY(12px); }
@@ -103,17 +103,10 @@ body.os-entry.os-ready { opacity: 1; }
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--rc-accent-y);
-  /* Gradient border using padding-box/border-box */
-  border: 1px solid transparent;
+  background: color-mix(in srgb, var(--rc-accent-y) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--rc-accent-y) 40%, transparent);
   border-radius: 999px;
   padding: 0.4rem 1rem;
-  background:
-    color-mix(in srgb, var(--rc-accent-y) 8%, transparent) padding-box,
-    linear-gradient(90deg,
-      color-mix(in srgb, var(--rc-accent-m) 50%, transparent),
-      color-mix(in srgb, var(--rc-accent-y) 70%, transparent),
-      color-mix(in srgb, var(--rc-accent-c) 40%, transparent)
-    ) border-box;
   box-shadow: 0 0 16px color-mix(in srgb, var(--rc-accent-y) 12%, transparent);
 }
 
@@ -160,37 +153,51 @@ body.os-entry.os-ready { opacity: 1; }
   opacity: 0.5;
 }
 
-/* ── Glass panel — conic gradient border (flows all the way around) ─── */
+/* ── Glass panel — conic gradient border via mask-composite ──────────── */
+/*                                                                         */
+/*  ::before = the border ring.                                            */
+/*    • fills the panel area with the conic gradient                       */
+/*    • mask punches out the content-box, leaving only the 2px ring        */
+/*  ::after  = inner atmospheric wash (hover)                              */
 .os-panel {
   position: relative;
   overflow: hidden;
-  /* 1.5px transparent border; conic gradient fills it as it wraps around */
-  border: 1.5px solid transparent;
+  background: color-mix(in srgb, var(--rc-surface) 28%, transparent);
   border-radius: 20px;
   padding: 1.5rem 1.75rem;
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
-  background:
-    color-mix(in srgb, var(--rc-surface) 28%, transparent) padding-box,
-    conic-gradient(from 225deg,
-      var(--rc-accent-m)   0deg,
-      var(--rc-accent-v)  90deg,
-      var(--rc-accent-c) 180deg,
-      var(--rc-accent-v) 270deg,
-      var(--rc-accent-m) 360deg
-    ) border-box;
   box-shadow:
     0 0 32px color-mix(in srgb, var(--rc-accent-m) 6%, transparent),
-    0 0 32px color-mix(in srgb, var(--rc-accent-c) 6%, transparent),
-    inset 0 0 24px color-mix(in srgb, var(--rc-accent-v) 2%, transparent);
-  transition:
-    background var(--rc-dur-mid) ease,
-    box-shadow var(--rc-dur-mid) ease;
+    0 0 32px color-mix(in srgb, var(--rc-accent-c) 6%, transparent);
+  transition: box-shadow var(--rc-dur-mid) ease;
 }
 
-/* Inner atmospheric wash */
+/* Conic gradient border ring */
 .os-panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 20px;
+  padding: 2px;
+  background: conic-gradient(from 225deg,
+    var(--rc-accent-m)   0deg,
+    var(--rc-accent-v)  90deg,
+    var(--rc-accent-c) 180deg,
+    var(--rc-accent-v) 270deg,
+    var(--rc-accent-m) 360deg
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* Inner atmospheric wash — visible on hover */
+.os-panel::after {
   content: '';
   position: absolute;
   inset: 0;
@@ -205,24 +212,14 @@ body.os-entry.os-ready { opacity: 1; }
 }
 
 .os-panel:hover {
-  background:
-    color-mix(in srgb, var(--rc-surface) 38%, transparent) padding-box,
-    conic-gradient(from 225deg,
-      var(--rc-accent-m)   0deg,
-      var(--rc-accent-v)  90deg,
-      var(--rc-accent-c) 180deg,
-      var(--rc-accent-v) 270deg,
-      var(--rc-accent-m) 360deg
-    ) border-box;
   box-shadow:
     0 0 48px color-mix(in srgb, var(--rc-accent-m) 12%, transparent),
-    0 0 48px color-mix(in srgb, var(--rc-accent-c) 12%, transparent),
-    inset 0 0 32px color-mix(in srgb, var(--rc-accent-v) 5%, transparent);
+    0 0 48px color-mix(in srgb, var(--rc-accent-c) 12%, transparent);
 }
-.os-panel:hover::before { opacity: 1; }
+.os-panel:hover::after { opacity: 1; }
 
 .os-panel p {
-  position: relative;
+  position: relative; z-index: 1;
   margin: 0;
   font-size: var(--rc-size-lg);
   color: var(--rc-text);
@@ -262,7 +259,7 @@ body.os-entry.os-ready { opacity: 1; }
   flex-shrink: 0;
 }
 
-/* ── Code block — magenta-to-cyan gradient border ────────────────────── */
+/* ── Code block — same mask-composite gradient border ────────────────── */
 .os-code-label {
   font-family: var(--rc-font-mono);
   font-size: var(--rc-size-xs);
@@ -273,27 +270,41 @@ body.os-entry.os-ready { opacity: 1; }
 }
 
 .os-code {
+  position: relative;
   font-family: var(--rc-font-mono);
   font-size: var(--rc-size-md);
   color: var(--rc-accent-c);
-  border: 1.5px solid transparent;
+  background: color-mix(in srgb, var(--rc-surface) 85%, transparent);
   border-radius: 14px;
   padding: 1rem 1.25rem;
   overflow-x: auto;
   white-space: pre;
   line-height: 1.6;
-  background:
-    color-mix(in srgb, var(--rc-surface) 85%, transparent) padding-box,
-    conic-gradient(from 180deg,
-      var(--rc-accent-c)   0deg,
-      var(--rc-accent-v)  90deg,
-      var(--rc-accent-m) 180deg,
-      var(--rc-accent-v) 270deg,
-      var(--rc-accent-c) 360deg
-    ) border-box;
   box-shadow:
     0 0 18px color-mix(in srgb, var(--rc-accent-c) 7%, transparent),
     inset 0 0 20px color-mix(in srgb, var(--rc-accent-c) 4%, transparent);
+}
+
+/* Conic gradient border ring on code blocks */
+.os-code::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+  padding: 1.5px;
+  background: conic-gradient(from 180deg,
+    var(--rc-accent-c)   0deg,
+    var(--rc-accent-v)  90deg,
+    var(--rc-accent-m) 180deg,
+    var(--rc-accent-v) 270deg,
+    var(--rc-accent-c) 360deg
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
 }
 
 /* ── Deferred list ───────────────────────────────────────────────────── */
@@ -323,25 +334,46 @@ body.os-entry.os-ready { opacity: 1; }
 
 /* ── Back CTA — gradient border pill ────────────────────────────────── */
 .os-back-cta {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 0.6rem;
   min-height: 42px;
   padding: 0 1.5rem;
   border-radius: 999px;
-  border: 1px solid transparent;
+  background: color-mix(in srgb, var(--rc-void) 55%, transparent);
   font-family: var(--rc-font-mono);
   font-size: var(--rc-size-xs);
   letter-spacing: 0.1em;
   text-transform: uppercase;
   text-decoration: none;
   color: var(--rc-accent-c);
-  background:
-    color-mix(in srgb, var(--rc-void) 55%, transparent) padding-box,
-    linear-gradient(135deg, var(--rc-accent-m), var(--rc-accent-v), var(--rc-accent-c)) border-box;
   transition: transform 150ms ease, box-shadow 150ms ease, color 150ms ease;
   align-self: flex-start;
 }
+
+/* Full conic gradient border ring on CTA pill */
+.os-back-cta::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  padding: 1.5px;
+  background: conic-gradient(from 0deg,
+    var(--rc-accent-m)   0deg,
+    var(--rc-accent-v)  90deg,
+    var(--rc-accent-c) 180deg,
+    var(--rc-accent-v) 270deg,
+    var(--rc-accent-m) 360deg
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
 .os-back-cta:hover {
   transform: translateY(-1px);
   color: var(--rc-accent-m);
