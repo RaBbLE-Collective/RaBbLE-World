@@ -65,7 +65,9 @@
    *   </div>
    */
   function panel({ title, className } = {}) {
-    const root = el('div', 'rc-panel');
+    // rabble-border-harmony: Aether's flowing conic-gradient border ring (the
+    // effect lives in Aether/motion; World only applies it — never redefines it).
+    const root = el('div', 'rc-panel', 'rabble-border-harmony');
     if (className) {
       // Support space-separated class strings
       className.trim().split(/\s+/).forEach(c => root.classList.add(c));
@@ -107,7 +109,7 @@
    * @returns {HTMLDivElement}
    */
   function memberCard({ key, name, role, tagline, accent } = {}) {
-    const root = el('div', 'rc-member-card');
+    const root = el('div', 'rc-member-card', 'rabble-border-harmony');
     if (key) root.dataset.memberKey = key;
 
     // Left accent stripe — colour resolved via CSS custom property cascade
@@ -147,7 +149,7 @@
    *   <button class="rc-btn [secondary]">[icon ]label</button>
    */
   function button(label, { secondary, icon } = {}) {
-    const node = el('button', 'rc-btn');
+    const node = el('button', 'rc-btn', 'rabble-border-harmony');
     if (secondary) node.classList.add('secondary');
     if (icon) {
       const iconEl = el('span', 'rc-btn__icon');

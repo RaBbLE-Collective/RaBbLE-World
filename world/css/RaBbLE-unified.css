@@ -294,26 +294,9 @@ html, body {
               color var(--rc-dur-fast) var(--rc-ease);
 }
 
-/* Conic gradient border ring (pill) — matches OS page CTA */
-.rc-btn::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 999px;
-  padding: 1px;
-  background: conic-gradient(from 225deg,
-    var(--rc-accent-m)   0deg,
-    var(--rc-accent-v)  90deg,
-    var(--rc-accent-c) 180deg,
-    var(--rc-accent-v) 270deg,
-    var(--rc-accent-m) 360deg);
-  -webkit-mask:
-    linear-gradient(#fff 0 0) content-box,
-    linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  pointer-events: none;
-}
+/* Flowing pill border ring comes from Aether .rabble-border-harmony
+ * (applied in RaBbLE-ui.js button factory + movements.js makeBtn/CTA).
+ * World defines only the pill shape, fill, and text colour. */
 
 .rc-btn:hover {
   background: color-mix(in srgb, var(--rc-accent-m) 22%, transparent);
@@ -325,14 +308,6 @@ html, body {
 .rc-btn.secondary {
   background: transparent;
   color: var(--rc-muted);
-}
-
-/* Softer, violet-toned ring for secondary buttons */
-.rc-btn.secondary::before {
-  background: conic-gradient(from 225deg,
-    color-mix(in srgb, var(--rc-accent-v) 55%, transparent)   0deg,
-    color-mix(in srgb, var(--rc-border) 85%, transparent)   180deg,
-    color-mix(in srgb, var(--rc-accent-v) 55%, transparent) 360deg);
 }
 
 .rc-btn.secondary:hover {

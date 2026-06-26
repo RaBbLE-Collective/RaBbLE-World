@@ -97,6 +97,14 @@
     }
     panelHostEl.classList.remove('movement-enter');
 
+    // Apply Aether's flowing border ring to every surface this movement rendered.
+    // The effect (conic ring + harmony-spin) is owned by Aether/motion — the stage
+    // only *applies* the .rabble-border-harmony utility, so panels built ad-hoc in
+    // movement code still flow without World ever redefining the effect.
+    panelHostEl
+      .querySelectorAll('.rc-panel, .rc-member-card, .rc-collective-card, .rc-member-reveal')
+      .forEach(function (surface) { surface.classList.add('rabble-border-harmony'); });
+
     // Entity settles
     if (entityEl && typeof entityEl.setEntityState === 'function') {
       entityEl.setEntityState('idle');

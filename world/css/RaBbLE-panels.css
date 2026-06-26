@@ -27,32 +27,13 @@
   display: flex;
   flex-direction: column;
   gap: var(--rc-gap-sm);
-  /* Soft dual-accent atmospheric glow — panels float on the void */
+  /* Soft dual-accent atmospheric glow — panels float on the void.
+   * The flowing conic-gradient border ring comes from Aether's
+   * .rabble-border-harmony (applied in RaBbLE-ui.js panel factory) —
+   * never redefined here. World owns radius/padding/glow/layout only. */
   box-shadow:
     0 0 28px color-mix(in srgb, var(--rc-accent-m) 5%, transparent),
     0 0 28px color-mix(in srgb, var(--rc-accent-c) 5%, transparent);
-}
-
-/* Conic gradient border ring — mask-composite punches out the content box,
- * leaving only the wrapping ring. Glass-safe (background-clip is not). */
-.rc-panel::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 14px;
-  padding: 1.5px;
-  background: conic-gradient(from 225deg,
-    var(--rc-accent-m)   0deg,
-    var(--rc-accent-v)  90deg,
-    var(--rc-accent-c) 180deg,
-    var(--rc-accent-v) 270deg,
-    var(--rc-accent-m) 360deg);
-  -webkit-mask:
-    linear-gradient(#fff 0 0) content-box,
-    linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  pointer-events: none;
 }
 
 /*
@@ -101,27 +82,7 @@
   border-radius: 12px;
   overflow: hidden; /* clip the stripe's border-radius corners */
   transition: box-shadow var(--rc-dur-fast) var(--rc-ease);
-}
-
-/* Conic gradient border ring — mask technique is overflow:hidden-safe */
-.rc-member-card::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 12px;
-  padding: 1.5px;
-  background: conic-gradient(from 225deg,
-    var(--rc-accent-m)   0deg,
-    var(--rc-accent-v)  90deg,
-    var(--rc-accent-c) 180deg,
-    var(--rc-accent-v) 270deg,
-    var(--rc-accent-m) 360deg);
-  -webkit-mask:
-    linear-gradient(#fff 0 0) content-box,
-    linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  pointer-events: none;
+  /* Flowing border ring from Aether .rabble-border-harmony (ui.js memberCard) */
 }
 
 .rc-member-card:hover {
@@ -305,27 +266,7 @@
   cursor: pointer;
   transition: background var(--rc-dur-fast) var(--rc-ease),
               box-shadow var(--rc-dur-fast) var(--rc-ease);
-}
-
-/* Conic gradient border ring — from 180deg for direction variety */
-.rc-collective-card::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 10px;
-  padding: 1px;
-  background: conic-gradient(from 180deg,
-    var(--rc-accent-m)   0deg,
-    var(--rc-accent-v)  90deg,
-    var(--rc-accent-c) 180deg,
-    var(--rc-accent-v) 270deg,
-    var(--rc-accent-m) 360deg);
-  -webkit-mask:
-    linear-gradient(#fff 0 0) content-box,
-    linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  pointer-events: none;
+  /* Flowing border ring from Aether .rabble-border-harmony.slow (movements.js) */
 }
 
 .rc-collective-card:hover {
@@ -453,27 +394,7 @@
   max-height: 100%;
   animation: memberDetailIn var(--rc-dur-mid) var(--rc-ease) both;
   transition: box-shadow var(--rc-dur-mid) var(--rc-ease);
-}
-
-/* Conic gradient ring — the member's own accent bleeds into the midpoints */
-.rc-member-reveal::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 16px;
-  padding: 1.5px;
-  background: conic-gradient(from 225deg,
-    var(--rc-accent-m)                       0deg,
-    var(--reveal-accent, var(--rc-accent-v)) 90deg,
-    var(--rc-accent-c)                      180deg,
-    var(--reveal-accent, var(--rc-accent-v)) 270deg,
-    var(--rc-accent-m)                      360deg);
-  -webkit-mask:
-    linear-gradient(#fff 0 0) content-box,
-    linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  pointer-events: none;
+  /* Flowing border ring from Aether .rabble-border-harmony (movements.js) */
 }
 
 .rc-member-reveal:hover {

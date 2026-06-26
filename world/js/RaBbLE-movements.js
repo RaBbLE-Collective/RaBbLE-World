@@ -48,7 +48,7 @@
   // Build an rc-btn element.
   function makeBtn(label, secondary) {
     var btn = document.createElement('button');
-    btn.className = 'rc-btn' + (secondary ? ' secondary' : '');
+    btn.className = 'rc-btn rabble-border-harmony' + (secondary ? ' secondary' : '');
     btn.type = 'button';
     btn.textContent = label;
     return btn;
@@ -270,7 +270,7 @@
       var av = accentVar(m.accent);
 
       var card = document.createElement('div');
-      card.className = 'rc-member-reveal';
+      card.className = 'rc-member-reveal rabble-border-harmony';
       card.style.setProperty('--reveal-accent', av);
 
       // Sigil label
@@ -373,7 +373,7 @@
       var av = accentVar(m.accent);
 
       var card = document.createElement('div');
-      card.className = 'rc-collective-card';
+      card.className = 'rc-collective-card rabble-border-harmony slow';
       card.style.setProperty('--card-accent', av);
       cardEls[key] = card;
 
@@ -662,7 +662,7 @@
 
     // CTA — anchor styled as an rc-btn, large
     var cta = document.createElement('a');
-    cta.className = 'rc-btn';
+    cta.className = 'rc-btn rabble-border-harmony';
     cta.href = ctaHref;
     cta.textContent = ctaLabel;
     cta.style.cssText = [
