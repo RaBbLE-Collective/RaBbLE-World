@@ -14,7 +14,7 @@
 
     // ── [1] threshold ─────────────────────────────────────────────────────────
     threshold: {
-      greeting: 'A signal resolves. You — at the threshold.\nI keep this place. Below is the Collective, drawn. Descend when you\'re ready.',
+      greeting: 'A signal resolves. You. At the threshold.\nI keep this place. Below is the Collective, drawn. Descend when you\'re ready.',
       enterLabel: 'enter',
     },
 

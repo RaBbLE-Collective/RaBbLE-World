@@ -113,7 +113,22 @@ html, body {
   align-items: center;
   justify-content: center;
   z-index: var(--rc-z-entity);
-  border-right: 1px solid var(--rc-border);
+}
+
+/* Flowing divider line — magenta → violet → cyan down the right edge */
+#entity-stage::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: 1px;
+  background: linear-gradient(180deg,
+    var(--rc-accent-m),
+    var(--rc-accent-v) 50%,
+    var(--rc-accent-c));
+  opacity: 0.4;
+  pointer-events: none;
 }
 
 #entity-stage rabble-entity {
@@ -123,9 +138,20 @@ html, body {
 
 @media (max-width: 768px) {
   #entity-stage {
-    border-right: none;
-    border-bottom: 1px solid var(--rc-border);
     padding-top: env(safe-area-inset-top, 0px);
+  }
+  /* Re-orient the flowing divider to the bottom edge on mobile */
+  #entity-stage::after {
+    top: auto;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: auto;
+    height: 1px;
+    background: linear-gradient(90deg,
+      var(--rc-accent-m),
+      var(--rc-accent-v) 50%,
+      var(--rc-accent-c));
   }
   #entity-stage rabble-entity { width: 140px; height: 140px; }
 }
@@ -175,9 +201,9 @@ html, body {
 
 /* ── Dock host ────────────────────────────────────────────────────────────── */
 #dock-host {
+  position: relative;
   grid-area: dock;
   z-index: var(--rc-z-dock);
-  border-top: 1px solid var(--rc-border);
   background: var(--rc-glass-80);
   backdrop-filter: var(--rc-blur);
   -webkit-backdrop-filter: var(--rc-blur);
@@ -185,18 +211,40 @@ html, body {
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
+/* Flowing divider line across the top of the dock */
+#dock-host::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg,
+    transparent,
+    var(--rc-accent-m) 20%,
+    var(--rc-accent-v) 50%,
+    var(--rc-accent-c) 80%,
+    transparent);
+  opacity: 0.45;
+  pointer-events: none;
+}
+
 /* ── Tinted-glass panel mixin (apply to .rc-panel) ───────────────────────── */
+/* Aether atmospheric treatment: no flat border — a conic gradient ring is
+ * drawn in RaBbLE-panels.css via ::before (mask-composite technique). Rounder
+ * radius + soft dual-accent glow give panels their liminal, floating quality. */
 .rc-panel {
+  position: relative;
   background: var(--rc-glass-78);
   backdrop-filter: var(--rc-blur);
   -webkit-backdrop-filter: var(--rc-blur);
-  border: 1px solid var(--rc-border);
-  border-radius: 6px;
+  border-radius: 14px;
   padding: var(--rc-gap-md);
 }
 
 /* ── Section header (cyan, VSCode Aether role) ────────────────────────────── */
 .rc-section-header {
+  position: relative;
   font-family: var(--rc-font-mono);
   font-size: var(--rc-size-sm);
   font-weight: 600;
@@ -204,40 +252,92 @@ html, body {
   text-transform: uppercase;
   color: var(--rc-accent-c);
   margin: 0 0 var(--rc-gap-sm);
-  padding-bottom: var(--rc-gap-xs);
-  border-bottom: 1px solid var(--rc-border);
+  padding-bottom: 6px;
+  border-bottom: none;
+}
+
+/* Gradient bottom rule: magenta → violet → cyan → transparent */
+.rc-section-header::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg,
+    var(--rc-accent-m),
+    var(--rc-accent-v) 40%,
+    var(--rc-accent-c) 70%,
+    transparent);
+  opacity: 0.5;
 }
 
 /* ── Button primitives ────────────────────────────────────────────────────── */
 .rc-btn {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: var(--rc-gap-xs);
-  padding: 6px 14px;
-  border-radius: 4px;
-  border: 1px solid var(--rc-accent-m);
+  padding: 6px 16px;
+  border-radius: 999px;
+  /* Kill the native <button> UA border/chrome — the ring is drawn via ::before */
+  border: none;
+  -webkit-appearance: none;
+  appearance: none;
   background: color-mix(in srgb, var(--rc-accent-m) 12%, transparent);
   color: var(--rc-accent-m);
   font-family: var(--rc-font-mono);
   font-size: var(--rc-size-sm);
   cursor: pointer;
   transition: background var(--rc-dur-fast) var(--rc-ease),
-              border-color var(--rc-dur-fast) var(--rc-ease);
+              box-shadow var(--rc-dur-fast) var(--rc-ease),
+              color var(--rc-dur-fast) var(--rc-ease);
+}
+
+/* Conic gradient border ring (pill) — matches OS page CTA */
+.rc-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  padding: 1px;
+  background: conic-gradient(from 225deg,
+    var(--rc-accent-m)   0deg,
+    var(--rc-accent-v)  90deg,
+    var(--rc-accent-c) 180deg,
+    var(--rc-accent-v) 270deg,
+    var(--rc-accent-m) 360deg);
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
 }
 
 .rc-btn:hover {
   background: color-mix(in srgb, var(--rc-accent-m) 22%, transparent);
+  box-shadow:
+    0 0 18px color-mix(in srgb, var(--rc-accent-m) 22%, transparent),
+    0 0 18px color-mix(in srgb, var(--rc-accent-c) 12%, transparent);
 }
 
 .rc-btn.secondary {
-  border-color: var(--rc-border);
   background: transparent;
   color: var(--rc-muted);
 }
 
+/* Softer, violet-toned ring for secondary buttons */
+.rc-btn.secondary::before {
+  background: conic-gradient(from 225deg,
+    color-mix(in srgb, var(--rc-accent-v) 55%, transparent)   0deg,
+    color-mix(in srgb, var(--rc-border) 85%, transparent)   180deg,
+    color-mix(in srgb, var(--rc-accent-v) 55%, transparent) 360deg);
+}
+
 .rc-btn.secondary:hover {
-  border-color: var(--rc-accent-v);
   color: var(--rc-text);
+  box-shadow: 0 0 16px color-mix(in srgb, var(--rc-accent-v) 16%, transparent);
 }
 
 /* ── Movement transition ──────────────────────────────────────────────────── */

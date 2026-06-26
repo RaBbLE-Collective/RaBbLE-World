@@ -27,6 +27,32 @@
   display: flex;
   flex-direction: column;
   gap: var(--rc-gap-sm);
+  /* Soft dual-accent atmospheric glow — panels float on the void */
+  box-shadow:
+    0 0 28px color-mix(in srgb, var(--rc-accent-m) 5%, transparent),
+    0 0 28px color-mix(in srgb, var(--rc-accent-c) 5%, transparent);
+}
+
+/* Conic gradient border ring — mask-composite punches out the content box,
+ * leaving only the wrapping ring. Glass-safe (background-clip is not). */
+.rc-panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+  padding: 1.5px;
+  background: conic-gradient(from 225deg,
+    var(--rc-accent-m)   0deg,
+    var(--rc-accent-v)  90deg,
+    var(--rc-accent-c) 180deg,
+    var(--rc-accent-v) 270deg,
+    var(--rc-accent-m) 360deg);
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
 }
 
 /*
@@ -65,20 +91,41 @@
  * so it can be a full-height block without padding interference.
  */
 .rc-member-card {
+  position: relative;
   display: flex;
   flex-direction: row;
   align-items: stretch;
   background: var(--rc-glass-78);
   backdrop-filter: var(--rc-blur);
   -webkit-backdrop-filter: var(--rc-blur);
-  border: 1px solid var(--rc-border);
-  border-radius: 6px;
+  border-radius: 12px;
   overflow: hidden; /* clip the stripe's border-radius corners */
-  transition: border-color var(--rc-dur-fast) var(--rc-ease);
+  transition: box-shadow var(--rc-dur-fast) var(--rc-ease);
+}
+
+/* Conic gradient border ring — mask technique is overflow:hidden-safe */
+.rc-member-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  padding: 1.5px;
+  background: conic-gradient(from 225deg,
+    var(--rc-accent-m)   0deg,
+    var(--rc-accent-v)  90deg,
+    var(--rc-accent-c) 180deg,
+    var(--rc-accent-v) 270deg,
+    var(--rc-accent-m) 360deg);
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
 }
 
 .rc-member-card:hover {
-  border-color: var(--card-accent, var(--rc-accent-v));
+  box-shadow: 0 0 24px color-mix(in srgb, var(--card-accent, var(--rc-accent-v)) 20%, transparent);
 }
 
 /* Coloured left stripe */
@@ -249,25 +296,46 @@
 
 /* Compact card in the list (tighter than default member-card) */
 .rc-collective-card {
+  position: relative;
   display: flex;
   align-items: stretch;
   background: color-mix(in srgb, var(--rc-surface) 60%, transparent);
-  border: 1px solid var(--rc-border);
-  border-radius: 5px;
+  border-radius: 10px;
   overflow: hidden;
   cursor: pointer;
-  transition: border-color var(--rc-dur-fast) var(--rc-ease),
-              background var(--rc-dur-fast) var(--rc-ease);
+  transition: background var(--rc-dur-fast) var(--rc-ease),
+              box-shadow var(--rc-dur-fast) var(--rc-ease);
+}
+
+/* Conic gradient border ring — from 180deg for direction variety */
+.rc-collective-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 10px;
+  padding: 1px;
+  background: conic-gradient(from 180deg,
+    var(--rc-accent-m)   0deg,
+    var(--rc-accent-v)  90deg,
+    var(--rc-accent-c) 180deg,
+    var(--rc-accent-v) 270deg,
+    var(--rc-accent-m) 360deg);
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
 }
 
 .rc-collective-card:hover {
   background: var(--rc-glass-78);
-  border-color: var(--card-accent, var(--rc-accent-v));
+  box-shadow: 0 0 18px color-mix(in srgb, var(--card-accent, var(--rc-accent-v)) 15%, transparent);
 }
 
 .rc-collective-card.active {
-  border-color: var(--card-accent, var(--rc-accent-v));
   background: color-mix(in srgb, var(--card-accent, var(--rc-accent-v)) 8%, var(--rc-surface));
+  box-shadow: 0 0 26px color-mix(in srgb, var(--card-accent, var(--rc-accent-v)) 24%, transparent);
 }
 
 .rc-collective-card__stripe {
@@ -326,6 +394,7 @@
 }
 
 .rc-collective-placeholder {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -336,8 +405,7 @@
   font-family: var(--rc-font-mono);
   font-size: var(--rc-size-sm);
   text-align: center;
-  border: 1px dashed var(--rc-border);
-  border-radius: 8px;
+  border-radius: 14px;
   padding: var(--rc-gap-xl);
   opacity: 0.6;
 }
@@ -348,8 +416,31 @@
   opacity: 0.4;
 }
 
+/* Faint conic ring — keeps the "empty / awaiting" feel at low opacity */
+.rc-collective-placeholder::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+  padding: 1px;
+  background: conic-gradient(from 225deg,
+    var(--rc-accent-m)   0deg,
+    var(--rc-accent-v)  90deg,
+    var(--rc-accent-c) 180deg,
+    var(--rc-accent-v) 270deg,
+    var(--rc-accent-m) 360deg);
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0.3;
+  pointer-events: none;
+}
+
 /* The member detail card that pops in */
 .rc-member-reveal {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: var(--rc-gap-md);
@@ -357,11 +448,36 @@
   background: var(--rc-glass-78);
   backdrop-filter: var(--rc-blur);
   -webkit-backdrop-filter: var(--rc-blur);
-  border: 1px solid var(--reveal-accent, var(--rc-border));
-  border-radius: 8px;
+  border-radius: 16px;
   overflow-y: auto;
   max-height: 100%;
   animation: memberDetailIn var(--rc-dur-mid) var(--rc-ease) both;
+  transition: box-shadow var(--rc-dur-mid) var(--rc-ease);
+}
+
+/* Conic gradient ring — the member's own accent bleeds into the midpoints */
+.rc-member-reveal::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  padding: 1.5px;
+  background: conic-gradient(from 225deg,
+    var(--rc-accent-m)                       0deg,
+    var(--reveal-accent, var(--rc-accent-v)) 90deg,
+    var(--rc-accent-c)                      180deg,
+    var(--reveal-accent, var(--rc-accent-v)) 270deg,
+    var(--rc-accent-m)                      360deg);
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.rc-member-reveal:hover {
+  box-shadow: 0 0 32px color-mix(in srgb, var(--reveal-accent, var(--rc-accent-v)) 16%, transparent);
 }
 
 .rc-member-reveal__sigil {

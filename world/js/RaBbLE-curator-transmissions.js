@@ -19,7 +19,7 @@
     greet: {
       threshold: [
         'You crossed something to get here. Most don\'t notice the edge. // %CALIBRATING%',
-        'A signal resolves. You — at the threshold. I keep this corridor. Descend when you\'re ready.',
+        'A signal resolves. You, at the threshold. I keep this corridor. Descend when you\'re ready.',
         'Presence registered. I am RaBbLE. Below is the realm; the floor is the Collective, drawn.',
       ],
       realm: [
