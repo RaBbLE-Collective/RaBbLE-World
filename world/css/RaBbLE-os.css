@@ -1,0 +1,213 @@
+/* ── RaBbLE-os.css — Developer Preview install guide ──────────────────── */
+/* Aether tokens only — no raw hex. Parallels RaBbLE-summon.css layout.   */
+
+@keyframes osPageRise {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+html, body {
+  min-height: 100%;
+  overflow-x: hidden;
+}
+
+body.os-entry { opacity: 0; transition: opacity 0.75s ease; }
+body.os-entry.os-ready { opacity: 1; }
+
+#bgCanvas {
+  position: fixed; inset: 0;
+  z-index: 0; pointer-events: none;
+}
+
+#root {
+  position: relative; z-index: 1;
+  min-height: 100dvh;
+  display: flex; flex-direction: column; align-items: center;
+  padding: max(2rem, env(safe-area-inset-top)) 1.5rem max(4rem, env(safe-area-inset-bottom));
+}
+
+/* ── Back nav ──────────────────────────────────────────────────────────── */
+.os-backnav {
+  align-self: flex-start;
+  font-family: var(--rc-font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  color: var(--rc-muted);
+  text-decoration: none;
+  margin-bottom: 1.5rem;
+  opacity: 0.7;
+  transition: opacity 150ms ease, color 150ms ease;
+}
+.os-backnav:hover { opacity: 1; color: var(--rc-accent-c); }
+
+/* ── Header ────────────────────────────────────────────────────────────── */
+.os-header {
+  text-align: center;
+  margin-bottom: 3rem;
+  animation: osPageRise 0.7s var(--rc-ease) forwards;
+}
+.os-wordmark {
+  font-family: var(--rc-font-mono);
+  font-size: 1.1rem;
+  letter-spacing: 0.18em;
+  color: var(--rc-accent-c);
+  text-decoration: none;
+  display: block;
+  margin-bottom: 0.5rem;
+  text-transform: none;
+}
+.os-header-title {
+  font-family: var(--rc-font-mono);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--rc-accent-g);
+  letter-spacing: 0.06em;
+  margin: 0 0 0.5rem;
+  text-transform: none;
+}
+.os-header-warning {
+  display: inline-block;
+  font-family: var(--rc-font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--rc-accent-y);
+  background: color-mix(in srgb, var(--rc-accent-y) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--rc-accent-y) 40%, transparent);
+  border-radius: 3px;
+  padding: 0.25rem 0.6rem;
+}
+
+/* ── Content container ─────────────────────────────────────────────────── */
+.os-content {
+  width: 100%;
+  max-width: 700px;
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+  animation: osPageRise 0.8s var(--rc-ease) 0.1s both;
+}
+
+/* ── Section ───────────────────────────────────────────────────────────── */
+.os-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.os-section-label {
+  font-family: var(--rc-font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--rc-muted);
+  border-bottom: 1px solid var(--rc-border);
+  padding-bottom: 0.4rem;
+}
+.os-section-title {
+  font-family: var(--rc-font-mono);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--rc-accent-c);
+  margin: 0;
+  text-transform: none;
+}
+
+/* ── Glass panel ───────────────────────────────────────────────────────── */
+.os-panel {
+  background: var(--rc-glass-78);
+  backdrop-filter: var(--rc-blur);
+  -webkit-backdrop-filter: var(--rc-blur);
+  border: 1px solid var(--rc-border);
+  border-radius: 4px;
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.os-panel p {
+  margin: 0;
+  font-size: var(--rc-size-md);
+  color: var(--rc-text);
+  line-height: 1.7;
+}
+
+/* ── Spec list ─────────────────────────────────────────────────────────── */
+.os-spec-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.os-spec-list li {
+  font-family: var(--rc-font-mono);
+  font-size: var(--rc-size-sm);
+  color: var(--rc-text);
+  display: flex;
+  gap: 0.75rem;
+}
+.os-spec-list li::before {
+  content: '◈';
+  color: var(--rc-accent-g);
+  flex-shrink: 0;
+}
+
+/* ── Code block ────────────────────────────────────────────────────────── */
+.os-code {
+  font-family: var(--rc-font-mono);
+  font-size: var(--rc-size-sm);
+  color: var(--rc-accent-c);
+  background: color-mix(in srgb, var(--rc-surface) 90%, transparent);
+  border: 1px solid var(--rc-border);
+  border-radius: 3px;
+  padding: 0.75rem 1rem;
+  overflow-x: auto;
+  white-space: pre;
+  line-height: 1.5;
+}
+.os-code-label {
+  font-family: var(--rc-font-mono);
+  font-size: var(--rc-size-xs);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--rc-muted);
+  margin-bottom: 0.4rem;
+}
+
+/* ── Deferred list ─────────────────────────────────────────────────────── */
+.os-deferred-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+.os-deferred-list li {
+  font-family: var(--rc-font-mono);
+  font-size: var(--rc-size-sm);
+  color: var(--rc-muted);
+  display: flex;
+  gap: 0.75rem;
+}
+.os-deferred-list li::before {
+  content: '–';
+  color: var(--rc-accent-y);
+  flex-shrink: 0;
+}
+
+/* ── Footer ────────────────────────────────────────────────────────────── */
+.os-footer {
+  margin-top: 1rem;
+  text-align: center;
+  font-family: var(--rc-font-mono);
+  font-size: var(--rc-size-xs);
+  color: var(--rc-muted);
+  letter-spacing: 0.08em;
+}
+.os-footer a {
+  color: var(--rc-accent-c);
+  text-decoration: none;
+}
+.os-footer a:hover { text-decoration: underline; }

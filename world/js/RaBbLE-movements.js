@@ -314,6 +314,26 @@
         card.appendChild(lineEl);
       });
 
+      // Optional install / detail link
+      if (m.installLink && m.installLink.href) {
+        var linkEl = document.createElement('a');
+        linkEl.href = m.installLink.href;
+        linkEl.textContent = m.installLink.label || 'learn more →';
+        linkEl.style.cssText = [
+          'display:inline-block',
+          'margin-top:var(--rc-gap-sm)',
+          'font-family:var(--rc-font-mono)',
+          'font-size:var(--rc-size-sm)',
+          'color:var(--rc-accent-g)',
+          'text-decoration:none',
+          'letter-spacing:0.04em',
+          'transition:opacity var(--rc-dur-fast)',
+        ].join(';');
+        linkEl.addEventListener('mouseover', function () { linkEl.style.opacity = '0.75'; });
+        linkEl.addEventListener('mouseout',  function () { linkEl.style.opacity = '1'; });
+        card.appendChild(linkEl);
+      }
+
       return card;
     }
 
@@ -402,7 +422,112 @@
 
   Stage.registerMovement({ id: 'collective', title: 'collective', enter: collectiveEnter, exit: collectiveExit });
 
-  // ── [4] converse ────────────────────────────────────────────────────────────
+  // ── [4] episode ─────────────────────────────────────────────────────────────
+
+  function episodeEnter(ctx) {
+    var data = D.episode || {};
+    var headline = data.headline || 'Genesis.';
+    var intro = data.intro || 'This is the beginning.';
+    var entries = data.entries || [];
+    var continueLabel = data.continueLabel || 'continue';
+
+    entityState(ctx, 'speaking');
+    ctx.say(intro, 'rabble');
+
+    var wrap = document.createElement('div');
+    wrap.style.cssText = [
+      'display:flex',
+      'flex-direction:column',
+      'gap:var(--rc-gap-md)',
+      'max-width:600px',
+      'margin:0 auto',
+      'padding:var(--rc-gap-md) 0',
+    ].join(';');
+
+    var hl = document.createElement('h2');
+    hl.className = 'rc-section-header';
+    hl.style.cssText = [
+      'font-size:var(--rc-size-xl)',
+      'text-transform:none',
+      'letter-spacing:0.02em',
+      'color:var(--rc-accent-m)',
+      'border-bottom:none',
+      'margin-bottom:var(--rc-gap-sm)',
+    ].join(';');
+    hl.textContent = headline;
+    wrap.appendChild(hl);
+
+    var panel = makePanel();
+
+    entries.forEach(function (entry) {
+      var row = document.createElement('div');
+      row.style.cssText = [
+        'display:flex',
+        'flex-direction:column',
+        'gap:var(--rc-gap-xs)',
+        'padding:var(--rc-gap-sm) 0',
+        'border-bottom:1px solid var(--rc-border)',
+      ].join(';');
+
+      var labelWrap = document.createElement('div');
+      labelWrap.style.cssText = 'display:flex;align-items:baseline;gap:var(--rc-gap-sm)';
+
+      var labelEl = document.createElement('span');
+      labelEl.style.cssText = [
+        'font-family:var(--rc-font-mono)',
+        'font-size:var(--rc-size-sm)',
+        'font-weight:600',
+        'color:var(--rc-accent-c)',
+        'letter-spacing:0.06em',
+      ].join(';');
+      labelEl.textContent = entry.label || '';
+      labelWrap.appendChild(labelEl);
+
+      if (entry.version) {
+        var verEl = document.createElement('span');
+        verEl.style.cssText = [
+          'font-family:var(--rc-font-mono)',
+          'font-size:var(--rc-size-xs)',
+          'color:var(--rc-accent-y)',
+          'letter-spacing:0.04em',
+        ].join(';');
+        verEl.textContent = entry.version;
+        labelWrap.appendChild(verEl);
+      }
+
+      var bodyEl = document.createElement('p');
+      bodyEl.style.cssText = [
+        'margin:0',
+        'font-size:var(--rc-size-md)',
+        'color:var(--rc-text)',
+        'line-height:1.6',
+      ].join(';');
+      bodyEl.textContent = entry.body || '';
+
+      row.appendChild(labelWrap);
+      row.appendChild(bodyEl);
+      panel.appendChild(row);
+    });
+
+    var pRows = panel.querySelectorAll('div');
+    if (pRows.length) pRows[pRows.length - 1].style.borderBottom = 'none';
+
+    wrap.appendChild(panel);
+
+    var btn = makeBtn(continueLabel);
+    btn.style.alignSelf = 'flex-start';
+    btn.addEventListener('click', function () { Stage.next(); });
+    wrap.appendChild(btn);
+
+    ctx.panelHost.appendChild(wrap);
+    setTimeout(function () { entityState(ctx, 'idle'); }, 1200);
+  }
+
+  function episodeExit(ctx) { /* no-op */ }
+
+  Stage.registerMovement({ id: 'episode', title: 'episode', enter: episodeEnter, exit: episodeExit });
+
+  // ── [5] converse ────────────────────────────────────────────────────────────
 
   function converseEnter(ctx) {
     var data = D.converse || {};
@@ -478,7 +603,7 @@
 
   Stage.registerMovement({ id: 'converse', title: 'converse', enter: converseEnter, exit: converseExit });
 
-  // ── [5] join ─────────────────────────────────────────────────────────────────
+  // ── [6] join ─────────────────────────────────────────────────────────────────
 
   function joinEnter(ctx) {
     var data = D.join || {};
