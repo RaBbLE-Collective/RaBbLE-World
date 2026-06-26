@@ -1,0 +1,1782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="manifest" href="../manifest.json">
+  <link rel="apple-touch-icon" href="../icons/icon-192.png">
+  <link rel="icon" type="image/x-icon" href="../icons/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="../icons/icon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../icons/icon-16.png">
+  <title>RaBbLE — Atlas (Design Catalog)</title>
+  <!-- Flip point: single source for sCoRE / Aether / NeBuLA base URLs. Must precede the loaders. -->
+  <script src="js/RaBbLE-config.js"></script>
+  <script src="js/RaBbLE-aether.js"></script>
+  <!-- NeBuLA IIFE bundle — defines window.NeBuLA + custom elements -->
+  <script src="js/RaBbLE-NeBuLA.js"></script>
+  <style>
+    /*
+     * RaBbLE-Catalog.html — page layout only.
+     * All var() values reference Aether tokens. No hex, no component styling.
+     */
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--rabble-void);
+      color: var(--rabble-text);
+      font-family: var(--rabble-font-ui);
+      font-size: 14px;
+      line-height: 1.5;
+      overflow-y: auto;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Ambient layer ─────────────────────────────────────────────────── */
+    .atlas-ambient {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── Page frame ────────────────────────────────────────────────────── */
+    #atlas-root {
+      position: relative;
+      z-index: 1;
+      max-width: 1360px;
+      margin: 0 auto;
+      padding: var(--rabble-space-7) var(--rabble-space-5) var(--rabble-space-8);
+    }
+
+    /* ── Page header ───────────────────────────────────────────────────── */
+    .atlas-page-header {
+      margin-bottom: var(--rabble-space-7);
+      padding-bottom: var(--rabble-space-5);
+      border-bottom: 1px solid var(--rabble-border);
+    }
+    .atlas-page-title {
+      font-family: var(--rabble-font-mono);
+      font-size: 11px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--rabble-muted);
+      margin: 0 0 var(--rabble-space-2);
+    }
+    .atlas-page-name {
+      font-family: var(--rabble-font-hero);
+      font-size: 32px;
+      font-weight: 700;
+      text-transform: none;
+      background: linear-gradient(135deg, var(--rabble-magenta) 0%, var(--rabble-violet) 50%, var(--rabble-cyan) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 0 0 var(--rabble-space-2);
+    }
+    .atlas-page-sub {
+      font-family: var(--rabble-font-mono);
+      font-size: 12px;
+      color: var(--rabble-muted);
+      letter-spacing: 0.06em;
+      margin: 0;
+    }
+    .atlas-nav-back {
+      display: inline-block;
+      font-family: var(--rabble-font-mono);
+      font-size: 11px;
+      color: var(--rabble-muted);
+      text-decoration: none;
+      letter-spacing: 0.08em;
+      margin-top: var(--rabble-space-3);
+      transition: color 150ms ease;
+    }
+    .atlas-nav-back:hover { color: var(--rabble-cyan); }
+
+    /* ── Section ───────────────────────────────────────────────────────── */
+    .atlas-section {
+      margin-bottom: var(--rabble-space-7);
+    }
+    .atlas-section-meta {
+      display: flex;
+      align-items: center;
+      gap: var(--rabble-space-2);
+      margin-bottom: var(--rabble-space-4);
+    }
+    .atlas-section-count {
+      font-family: var(--rabble-font-mono);
+      font-size: 10px;
+      color: var(--rabble-dimmer);
+      letter-spacing: 0.06em;
+    }
+
+    /* ── Entry gallery ─────────────────────────────────────────────────── */
+    .atlas-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: var(--rabble-space-5);
+    }
+    .atlas-grid.wide {
+      grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+    }
+    .atlas-grid.full {
+      grid-template-columns: 1fr;
+    }
+    .atlas-grid.two-col {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    /* ── Entry card ────────────────────────────────────────────────────── */
+    .atlas-entry {
+      display: flex;
+      flex-direction: column;
+      gap: var(--rabble-space-3);
+      padding: var(--rabble-space-4);
+      background: color-mix(in srgb, var(--rabble-surface) 70%, transparent);
+      border: 1px solid var(--rabble-border);
+      border-radius: var(--rabble-radius-lg);
+    }
+    .atlas-entry-preview {
+      display: flex;
+      align-items: flex-start;
+      justify-content: flex-start;
+      min-height: 48px;
+      padding: var(--rabble-space-2) 0;
+      flex-wrap: wrap;
+      gap: var(--rabble-space-2);
+    }
+    .atlas-entry-preview.centered {
+      justify-content: center;
+      align-items: center;
+    }
+    .atlas-entry-preview.tall {
+      min-height: 120px;
+    }
+    .atlas-entry-preview.entity-tall {
+      min-height: 320px;
+      position: relative;
+    }
+    .atlas-entry-preview.three-tall {
+      min-height: 360px;
+      width: 100%;
+      position: relative;
+    }
+    .atlas-entry-meta {
+      display: flex;
+      align-items: center;
+      gap: var(--rabble-space-2);
+      flex-wrap: wrap;
+    }
+    .atlas-entry-name {
+      font-family: var(--rabble-font-mono);
+      font-size: 12px;
+      color: var(--rabble-text);
+      letter-spacing: 0.04em;
+      flex: 1;
+    }
+    .atlas-entry-code {
+      font-family: var(--rabble-font-mono);
+      font-size: 10px;
+      color: var(--rabble-muted);
+      background: color-mix(in srgb, var(--rabble-void) 60%, transparent);
+      border: 1px solid var(--rabble-border);
+      border-radius: var(--rabble-radius-sm);
+      padding: var(--rabble-space-1) var(--rabble-space-2);
+      overflow-x: auto;
+      white-space: pre;
+      display: block;
+      line-height: 1.5;
+    }
+
+    /* ── Inline overlay demo ────────────────────────────────────────────── */
+    .atlas-overlay-demo {
+      position: relative;
+      overflow: hidden;
+      border-radius: var(--rabble-radius-md);
+      min-height: 200px;
+      width: 100%;
+      background: color-mix(in srgb, var(--rabble-void) 80%, transparent);
+    }
+    .atlas-overlay-demo .rabble-overlay {
+      position: absolute;
+    }
+
+    /* ── Inline whisper demo ────────────────────────────────────────────── */
+    .atlas-whisper-demo {
+      position: relative;
+      min-height: 120px;
+      width: 100%;
+    }
+    .atlas-whisper-demo .rabble-whisper {
+      position: absolute;
+      right: 8px;
+      top: 10px;
+      transform: none;
+    }
+    .atlas-whisper-demo .rabble-whisper.is-active {
+      transform: none;
+    }
+
+    /* ── Inline glitch-veil demo ────────────────────────────────────────── */
+    .atlas-glitch-demo {
+      position: relative;
+      min-height: 80px;
+      overflow: hidden;
+      border-radius: var(--rabble-radius-md);
+      border: 1px solid var(--rabble-border);
+    }
+    .atlas-glitch-demo .rabble-glitch-veil {
+      position: absolute;
+    }
+
+    /* ── CRT demo boxes ────────────────────────────────────────────────── */
+    .atlas-crt-demo {
+      position: relative;
+      min-height: 80px;
+      overflow: hidden;
+      border-radius: var(--rabble-radius-md);
+      border: 1px solid var(--rabble-border);
+      background: color-mix(in srgb, var(--rabble-surface) 80%, transparent);
+    }
+
+    /* ── Starfield demo ────────────────────────────────────────────────── */
+    .atlas-starfield-host {
+      position: relative;
+      width: 100%;
+      height: 200px;
+      border-radius: var(--rabble-radius-md);
+      overflow: hidden;
+      border: 1px solid var(--rabble-border);
+      background: var(--rabble-void);
+    }
+
+    /* ── Token swatches ────────────────────────────────────────────────── */
+    .atlas-swatch-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--rabble-space-2);
+    }
+    .atlas-swatch {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      min-width: 72px;
+    }
+    .atlas-swatch-color {
+      width: 52px;
+      height: 52px;
+      border-radius: var(--rabble-radius-md);
+      border: 1px solid color-mix(in srgb, var(--rabble-text) 15%, transparent);
+    }
+    .atlas-swatch-label {
+      font-family: var(--rabble-font-mono);
+      font-size: 9px;
+      color: var(--rabble-muted);
+      letter-spacing: 0.06em;
+      text-align: center;
+      text-transform: uppercase;
+    }
+
+    /* ── Type scale demo ───────────────────────────────────────────────── */
+    .atlas-type-row {
+      display: flex;
+      flex-direction: column;
+      gap: var(--rabble-space-2);
+    }
+    .atlas-type-sample {
+      display: flex;
+      align-items: baseline;
+      gap: var(--rabble-space-4);
+    }
+    .atlas-type-meta {
+      font-family: var(--rabble-font-mono);
+      font-size: 9px;
+      color: var(--rabble-dimmer);
+      letter-spacing: 0.06em;
+      width: 80px;
+      flex-shrink: 0;
+    }
+
+    /* ── Spacing demo ──────────────────────────────────────────────────── */
+    .atlas-spacing-row {
+      display: flex;
+      flex-direction: column;
+      gap: var(--rabble-space-2);
+    }
+    .atlas-spacing-sample {
+      display: flex;
+      align-items: center;
+      gap: var(--rabble-space-3);
+    }
+    .atlas-spacing-bar {
+      height: 12px;
+      background: color-mix(in srgb, var(--rabble-cyan) 40%, transparent);
+      border-radius: var(--rabble-radius-sm);
+      flex-shrink: 0;
+    }
+    .atlas-spacing-meta {
+      font-family: var(--rabble-font-mono);
+      font-size: 9px;
+      color: var(--rabble-muted);
+      letter-spacing: 0.06em;
+      white-space: nowrap;
+    }
+
+    /* ── UI factory mount targets ──────────────────────────────────────── */
+    .atlas-factory-mount {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 80px;
+    }
+
+    /* ── Section divider ───────────────────────────────────────────────── */
+    .atlas-divider {
+      height: 1px;
+      background: linear-gradient(90deg,
+        transparent,
+        color-mix(in srgb, var(--rabble-border) 80%, transparent) 20%,
+        color-mix(in srgb, var(--rabble-border) 80%, transparent) 80%,
+        transparent);
+      margin: var(--rabble-space-7) 0;
+    }
+
+    /* ── Responsive ────────────────────────────────────────────────────── */
+    @media (max-width: 768px) {
+      .atlas-grid.two-col { grid-template-columns: 1fr; }
+      .atlas-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body data-page-id="catalog">
+
+  <!-- Ambient background layer -->
+  <div class="atlas-ambient">
+    <div class="rabble-scanlines"></div>
+    <div class="rabble-vignette"></div>
+    <div class="rabble-chromatic"></div>
+  </div>
+
+  <div id="atlas-root">
+
+    <!-- ── Page header ─────────────────────────────────────────────── -->
+    <div class="atlas-page-header">
+      <p class="atlas-page-title">◈ framework catalog · Aether + NeBuLA · Episode 1</p>
+      <h1 class="atlas-page-name">Atlas</h1>
+      <p class="atlas-page-sub">Every component and element rendered from Aether CSS classes + NeBuLA custom elements. Zero bespoke component CSS.</p>
+      <a class="atlas-nav-back" href="../index.html">← joinrabble.world</a>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════════════
+         § 1 — SURFACES
+         Components: .rabble-panel, .rabble-border-harmony, .rabble-harmony-line
+    ═══════════════════════════════════════════════════════════════════ -->
+    <section class="atlas-section" id="s-surfaces">
+      <div class="atlas-section-meta">
+        <div class="rabble-section-header">Surfaces</div>
+        <span class="atlas-section-count">3 components</span>
+      </div>
+      <div class="atlas-grid">
+
+        <!-- rabble-panel -->
+        <div class="atlas-entry">
+          <div class="atlas-entry-preview">
+            <div class="rabble-panel" style="width:100%">
+              A panel is a glass surface. It holds content without imposing.
+            </div>
+          </div>
+          <div class="atlas-entry-meta">
+            <span class="atlas-entry-name">.rabble-panel</span>
+            <span class="rabble-badge rabble-accent-magenta">Aether</span>
+          </div>
+          <code class="atlas-entry-code">&lt;div class="rabble-panel"&gt;...&lt;/div&gt;</code>
+        </div>
+
+        <!-- rabble-border-harmony -->
+        <div class="atlas-entry">
+          <div class="atlas-entry-preview tall centered">
+            <div class="rabble-border-harmony" style="width:100%;min-height:80px;padding:var(--rabble-space-4);display:flex;align-items:center;justify-content:center">
+              <span style="font-family:var(--rabble-font-mono);font-size:12px;color:var(--rabble-muted)">flowing boundary</span>
+            </div>
+          </div>
+          <div class="atlas-entry-meta">
+            <span class="atlas-entry-name">.rabble-border-harmony</span>
+            <span class="rabble-badge rabble-accent-magenta">Aether</span>
+          </div>
+          <code class="atlas-entry-code">&lt;div class="rabble-border-harmony"&gt;...&lt;/div&gt;</code>
+        </div>
+
+        <!-- rabble-harmony-line -->
+        <div class="atlas-entry">
+          <div class="atlas-entry-preview tall" style="flex-direction:column;gap:var(--rabble-space-3)">
+            <div class="rabble-harmony-line" style="width:100%"></div>
+            <div class="rabble-harmony-line slow" style="width:100%"></div>
+            <div class="rabble-harmony-line fast" style="width:100%"></div>
+          </div>
+          <div class="atlas-entry-meta">
+            <span class="atlas-entry-name">.rabble-harmony-line</span>
+            <span class="rabble-badge rabble-accent-magenta">Aether</span>
+          </div>
+          <code class="atlas-entry-code">&lt;div class="rabble-harmony-line"&gt;&lt;/div&gt;
+&lt;div class="rabble-harmony-line slow"&gt;&lt;/div&gt;
+&lt;div class="rabble-harmony-line fast"&gt;&lt;/div&gt;</code>
+        </div>
+
+      </div>
+    </section>
+
+    <div class="atlas-divider"></div>
+
+    <!-- ══════════════════════════════════════════════════════════════════
+         § 2 — CARDS
+         Components: .rabble-card + mods + accents
+    ═══════════════════════════════════════════════════════════════════ -->
+    <section class="atlas-section" id="s-cards">
+      <div class="atlas-section-meta">
+        <div class="rabble-section-header">Cards</div>
+        <span class="atlas-section-count">11 variants</span>
+      </div>
+      <div class="atlas-grid">
+
+        <!-- base card -->
+        <div class="atlas-entry">
+          <div class="atlas-entry-preview">
+            <div class="rabble-card rabble-accent-magenta" style="padding:var(--rabble-space-3);width:100%">
+              <div style="font-family:var(--rabble-font-mono);font-size:12px;color:var(--rabble-muted)">base card · magenta accent</div>
+            </div>
+          </div>
+          <div class="atlas-entry-meta">
+            <span class="atlas-entry-name">.rabble-card</span>
+            <span class="rabble-badge rabble-accent-magenta">Aether</span>
+          </div>
+          <code class="atlas-entry-code">&lt;div class="rabble-card rabble-accent-magenta"&gt;...&lt;/div&gt;</code>
+        </div>
+
+        <!-- .is-flat -->
+        <div class="atlas-entry">
+          <div class="atlas-entry-preview">
+            <div class="rabble-card is-flat rabble-accent-cyan" style="padding:var(--rabble-space-3);width:100%">
+              <div style="font-family:var(--rabble-font-mono);font-size:12px;color:var(--rabble-muted)">.is-flat · cyan accent</div>
+            </div>
+          </div>
+          <div class="atlas-entry-meta">
+            <span class="atlas-entry-name">.rabble-card.is-flat</span>
+            <span class="rabble-badge rabble-accent-magenta">Aether</span>
+          </div>
+          <code class="atlas-entry-code">&lt;div class="rabble-card is-flat rabble-accent-cyan"&gt;...&lt;/div&gt;</code>
+        </div>
+
+        <!-- .is-raised -->
+        <div class="atlas-entry">
+          <div class="atlas-entry-preview">
+            <div class="rabble-card is-raised rabble-accent-violet" style="padding:var(--rabble-space-3);width:100%">
+              <div style="font-family:var(--rabble-font-mono);font-size:12px;color:var(--rabble-muted)">.is-raised · violet accent</div>
+            </div>
+          </div>
+          <div class="atlas-entry-meta">
+            <span class="atlas-entry-name">.rabble-card.is-raised</span>
+            <span class="rabble-badge rabble-accent-magenta">Aether</span>
+          </div>
+          <code class="atlas-entry-code">&lt;div class="rabble-card is-raised rabble-accent-violet"&gt;...&lt;/div&gt;</code>
+        </div>
+
+        <!-- .is-active -->
+        <div class="atlas-entry">
+          <div class="atlas-entry-preview">
+            <div class="rabble-card is-active rabble-accent-pink" style="padding:var(--rabble-space-3);width:100%">
+              <div style="font-family:var(--rabble-font-mono);font-size:12px;color:var(--rabble-muted)">.is-active · pink accent</div>
+            </div>
+          </div>
+          <div class="atlas-entry-meta">
+            <span class="atlas-entry-name">.rabble-card.is-active</span>
+            <span class="rabble-badge rabble-accent-magenta">Aether</span>
+          </div>
+          <code class="atlas-entry-code">&lt;div class="rabble-card is-active rabble-accent-pink"&gt;...&lt;/div&gt;</code>
+        </div>
+
+        <!-- accent swatches: green, yellow, red -->
+        <div class="atlas-entry">
+          <div class="atlas-entry-preview" style="flex-direction:column;gap:var(--rabble-space-2)">
+            <div class="rabble-card rabble-accent-green" style="padding:var(--rabble-space-2) var(--rabble-space-3);width:100%">
+              <span style="font-family:var(--rabble-font-mono);font-size:11px;color:var(--rabble-muted)">.rabble-accent-green</span>
+            </div>
+            <div class="rabble-card rabble-accent-yellow" style="padding:var(--rabble-space-2) var(--rabble-space-3);width:100%">
+              <span style="font-family:var(--rabble-font-mono);font-size:11px;color:var(--rabble-muted)">.rabble-accent-yellow</span>
+            </div>
+            <div class="rabble-card rabble-accent-red" style="padding:var(--rabble-space-2) var(--rabble-space-3);width:100%">
+              <span style="font-family:var(--rabble-font-mono);font-size:11px;color:var(--rabble-muted)">.rabble-accent-red</span>
+            </div>
+          </div>
+          <div class="atlas-entry-meta">
+            <span class="atlas-entry-name">.rabble-accent-{green,yellow,red}</span>
+            <span class="rabble-badge rabble-accent-magenta">Aether</span>
+          </div>
+          <code class="atlas-entry-code">&lt;div class="rabble-card rabble-accent-green"&gt;</code>
+        </div>
+
+        <!-- section-header inside a panel -->
+        <div class="atlas-entry">
+          <div class="atlas-entry-preview tall">
+            <div class="rabble-panel" style="width:100%">
+              <div class="rabble-section-header">◈ section title</div>
+              <p style="font-size:13px;color:var(--rabble-muted);margin:0">Content lives below the section header. The header uses mono, cyan, glow.</p>
+            </div>
+          </div>
+          <div class="atlas-entry-meta">
+            <span class="atlas-entry-name">.rabble-section-header</span>
+            <span class="rabble-badge rabble-accent-magenta">Aether</span>
+          </div>
+          <code class="atlas-entry-code">&lt;div class="rabble-section-header"&gt;◈ title&lt;/div&gt;</code>
+        </div>
+
+      </div>
+    </section>
+
+    <div class="atlas-divider"></div>
+
+    <!-- ══════════════════════════════════════════════════════════════════
+         § 3 — CONTROLS
+         Components: .rabble-btn, .rabble-badge, .rabble-stat-row
+    ═══════════════════════════════════════════════════════════════════ -->
+    <section class="atlas-section" id="s-controls">
+      <div class="atlas-section-meta">
+        <div class="rabble-section-header">Controls</div>
+        <span class="atlas-section-count">8 variants</span>
+      </div>
+      <div class="atlas-grid">
+
+        <!-- rabble-btn primary -->
+        <div class="atlas-entry">
+          <div class="atlas-entry-preview centered">
+            <button class="rabble-btn">Cast</button>
+          </div>
+          <div class="atlas-entry-meta">
+            <span class="atlas-entry-name">.rabble-btn</span>
+            <span class="rabble-badge rabble-accent-magenta">Aether</span>
+          </div>
+          <code class="atlas-entry-code">&lt;button class="rabble-btn"&gt;Cast&lt;/button&gt;</code>
+        </div>
+
+        <!-- rabble-btn-pill -->
+        <div class="atlas-entry">
+          <div class="atlas-entry-preview centered" style="gap:var(--rabble-space-2)">
+            <button class="rabble-btn rabble-btn-pill">Summon</button>
+          </div>
+          <div class="atlas-entry-meta">
+            <span class="atlas-entry-name">.rabble-btn-pill</span>
+            <span class="rabble-badge rabble-accent-magenta">Aether</span>
+          </div>
+          <code class="atlas-entry-code">&lt;button class="rabble-btn rabble-btn-pill"&gt;Summon&lt;/button&gt;</code>
+        </div>
+
+        <!-- rabble-btn.is-secondary -->
+        <div class="atlas-entry">
+          <div class="atlas-entry-preview centered">
+            <button class="rabble-btn is-secondary rabble-accent-cyan">Defer</button>
+          </div>
+          <div class="atlas-entry-meta">
+            <span class="atlas-entry-name">.rabble-btn.is-secondary</span>
+            <span class="rabble-badge rabble-accent-magenta">Aether</span>
+          </div>
+          <code class="atlas-entry-code">&lt;button class="rabble-btn is-secondary"&gt;Defer&lt;/button&gt;</code>
+        </div>
+
+        <!-- rabble-badge variants -->
+        <div class="atlas-entry">
+          <div class="atlas-entry-preview" style="flex-wrap:wrap;gap:var(--rabble-space-2)">
+            <span class="rabble-badge rabble-accent-magenta">Aether</span>
+            <span class="rabble-badge rabble-accent-cyan">NeBuLA</span>
+            <span class="rabble-badge rabble-accent-violet">v0.0.0.0</span>
+            <span class="rabble-badge rabble-accent-green">live</span>
+            <span class="rabble-badge rabble-accent-yellow">warn</span>
+            <span class="rabble-badge rabble-accent-red">error</span>
+            <span class="rabble-badge rabble-accent-pink">EP1</span>
+          </div>
+          <div class="atlas-entry-meta">
+            <span class="atlas-entry-name">.rabble-badge</span>
+            <span class="rabble-badge rabble-accent-magenta">Aether</span>
+          </div>
+          <code class="atlas-entry-code">&lt;span class="rabble-badge rabble-accent-cyan"&gt;NeBuLA&lt;/span&gt;</code>
+        </div>
+
+        <!-- rabble-stat-row -->
+        <div class="atlas-entry">
+          <div class="atlas-entry-preview tall" style="width:100%">
+            <div style="width:100%">
+              <div class="rabble-stat-row">
+                <span class="rabble-stat-row-label">Epoch</span>
+                <span class="rabble-stat-row-value">0</span>
+              </div>
+              <div class="rabble-stat-row">
+                <span class="rabble-stat-row-label">Echo</span>
+                <span class="rabble-stat-row-value">0</span>
+              </div>
+              <div class="rabble-stat-row">
+                <span class="rabble-stat-row-label">Episode</span>
+                <span class="rabble-stat-row-value">1 · Genesis</span>
+              </div>
+              <div class="rabble-stat-row">
+                <span class="rabble-stat-row-label">Backend</span>
+                <span class="rabble-stat-row-value">Canvas2D</span>
+              </div>
+            </div>
+          </div>
+          <div class="atlas-entry-meta">
+            <span class="atlas-entry-name">.rabble-stat-row</span>
+            <span class="rabble-badge rabble-accent-magenta">Aether</span>
+          </div>
+          <code class="atlas-entry-code">&lt;div class="rabble-stat-row"&gt;
+  &lt;span class="rabble-stat-row-label"&gt;Key&lt;/span&gt;
+  &lt;span class="rabble-stat-row-value"&gt;Value&lt;/span&gt;
+&lt;/div&gt;</code>
+        </div>
+
+      </div>
+    </section>
+
+    <div class="atlas-divider"></div>
+
+    <!-- ══════════════════════════════════════════════════════════════════
+         § 4 — NAVIGATION
+         Components: .rabble-statusbar, .rabble-dock, .rabble-rail
+    ═══════════════════════════════════════════════════════════════════ -->
+    <section class="atlas-section" id="s-navigation">
+      <div class="atlas-section-meta">
+        <div class="rabble-section-header">Navigation</div>
+        <span class="atlas-section-count">3 components</span>
+      </div>
+      <div class="atlas-grid full">
+
+        <!-- rabble-statusbar -->
+        <div class="atlas-entry">
+          <div class="atlas-entry-preview" style="flex-direction:column;gap:0;width:100%">
+            <div class="rabble-statusbar">
+              <div class="rabble-statusbar-zone">
+                <span class="rabble-sigil">◈</span>
+                <span style="font-family:var(--rabble-font-mono);font-size:11px;color:var(--rabble-muted)">RaBbLE</span>
+              </div>
+              <div class="rabble-statusbar-zone">
+                <span style="font-family:var(--rabble-font-mono);font-size:11px;color:var(--rabble-cyan)">EP1 · Genesis · v0.0.0.1</span>
+              </div>
+              <div class="rabble-statusbar-zone">
+                <span class="rabble-badge rabble-accent-green" style="font-size:9px">local</span>
+                <span style="font-family:var(--rabble-font-mono);font-size:11px;color:var(--rabble-muted)">Canvas2D</span>
+              </div>
+            </div>
+          </div>
+          <div class="atlas-entry-meta">
+            <span class="atlas-entry-name">.rabble-statusbar + .rabble-statusbar-zone</span>
+            <span class="rabble-badge rabble-accent-magenta">Aether</span>
+          </div>
+          <code class="atlas-entry-code">&lt;div class="rabble-statusbar"&gt;
+  &lt;div class="rabble-statusbar-zone"&gt;...&lt;/div&gt;
+  &lt;div class="rabble-statusbar-zone"&gt;...&lt;/div&gt;
+  &lt;div class="rabble-statusbar-zone"&gt;...&lt;/div&gt;
+&lt;/div&gt;</code>
+        </div>
+
+        <!-- rabble-rail -->
+        <div class="atlas-entry">
+          <div class="atlas-entry-preview" style="flex-direction:column;gap:var(--rabble-space-3);width:100%">
+            <div class="rabble-rail" style="width:100%">
+              <div class="rabble-rail-fill" style="width:33%"></div>
+            </div>
+            <div class="rabble-rail" style="width:100%">
+              <div class="rabble-rail-fill" style="width:66%"></div>
+            </div>
+            <div class="rabble-rail" style="width:100%">
+              <div class="rabble-rail-fill" style="width:100%"></div>
+            </div>
+          </div>
+          <div class="atlas-entry-meta">
+            <span class="atlas-entry-name">.rabble-rail + .rabble-rail-fill</span>
+            <span class="rabble-badge rabble-accent-magenta">Aether</span>
+          </div>
+          <code class="atlas-entry-code">&lt;div class="rabble-rail"&gt;
+  &lt;div class="rabble-rail-fill" style="width:66%"&gt;&lt;/div&gt;
+&lt;/div&gt;</code>
+        </div>
+
+        <!-- rabble-dock collapsed + open -->
+        <div class="atlas-entry">
+          <div class="atlas-entry-preview" style="flex-direction:column;gap:var(--rabble-space-4);width:100%">
+            <!-- Collapsed -->
+            <div>
+              <p style="font-family:var(--rabble-font-mono);font-size:10px;color:var(--rabble-dimmer);margin:0 0 var(--rabble-space-1)">collapsed</p>
+              <div class="rabble-dock">
+                <div class="rabble-dock-item">
+                  <span class="rabble-sigil">◈</span>
+                  <span class="rabble-transmission">RaBbLE is listening...</span>
+                </div>
+              </div>
+            </div>
+            <!-- Open -->
+            <div>
+              <p style="font-family:var(--rabble-font-mono);font-size:10px;color:var(--rabble-dimmer);margin:0 0 var(--rabble-space-1)">.is-open</p>
+              <div class="rabble-dock is-open" style="max-height:160px">
+                <div class="rabble-log" style="min-height:100px">
+                  <div class="rabble-log-line is-entity"><span class="rabble-log-who">RaBbLE</span> The loop is local. That is the honest beginning.</div>
+                  <div class="rabble-log-line is-user"><span class="rabble-log-who">you</span> What comes next?</div>
+                  <div class="rabble-log-line is-system"><span class="rabble-log-who">sys</span> Episode 2 · Exodus</div>
+                </div>
+                <div class="rabble-dock-item">
+                  <span class="rabble-sigil is-thinking" id="dockSigil">◈</span>
+                  <span class="rabble-transmission">thinking...</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="atlas-entry-meta">
+            <span class="atlas-entry-name">.rabble-dock + .rabble-dock-item + .is-open</span>
+            <span class="rabble-badge rabble-accent-magenta">Aether</span>
+          </div>
+          <code class="atlas-entry-code">&lt;div class="rabble-dock is-open"&gt;
+  &lt;div class="rabble-dock-item"&gt;
+    &lt;span class="rabble-sigil"&gt;◈&lt;/span&gt;
+    &lt;span class="rabble-transmission"&gt;...&lt;/span&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</code>
+        </div>
+
+      </div>
+    </section>
+
+    <div class="atlas-divider"></div>
+
+    <!-- ══════════════════════════════════════════════════════════════════
+         § 5 — ENTITY & RENDER
+         NeBuLA custom elements + UI factories
+    ═══════════════════════════════════════════════════════════════════ -->
+    <section class="atlas-section" id="s-entity">
+      <div class="atlas-section-meta">
+        <div class="rabble-section-header">Entity &amp; Render</div>
+        <span class="atlas-section-count">8 elements</span>
+      </div>
+      <div class="atlas-grid wide">
+
+        <!-- rabble-entity -->
+        <div class="atlas-entry">
+          <div class="atlas-entry-preview entity-tall">
+            <rabble-entity
+              id="catalogEntity"
+              style="width:100%;height:320px;display:block"
+              mode="idle"
+              particle-count="180"
+              overscan="1.8"
+            ></rabble-entity>
+          </div>
+          <div class="atlas-entry-meta">
+            <span class="atlas-entry-name" id="entityStateLabel">&lt;rabble-entity&gt; · idle</span>
+            <span class="rabble-badge rabble-accent-cyan">NeBuLA</span>
+          </div>
+          <code class="atlas-entry-code">&lt;rabble-entity mode="idle" particle-count="180"&gt;&lt;/rabble-entity&gt;
+// entity.setEntityState('thinking')
+// entity.setEntityState('speaking')</code>
+        </div>
+
+        <!-- rabble-floor -->
+        <div class="atlas-entry">
+          <div class="atlas-entry-preview three-tall" id="floorPreview">
+            <rabble-floor
+              id="catalogFloor"
+              style="width:100%;height:360px;display:block"
+              zoom="1.0"
+            ></rabble-floor>
+          </div>
+          <div class="atlas-entry-meta">
+            <span class="atlas-entry-name">&lt;rabble-floor&gt;</span>
+            <span class="rabble-badge rabble-accent-cyan">NeBuLA</span>
+          </div>
+          <code class="atlas-entry-code">&lt;rabble-floor zoom="1.0"&gt;&lt;/rabble-floor&gt;
+// floor.setData({ docs, kinds, seals, memberUV })</code>
+        </div>
+
+        <!-- rabble-graph -->
+        <div class="atlas-entry">
+          <div class="atlas-entry-preview three-tall" id="graphPreview">
+            <rabble-graph
+              id="catalogGraph"
+              style="width:100%;height:360px;display:block"
+            ></rabble-graph>
+          </div>
+          <div class="atlas-entry-meta">
+            <span class="atlas-entry-name">&lt;rabble-graph&gt;</span>
+            <span class="rabble-badge rabble-accent-cyan">NeBuLA</span>
+          </div>
+          <code class="atlas-entry-code">&lt;rabble-graph&gt;&lt;/rabble-graph&gt;
+// graph.setData({ docs, kinds, seals })
+// graph.zoomIn() / zoomOut() / resetView()</code>
+        </div>
+
+        <!-- rabble-doors (stub) -->
+        <div class="atlas-entry">
+          <div class="atlas-entry-preview tall centered">
+            <div style="width:100%;min-height:100px;display:flex;align-items:center;justify-content:center">
+              <rabble-doors
+                id="catalogDoors"
+                style="width:200px;height:100px;display:block;border:1px solid var(--rabble-border);border-radius:var(--rabble-radius-md)"
+              ></rabble-doors>
+            </div>
+          </div>
+          <div class="atlas-entry-meta">
+            <span class="atlas-entry-name">&lt;rabble-doors&gt; (P5 stub)</span>
+            <span class="rabble-badge rabble-accent-cyan">NeBuLA</span>
+            <span class="rabble-badge rabble-accent-yellow">stub</span>
+          </div>
+          <code class="atlas-entry-code">&lt;rabble-doors&gt;&lt;/rabble-doors&gt;
+// post-EP1 orbital-door implementation</code>
+        </div>
+
+        <!-- NeBuLA.ui.createEntityMini -->
+        <div class="atlas-entry">
+          <div class="atlas-entry-preview tall centered">
+            <div class="atlas-factory-mount" id="mountEntityMini"></div>
+          </div>
+          <div class="atlas-entry-meta">
+            <span class="atlas-entry-name">NeBuLA.ui.createEntityMini()</span>
+            <span class="rabble-badge rabble-accent-cyan">NeBuLA</span>
+          </div>
+          <code class="atlas-entry-code">const mini = NeBuLA.ui.createEntityMini();
+container.appendChild(mini.el);</code>
+        </div>
+
+        <!-- NeBuLA.ui.createGrimoireEye -->
+        <div class="atlas-entry">
+          <div class="atlas-entry-preview tall centered">
+            <div class="atlas-factory-mount" id="mountGrimoireEye"></div>
+          </div>
+          <div class="atlas-entry-meta">
+            <span class="atlas-entry-name">NeBuLA.ui.createGrimoireEye()</span>
+            <span class="rabble-badge rabble-accent-cyan">NeBuLA</span>
+          </div>
+          <code class="atlas-entry-code">const eye = NeBuLA.ui.createGrimoireEye({size:80});
+container.appendChild(eye.el);</code>
+        </div>
+
+        <!-- NeBuLA.ui.createAmbientEye -->
+        <div class="atlas-entry">
+          <div class="atlas-entry-preview tall centered">
+            <div class="atlas-factory-mount" id="mountAmbientEye"></div>
+          </div>
+          <div class="atlas-entry-meta">
+            <span class="atlas-entry-name">NeBuLA.ui.createAmbientEye()</span>
+            <span class="rabble-badge rabble-accent-cyan">NeBuLA</span>
+          </div>
+          <code class="atlas-entry-code">const eye = NeBuLA.ui.createAmbientEye({size:80});
+container.appendChild(eye.el);</code>
+        </div>
+
+        <!-- NeBuLA.ui.createGrimoireRing -->
+        <div class="atlas-entry">
+          <div class="atlas-entry-preview tall centered">
+            <div class="atlas-factory-mount" id="mountGrimoireRing"></div>
+          </div>
+          <div class="atlas-entry-meta">
+            <span class="atlas-entry-name">NeBuLA.ui.createGrimoireRing()</span>
+            <span class="rabble-badge rabble-accent-cyan">NeBuLA</span>
+          </div>
+          <code class="atlas-entry-code">const ring = NeBuLA.ui.createGrimoireRing({size:120});
+container.appendChild(ring.el);</code>
+        </div>
+
+      </div>
+    </section>
+
+    <div class="atlas-divider"></div>
+
+    <!-- ══════════════════════════════════════════════════════════════════
+         § 6 — CHAT & LOG
+         Components: .rabble-log, .rabble-chat, .rabble-transmission, .rabble-askbox
+    ═══════════════════════════════════════════════════════════════════ -->
+    <section class="atlas-section" id="s-chat">
+      <div class="atlas-section-meta">
+        <div class="rabble-section-header">Chat &amp; Log</div>
+        <span class="atlas-section-count">5 components</span>
+      </div>
+      <div class="atlas-grid wide">
+
+        <!-- rabble-log -->
+        <div class="atlas-entry">
+          <div class="atlas-entry-preview tall">
+            <div class="rabble-log" style="height:140px;width:100%;border:1px solid var(--rabble-border);border-radius:var(--rabble-radius-md)">
+              <div class="rabble-log-line is-system"><span class="rabble-log-who">sys</span> boot sequence complete</div>
+              <div class="rabble-log-line is-entity"><span class="rabble-log-who">RaBbLE</span> I am here. The loop is local.</div>
+              <div class="rabble-log-line is-user"><span class="rabble-log-who">you</span> What is a Grimoire?</div>
+              <div class="rabble-log-line is-entity"><span class="rabble-log-who">RaBbLE</span> The Grimoire is the knowledge layer. Every session leaves a trace.</div>
+              <div class="rabble-log-line is-system"><span class="rabble-log-who">sys</span> 4 messages · session S179</div>
+            </div>
+          </div>
+          <div class="atlas-entry-meta">
+            <span class="atlas-entry-name">.rabble-log + .rabble-log-line</span>
+            <span class="rabble-badge rabble-accent-magenta">Aether</span>
+          </div>
+          <code class="atlas-entry-code">&lt;div class="rabble-log"&gt;
+  &lt;div class="rabble-log-line is-entity"&gt;
+    &lt;span class="rabble-log-who"&gt;RaBbLE&lt;/span&gt; ...
+  &lt;/div&gt;
+  &lt;div class="rabble-log-line is-user"&gt;...&lt;/div&gt;
+  &lt;div class="rabble-log-line is-system"&gt;...&lt;/div&gt;
+&lt;/div&gt;</code>
+        </div>
+
+        <!-- rabble-chat + rabble-askbox -->
+        <div class="atlas-entry">
+          <div class="atlas-entry-preview tall" style="flex-direction:column;width:100%;gap:var(--rabble-space-2)">
+            <div class="rabble-chat rabble-accent-cyan" style="min-height:100px;padding:var(--rabble-space-2)">
+              <div class="rabble-chat-bubble is-entity">The cloud is an extension. The OS is where RaBbLE is sovereign.</div>
+              <div class="rabble-chat-bubble is-user rabble-accent-magenta">How do I start?</div>
+              <div class="rabble-chat-bubble is-entity">curl -fsSL https://joinrabble.world/setup.sh | bash</div>
+            </div>
+            <div class="rabble-askbox rabble-accent-cyan">
+              <div class="rabble-askbox-input">
+                <input type="text" placeholder="ask RaBbLE anything..." readonly>
+              </div>
+            </div>
+          </div>
+          <div class="atlas-entry-meta">
+            <span class="atlas-entry-name">.rabble-chat + .rabble-chat-bubble + .rabble-askbox</span>
+            <span class="rabble-badge rabble-accent-magenta">Aether</span>
+          </div>
+          <code class="atlas-entry-code">&lt;div class="rabble-chat rabble-accent-cyan"&gt;
+  &lt;div class="rabble-chat-bubble is-entity"&gt;...&lt;/div&gt;
+  &lt;div class="rabble-chat-bubble is-user"&gt;...&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="rabble-askbox"&gt;
+  &lt;div class="rabble-askbox-input"&gt;&lt;input ...&gt;&lt;/div&gt;
+&lt;/div&gt;</code>
+        </div>
+
+        <!-- rabble-transmission -->
+        <div class="atlas-entry">
+          <div class="atlas-entry-preview tall">
+            <div class="rabble-panel" style="width:100%">
+              <div style="display:flex;align-items:center;gap:var(--rabble-space-2)">
+                <span class="rabble-sigil">◈</span>
+                <span class="rabble-transmission" id="transmissionDemo">RaBbLE is observing the session flow...</span>
+              </div>
+            </div>
+          </div>
+          <div class="atlas-entry-meta">
+            <span class="atlas-entry-name">.rabble-transmission</span>
+            <span class="rabble-badge rabble-accent-magenta">Aether</span>
+          </div>
+          <code class="atlas-entry-code">&lt;span class="rabble-transmission"&gt;text truncates with ellipsis&lt;/span&gt;</code>
+        </div>
+
+      </div>
+    </section>
+
+    <div class="atlas-divider"></div>
+
+    <!-- ══════════════════════════════════════════════════════════════════
+         § 7 — OVERLAYS
+         Components: .rabble-overlay variants + .rabble-whisper
+    ═══════════════════════════════════════════════════════════════════ -->
+    <section class="atlas-section" id="s-overlays">
+      <div class="atlas-section-meta">
+        <div class="rabble-section-header">Overlays</div>
+        <span class="atlas-section-count">6 variants</span>
+      </div>
+      <div class="atlas-grid wide">
+
+        <!-- rabble-overlay-login (inline demo) -->
+        <div class="atlas-entry">
+          <div class="atlas-entry-preview" style="width:100%">
+            <div class="atlas-overlay-demo">
+              <div class="rabble-overlay" style="position:relative;background:none;backdrop-filter:none;padding:var(--rabble-space-4)">
+                <div class="rabble-overlay-login rabble-accent-magenta" style="padding:var(--rabble-space-4)">
+                  <div class="rabble-section-header">◈ summon · login</div>
+                  <p style="font-family:var(--rabble-font-mono);font-size:12px;color:var(--rabble-muted);margin:0">Handle or passphrase. The entity awaits.</p>
+                  <div style="margin-top:var(--rabble-space-3)">
+                    <div class="rabble-askbox-input rabble-accent-magenta">
+                      <input type="text" placeholder="your-handle" readonly>
+                    </div>
+                  </div>
+                  <div style="margin-top:var(--rabble-space-3);display:flex;gap:var(--rabble-space-2)">
+                    <button class="rabble-btn rabble-btn-pill" style="font-size:12px;padding:8px 20px">Summon</button>
+                    <button class="rabble-btn is-secondary" style="font-size:12px;padding:8px 20px">Cancel</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="atlas-entry-meta">
+            <span class="atlas-entry-name">.rabble-overlay + .rabble-overlay-login</span>
+            <span class="rabble-badge rabble-accent-magenta">Aether</span>
+          </div>
+          <code class="atlas-entry-code">&lt;div class="rabble-overlay"&gt;
+  &lt;div class="rabble-overlay-login"&gt;...&lt;/div&gt;
+&lt;/div&gt;</code>
+        </div>
+
+        <!-- rabble-overlay-nav (inline) -->
+        <div class="atlas-entry">
+          <div class="atlas-entry-preview tall">
+            <div class="rabble-overlay-nav" style="width:100%;padding:var(--rabble-space-4);background:color-mix(in srgb,var(--rabble-void) 88%,transparent);border-radius:var(--rabble-radius-md);border:1px solid var(--rabble-border)">
+              <div class="rabble-section-header">◈ navigate</div>
+              <div style="display:flex;flex-direction:column;gap:var(--rabble-space-2);margin-top:var(--rabble-space-2)">
+                <a href="#" style="font-family:var(--rabble-font-mono);font-size:12px;color:var(--rabble-cyan);text-decoration:none">joinrabble.world</a>
+                <a href="#" style="font-family:var(--rabble-font-mono);font-size:12px;color:var(--rabble-muted);text-decoration:none">RaBbLE-OS</a>
+                <a href="#" style="font-family:var(--rabble-font-mono);font-size:12px;color:var(--rabble-muted);text-decoration:none">Summon Ceremony</a>
+                <a href="#" style="font-family:var(--rabble-font-mono);font-size:12px;color:var(--rabble-magenta);text-decoration:none">Atlas ←</a>
+              </div>
+            </div>
+          </div>
+          <div class="atlas-entry-meta">
+            <span class="atlas-entry-name">.rabble-overlay-nav</span>
+            <span class="rabble-badge rabble-accent-magenta">Aether</span>
+          </div>
+          <code class="atlas-entry-code">&lt;div class="rabble-overlay rabble-overlay-nav"&gt;...&lt;/div&gt;</code>
+        </div>
+
+        <!-- rabble-overlay-log (inline) -->
+        <div class="atlas-entry">
+          <div class="atlas-entry-preview tall">
+            <div class="rabble-overlay-log" style="width:100%;padding:var(--rabble-space-3);background:color-mix(in srgb,var(--rabble-void) 88%,transparent);border-radius:var(--rabble-radius-md);border:1px solid var(--rabble-border)">
+              <div class="rabble-log" style="height:100px;width:100%">
+                <div class="rabble-log-line is-system"><span class="rabble-log-who">sys</span> session log overlay</div>
+                <div class="rabble-log-line is-entity"><span class="rabble-log-who">RaBbLE</span> All transmissions visible</div>
+              </div>
+            </div>
+          </div>
+          <div class="atlas-entry-meta">
+            <span class="atlas-entry-name">.rabble-overlay-log</span>
+            <span class="rabble-badge rabble-accent-magenta">Aether</span>
+          </div>
+          <code class="atlas-entry-code">&lt;div class="rabble-overlay rabble-overlay-log"&gt;...&lt;/div&gt;</code>
+        </div>
+
+        <!-- rabble-overlay-ios (inline) -->
+        <div class="atlas-entry">
+          <div class="atlas-entry-preview tall">
+            <div style="width:100%;padding:var(--rabble-space-3) var(--rabble-space-4);background:color-mix(in srgb,var(--rabble-surface) 90%,transparent);border-radius:var(--rabble-radius-lg) var(--rabble-radius-lg) 0 0;border:1px solid var(--rabble-border)">
+              <div class="rabble-section-header">◈ install · iOS</div>
+              <p style="font-family:var(--rabble-font-mono);font-size:11px;color:var(--rabble-muted);margin:var(--rabble-space-2) 0 0">Tap <strong style="color:var(--rabble-cyan)">Share</strong>, then <strong style="color:var(--rabble-cyan)">Add to Home Screen</strong></p>
+            </div>
+          </div>
+          <div class="atlas-entry-meta">
+            <span class="atlas-entry-name">.rabble-overlay-ios</span>
+            <span class="rabble-badge rabble-accent-magenta">Aether</span>
+          </div>
+          <code class="atlas-entry-code">&lt;div class="rabble-overlay rabble-overlay-ios"&gt;...&lt;/div&gt;</code>
+        </div>
+
+        <!-- rabble-whisper -->
+        <div class="atlas-entry">
+          <div class="atlas-entry-preview tall">
+            <div class="atlas-whisper-demo" style="width:100%;min-height:130px">
+              <div class="rabble-whisper is-active rabble-accent-violet" style="position:relative;right:auto;top:auto;transform:none;width:100%">
+                <div class="rabble-whisper-head">
+                  <span class="rabble-whisper-glyph">◈</span>
+                  <span class="rabble-whisper-name">RaBbLE</span>
+                  <span class="rabble-badge rabble-accent-violet" style="font-size:9px">whisper</span>
+                </div>
+                <div class="rabble-whisper-body">
+                  A behavioral signal was detected. The session entropy is rising. The entity is adjusting its response cadence accordingly.
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="atlas-entry-meta">
+            <span class="atlas-entry-name">.rabble-whisper + .is-active</span>
+            <span class="rabble-badge rabble-accent-magenta">Aether</span>
+          </div>
+          <code class="atlas-entry-code">&lt;div class="rabble-whisper is-active"&gt;
+  &lt;div class="rabble-whisper-head"&gt;
+    &lt;span class="rabble-whisper-glyph"&gt;◈&lt;/span&gt;
+    &lt;span class="rabble-whisper-name"&gt;RaBbLE&lt;/span&gt;
+  &lt;/div&gt;
+  &lt;div class="rabble-whisper-body"&gt;...&lt;/div&gt;
+&lt;/div&gt;</code>
+        </div>
+
+      </div>
+    </section>
+
+    <div class="atlas-divider"></div>
+
+    <!-- ══════════════════════════════════════════════════════════════════
+         § 8 — MOTION
+         Components: .rabble-sigil, .rabble-stagger-in, harmony
+    ═══════════════════════════════════════════════════════════════════ -->
+    <section class="atlas-section" id="s-motion">
+      <div class="atlas-section-meta">
+        <div class="rabble-section-header">Motion</div>
+        <span class="atlas-section-count">5 components</span>
+      </div>
+      <div class="atlas-grid">
+
+        <!-- rabble-sigil states -->
+        <div class="atlas-entry">
+          <div class="atlas-entry-preview" style="gap:var(--rabble-space-4)">
+            <div style="display:flex;flex-direction:column;gap:var(--rabble-space-2)">
+              <div style="display:flex;align-items:center;gap:var(--rabble-space-2)">
+                <span class="rabble-sigil">◈</span>
+                <span style="font-family:var(--rabble-font-mono);font-size:11px;color:var(--rabble-muted)">idle</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:var(--rabble-space-2)">
+                <span class="rabble-sigil is-thinking">◈</span>
+                <span style="font-family:var(--rabble-font-mono);font-size:11px;color:var(--rabble-muted)">.is-thinking</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:var(--rabble-space-2)">
+                <span class="rabble-sigil is-speaking">◈</span>
+                <span style="font-family:var(--rabble-font-mono);font-size:11px;color:var(--rabble-muted)">.is-speaking</span>
+              </div>
+            </div>
+          </div>
+          <div class="atlas-entry-meta">
+            <span class="atlas-entry-name">.rabble-sigil + .is-thinking/.is-speaking</span>
+            <span class="rabble-badge rabble-accent-magenta">Aether</span>
+          </div>
+          <code class="atlas-entry-code">&lt;span class="rabble-sigil is-thinking"&gt;◈&lt;/span&gt;
+&lt;span class="rabble-sigil is-speaking"&gt;◈&lt;/span&gt;</code>
+        </div>
+
+        <!-- rabble-stagger-in -->
+        <div class="atlas-entry">
+          <div class="atlas-entry-preview tall" style="width:100%">
+            <div class="rabble-stagger-in" style="width:100%;display:flex;flex-direction:column;gap:var(--rabble-space-2)" id="staggerDemo">
+              <div class="rabble-panel">Item 1 · stagger delay 0ms</div>
+              <div class="rabble-panel">Item 2 · stagger delay 80ms</div>
+              <div class="rabble-panel">Item 3 · stagger delay 160ms</div>
+            </div>
+          </div>
+          <div class="atlas-entry-meta">
+            <span class="atlas-entry-name">.rabble-stagger-in</span>
+            <span class="rabble-badge rabble-accent-magenta">Aether</span>
+          </div>
+          <code class="atlas-entry-code">&lt;div class="rabble-stagger-in"&gt;
+  &lt;div&gt;Item 1&lt;/div&gt;
+  &lt;div&gt;Item 2&lt;/div&gt;
+  &lt;div&gt;Item 3&lt;/div&gt;
+&lt;/div&gt;</code>
+        </div>
+
+        <!-- rabble-stagger-in.fast -->
+        <div class="atlas-entry">
+          <div class="atlas-entry-preview tall" style="width:100%">
+            <div class="rabble-stagger-in fast" style="width:100%;display:flex;flex-direction:column;gap:var(--rabble-space-2)" id="staggerFastDemo">
+              <div class="rabble-card rabble-accent-cyan" style="padding:var(--rabble-space-2) var(--rabble-space-3)">Fast 1 · 0ms</div>
+              <div class="rabble-card rabble-accent-cyan" style="padding:var(--rabble-space-2) var(--rabble-space-3)">Fast 2 · 40ms</div>
+              <div class="rabble-card rabble-accent-cyan" style="padding:var(--rabble-space-2) var(--rabble-space-3)">Fast 3 · 80ms</div>
+            </div>
+          </div>
+          <div class="atlas-entry-meta">
+            <span class="atlas-entry-name">.rabble-stagger-in.fast</span>
+            <span class="rabble-badge rabble-accent-magenta">Aether</span>
+          </div>
+          <code class="atlas-entry-code">&lt;div class="rabble-stagger-in fast"&gt;...&lt;/div&gt;</code>
+        </div>
+
+        <!-- rabble-border-harmony variants -->
+        <div class="atlas-entry">
+          <div class="atlas-entry-preview tall" style="flex-direction:column;gap:var(--rabble-space-3);width:100%">
+            <div class="rabble-border-harmony" style="padding:var(--rabble-space-2) var(--rabble-space-3);width:100%">
+              <span style="font-family:var(--rabble-font-mono);font-size:11px;color:var(--rabble-muted)">border-harmony (default)</span>
+            </div>
+            <div class="rabble-border-harmony slow" style="padding:var(--rabble-space-2) var(--rabble-space-3);width:100%">
+              <span style="font-family:var(--rabble-font-mono);font-size:11px;color:var(--rabble-muted)">border-harmony.slow</span>
+            </div>
+            <div class="rabble-border-harmony fast" style="padding:var(--rabble-space-2) var(--rabble-space-3);width:100%">
+              <span style="font-family:var(--rabble-font-mono);font-size:11px;color:var(--rabble-muted)">border-harmony.fast</span>
+            </div>
+          </div>
+          <div class="atlas-entry-meta">
+            <span class="atlas-entry-name">.rabble-border-harmony (slow/fast)</span>
+            <span class="rabble-badge rabble-accent-magenta">Aether</span>
+          </div>
+          <code class="atlas-entry-code">&lt;div class="rabble-border-harmony"&gt;...&lt;/div&gt;
+&lt;div class="rabble-border-harmony slow"&gt;...&lt;/div&gt;
+&lt;div class="rabble-border-harmony fast"&gt;...&lt;/div&gt;</code>
+        </div>
+
+      </div>
+    </section>
+
+    <div class="atlas-divider"></div>
+
+    <!-- ══════════════════════════════════════════════════════════════════
+         § 9 — AMBIENT & CRT
+         Components: scanlines, vignette, chromatic, glitch, starfield + stubs
+    ═══════════════════════════════════════════════════════════════════ -->
+    <section class="atlas-section" id="s-ambient">
+      <div class="atlas-section-meta">
+        <div class="rabble-section-header">Ambient &amp; CRT</div>
+        <span class="atlas-section-count">8 effects</span>
+      </div>
+      <div class="atlas-grid">
+
+        <!-- rabble-scanlines -->
+        <div class="atlas-entry">
+          <div class="atlas-entry-preview centered">
+            <div class="atlas-crt-demo" style="width:100%;min-height:80px">
+              <div class="rabble-scanlines" style="position:absolute;inset:0"></div>
+              <div style="display:flex;align-items:center;justify-content:center;height:80px;font-family:var(--rabble-font-mono);font-size:12px;color:var(--rabble-muted)">scanlines active</div>
+            </div>
+          </div>
+          <div class="atlas-entry-meta">
+            <span class="atlas-entry-name">.rabble-scanlines</span>
+            <span class="rabble-badge rabble-accent-magenta">Aether</span>
+          </div>
+          <code class="atlas-entry-code">&lt;div class="rabble-scanlines"&gt;&lt;/div&gt;</code>
+        </div>
+
+        <!-- rabble-vignette -->
+        <div class="atlas-entry">
+          <div class="atlas-entry-preview centered">
+            <div class="atlas-crt-demo" style="width:100%;min-height:80px">
+              <div class="rabble-vignette" style="position:absolute;inset:0"></div>
+              <div style="display:flex;align-items:center;justify-content:center;height:80px;font-family:var(--rabble-font-mono);font-size:12px;color:var(--rabble-text)">vignette darkens edges</div>
+            </div>
+          </div>
+          <div class="atlas-entry-meta">
+            <span class="atlas-entry-name">.rabble-vignette</span>
+            <span class="rabble-badge rabble-accent-magenta">Aether</span>
+          </div>
+          <code class="atlas-entry-code">&lt;div class="rabble-vignette"&gt;&lt;/div&gt;</code>
+        </div>
+
+        <!-- rabble-chromatic -->
+        <div class="atlas-entry">
+          <div class="atlas-entry-preview centered">
+            <div class="atlas-crt-demo" style="width:100%;min-height:80px;background:var(--rabble-surface)">
+              <div class="rabble-chromatic" style="position:absolute;inset:0"></div>
+              <div style="display:flex;align-items:center;justify-content:center;height:80px;font-family:var(--rabble-font-mono);font-size:12px;color:var(--rabble-text)">chromatic aberration</div>
+            </div>
+          </div>
+          <div class="atlas-entry-meta">
+            <span class="atlas-entry-name">.rabble-chromatic</span>
+            <span class="rabble-badge rabble-accent-magenta">Aether</span>
+          </div>
+          <code class="atlas-entry-code">&lt;div class="rabble-chromatic"&gt;&lt;/div&gt;</code>
+        </div>
+
+        <!-- rabble-glitch-veil -->
+        <div class="atlas-entry">
+          <div class="atlas-entry-preview centered">
+            <div class="atlas-glitch-demo" style="width:100%;min-height:80px">
+              <div class="rabble-glitch-veil is-active" style="position:absolute;display:block"></div>
+              <div style="display:flex;align-items:center;justify-content:center;height:80px;font-family:var(--rabble-font-mono);font-size:12px;color:var(--rabble-text)">glitch veil · .is-active</div>
+            </div>
+          </div>
+          <div class="atlas-entry-meta">
+            <span class="atlas-entry-name">.rabble-glitch-veil.is-active</span>
+            <span class="rabble-badge rabble-accent-magenta">Aether</span>
+          </div>
+          <code class="atlas-entry-code">&lt;div class="rabble-glitch-veil is-active"&gt;&lt;/div&gt;</code>
+        </div>
+
+        <!-- NeBuLA.effects.starfield -->
+        <div class="atlas-entry">
+          <div class="atlas-entry-preview">
+            <div class="atlas-starfield-host" id="starfieldHost"></div>
+          </div>
+          <div class="atlas-entry-meta">
+            <span class="atlas-entry-name">NeBuLA.effects.starfield()</span>
+            <span class="rabble-badge rabble-accent-cyan">NeBuLA</span>
+          </div>
+          <code class="atlas-entry-code">const sf = NeBuLA.effects.starfield(host, {
+  count: 120, drift: 0.8,
+  depthLayers: 3
+});
+sf.start();</code>
+        </div>
+
+        <!-- streaks — stub -->
+        <div class="atlas-entry">
+          <div class="atlas-entry-preview centered">
+            <div class="rabble-panel" style="width:100%;min-height:60px;display:flex;align-items:center;justify-content:center;gap:var(--rabble-space-2)">
+              <span class="rabble-badge rabble-accent-yellow">P5 stub</span>
+              <span style="font-family:var(--rabble-font-mono);font-size:11px;color:var(--rabble-muted)">streaks</span>
+            </div>
+          </div>
+          <div class="atlas-entry-meta">
+            <span class="atlas-entry-name">NeBuLA.effects.streaks</span>
+            <span class="rabble-badge rabble-accent-cyan">NeBuLA</span>
+            <span class="rabble-badge rabble-accent-yellow">stub</span>
+          </div>
+          <code class="atlas-entry-code">NeBuLA.effects.streaks(host, opts) // post-EP1</code>
+        </div>
+
+        <!-- constellation — stub -->
+        <div class="atlas-entry">
+          <div class="atlas-entry-preview centered">
+            <div class="rabble-panel" style="width:100%;min-height:60px;display:flex;align-items:center;justify-content:center;gap:var(--rabble-space-2)">
+              <span class="rabble-badge rabble-accent-yellow">P5 stub</span>
+              <span style="font-family:var(--rabble-font-mono);font-size:11px;color:var(--rabble-muted)">constellation</span>
+            </div>
+          </div>
+          <div class="atlas-entry-meta">
+            <span class="atlas-entry-name">NeBuLA.effects.constellation</span>
+            <span class="rabble-badge rabble-accent-cyan">NeBuLA</span>
+            <span class="rabble-badge rabble-accent-yellow">stub</span>
+          </div>
+          <code class="atlas-entry-code">NeBuLA.effects.constellation(host, opts) // post-EP1</code>
+        </div>
+
+        <!-- haze — stub -->
+        <div class="atlas-entry">
+          <div class="atlas-entry-preview centered">
+            <div class="rabble-panel" style="width:100%;min-height:60px;display:flex;align-items:center;justify-content:center;gap:var(--rabble-space-2)">
+              <span class="rabble-badge rabble-accent-yellow">P5 stub</span>
+              <span style="font-family:var(--rabble-font-mono);font-size:11px;color:var(--rabble-muted)">haze</span>
+            </div>
+          </div>
+          <div class="atlas-entry-meta">
+            <span class="atlas-entry-name">NeBuLA.effects.haze</span>
+            <span class="rabble-badge rabble-accent-cyan">NeBuLA</span>
+            <span class="rabble-badge rabble-accent-yellow">stub</span>
+          </div>
+          <code class="atlas-entry-code">NeBuLA.effects.haze(host, opts) // post-EP1</code>
+        </div>
+
+      </div>
+    </section>
+
+    <div class="atlas-divider"></div>
+
+    <!-- ══════════════════════════════════════════════════════════════════
+         § 10 — TOKENS
+         Palette swatches, type scale, spacing scale
+    ═══════════════════════════════════════════════════════════════════ -->
+    <section class="atlas-section" id="s-tokens">
+      <div class="atlas-section-meta">
+        <div class="rabble-section-header">Tokens</div>
+        <span class="atlas-section-count">palette · type · spacing</span>
+      </div>
+      <div class="atlas-grid full">
+
+        <!-- Accent palette -->
+        <div class="atlas-entry">
+          <div class="atlas-entry-preview" style="flex-direction:column;gap:var(--rabble-space-3)">
+            <p style="font-family:var(--rabble-font-mono);font-size:10px;color:var(--rabble-dimmer);margin:0;text-transform:uppercase;letter-spacing:0.1em">Accent Colors</p>
+            <div class="atlas-swatch-row">
+              <div class="atlas-swatch">
+                <div class="atlas-swatch-color" style="background:var(--rabble-magenta)"></div>
+                <span class="atlas-swatch-label">magenta</span>
+              </div>
+              <div class="atlas-swatch">
+                <div class="atlas-swatch-color" style="background:var(--rabble-cyan)"></div>
+                <span class="atlas-swatch-label">cyan</span>
+              </div>
+              <div class="atlas-swatch">
+                <div class="atlas-swatch-color" style="background:var(--rabble-violet)"></div>
+                <span class="atlas-swatch-label">violet</span>
+              </div>
+              <div class="atlas-swatch">
+                <div class="atlas-swatch-color" style="background:var(--rabble-pink)"></div>
+                <span class="atlas-swatch-label">pink</span>
+              </div>
+              <div class="atlas-swatch">
+                <div class="atlas-swatch-color" style="background:var(--rabble-green)"></div>
+                <span class="atlas-swatch-label">green</span>
+              </div>
+              <div class="atlas-swatch">
+                <div class="atlas-swatch-color" style="background:var(--rabble-yellow)"></div>
+                <span class="atlas-swatch-label">yellow</span>
+              </div>
+              <div class="atlas-swatch">
+                <div class="atlas-swatch-color" style="background:var(--rabble-red)"></div>
+                <span class="atlas-swatch-label">red</span>
+              </div>
+            </div>
+            <p style="font-family:var(--rabble-font-mono);font-size:10px;color:var(--rabble-dimmer);margin:0;text-transform:uppercase;letter-spacing:0.1em">Surfaces</p>
+            <div class="atlas-swatch-row">
+              <div class="atlas-swatch">
+                <div class="atlas-swatch-color" style="background:var(--rabble-void)"></div>
+                <span class="atlas-swatch-label">void</span>
+              </div>
+              <div class="atlas-swatch">
+                <div class="atlas-swatch-color" style="background:var(--rabble-bg)"></div>
+                <span class="atlas-swatch-label">bg</span>
+              </div>
+              <div class="atlas-swatch">
+                <div class="atlas-swatch-color" style="background:var(--rabble-surface)"></div>
+                <span class="atlas-swatch-label">surface</span>
+              </div>
+              <div class="atlas-swatch">
+                <div class="atlas-swatch-color" style="background:var(--rabble-raised)"></div>
+                <span class="atlas-swatch-label">raised</span>
+              </div>
+              <div class="atlas-swatch">
+                <div class="atlas-swatch-color" style="background:var(--rabble-border)"></div>
+                <span class="atlas-swatch-label">border</span>
+              </div>
+            </div>
+            <p style="font-family:var(--rabble-font-mono);font-size:10px;color:var(--rabble-dimmer);margin:0;text-transform:uppercase;letter-spacing:0.1em">Text</p>
+            <div class="atlas-swatch-row">
+              <div class="atlas-swatch">
+                <div class="atlas-swatch-color" style="background:var(--rabble-text)"></div>
+                <span class="atlas-swatch-label">text</span>
+              </div>
+              <div class="atlas-swatch">
+                <div class="atlas-swatch-color" style="background:var(--rabble-muted)"></div>
+                <span class="atlas-swatch-label">muted</span>
+              </div>
+              <div class="atlas-swatch">
+                <div class="atlas-swatch-color" style="background:var(--rabble-dimmer)"></div>
+                <span class="atlas-swatch-label">dimmer</span>
+              </div>
+            </div>
+          </div>
+          <div class="atlas-entry-meta">
+            <span class="atlas-entry-name">--rabble-{color} tokens</span>
+            <span class="rabble-badge rabble-accent-magenta">Aether</span>
+          </div>
+          <code class="atlas-entry-code">background: var(--rabble-magenta);
+color: var(--rabble-cyan);
+border-color: var(--rabble-border);</code>
+        </div>
+
+        <!-- Type scale -->
+        <div class="atlas-entry">
+          <div class="atlas-entry-preview" style="flex-direction:column;width:100%">
+            <div class="atlas-type-row">
+              <div class="atlas-type-sample">
+                <span class="atlas-type-meta">--space-8 · 64</span>
+                <div style="width:64px;height:12px;background:color-mix(in srgb,var(--rabble-violet) 30%,transparent);border-radius:var(--rabble-radius-sm)"></div>
+              </div>
+              <div class="atlas-type-sample">
+                <span class="atlas-type-meta">--space-7 · 48</span>
+                <div style="width:48px;height:12px;background:color-mix(in srgb,var(--rabble-violet) 30%,transparent);border-radius:var(--rabble-radius-sm)"></div>
+              </div>
+              <div class="atlas-type-sample">
+                <span class="atlas-type-meta">--space-6 · 32</span>
+                <div style="width:32px;height:12px;background:color-mix(in srgb,var(--rabble-violet) 30%,transparent);border-radius:var(--rabble-radius-sm)"></div>
+              </div>
+              <div class="atlas-type-sample">
+                <span class="atlas-type-meta">--space-5 · 24</span>
+                <div style="width:24px;height:12px;background:color-mix(in srgb,var(--rabble-violet) 30%,transparent);border-radius:var(--rabble-radius-sm)"></div>
+              </div>
+              <div class="atlas-type-sample">
+                <span class="atlas-type-meta">--space-4 · 16</span>
+                <div style="width:16px;height:12px;background:color-mix(in srgb,var(--rabble-violet) 30%,transparent);border-radius:var(--rabble-radius-sm)"></div>
+              </div>
+              <div class="atlas-type-sample">
+                <span class="atlas-type-meta">--space-3 · 12</span>
+                <div style="width:12px;height:12px;background:color-mix(in srgb,var(--rabble-violet) 30%,transparent);border-radius:var(--rabble-radius-sm)"></div>
+              </div>
+              <div class="atlas-type-sample">
+                <span class="atlas-type-meta">--space-2 · 8</span>
+                <div style="width:8px;height:12px;background:color-mix(in srgb,var(--rabble-violet) 30%,transparent);border-radius:var(--rabble-radius-sm)"></div>
+              </div>
+              <div class="atlas-type-sample">
+                <span class="atlas-type-meta">--space-1 · 4</span>
+                <div style="width:4px;height:12px;background:color-mix(in srgb,var(--rabble-violet) 30%,transparent);border-radius:var(--rabble-radius-sm)"></div>
+              </div>
+            </div>
+          </div>
+          <div class="atlas-entry-meta">
+            <span class="atlas-entry-name">--rabble-space-{1-8} tokens</span>
+            <span class="rabble-badge rabble-accent-magenta">Aether</span>
+          </div>
+          <code class="atlas-entry-code">padding: var(--rabble-space-4); /* 16px */
+gap: var(--rabble-space-2);     /* 8px */
+margin: var(--rabble-space-7);  /* 48px */</code>
+        </div>
+
+        <!-- Typography scale -->
+        <div class="atlas-entry">
+          <div class="atlas-entry-preview" style="flex-direction:column;gap:var(--rabble-space-2);width:100%">
+            <div style="font-family:var(--rabble-font-hero);font-size:32px;color:var(--rabble-text);line-height:1.2;text-transform:none">RaBbLE</div>
+            <div style="font-family:var(--rabble-font-ui);font-size:24px;color:var(--rabble-text);line-height:1.3">display · 24px</div>
+            <div style="font-family:var(--rabble-font-ui);font-size:18px;color:var(--rabble-text)">heading · 18px</div>
+            <div style="font-family:var(--rabble-font-ui);font-size:15px;color:var(--rabble-text)">body · 15px — the entity observes</div>
+            <div style="font-family:var(--rabble-font-ui);font-size:13px;color:var(--rabble-muted)">small · 13px — metadata, captions</div>
+            <div style="font-family:var(--rabble-font-mono);font-size:13px;color:var(--rabble-cyan)">mono · 13px — code, labels, IDs</div>
+            <div style="font-family:var(--rabble-font-mono);font-size:11px;color:var(--rabble-muted);letter-spacing:0.12em;text-transform:uppercase">MICRO · 11px · labels</div>
+          </div>
+          <div class="atlas-entry-meta">
+            <span class="atlas-entry-name">--rabble-font-{hero,ui,mono} scale</span>
+            <span class="rabble-badge rabble-accent-magenta">Aether</span>
+          </div>
+          <code class="atlas-entry-code">font-family: var(--rabble-font-hero);
+font-family: var(--rabble-font-ui);
+font-family: var(--rabble-font-mono);</code>
+        </div>
+
+        <!-- Radius tokens -->
+        <div class="atlas-entry">
+          <div class="atlas-entry-preview" style="flex-wrap:wrap;gap:var(--rabble-space-3)">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:var(--rabble-space-1)">
+              <div style="width:40px;height:40px;background:color-mix(in srgb,var(--rabble-magenta) 20%,transparent);border:1px solid var(--rabble-magenta);border-radius:var(--rabble-radius-sm)"></div>
+              <span style="font-family:var(--rabble-font-mono);font-size:9px;color:var(--rabble-muted)">sm · 4px</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:var(--rabble-space-1)">
+              <div style="width:40px;height:40px;background:color-mix(in srgb,var(--rabble-cyan) 20%,transparent);border:1px solid var(--rabble-cyan);border-radius:var(--rabble-radius-md)"></div>
+              <span style="font-family:var(--rabble-font-mono);font-size:9px;color:var(--rabble-muted)">md · 8px</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:var(--rabble-space-1)">
+              <div style="width:40px;height:40px;background:color-mix(in srgb,var(--rabble-violet) 20%,transparent);border:1px solid var(--rabble-violet);border-radius:var(--rabble-radius-lg)"></div>
+              <span style="font-family:var(--rabble-font-mono);font-size:9px;color:var(--rabble-muted)">lg · 12px</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:var(--rabble-space-1)">
+              <div style="width:40px;height:40px;background:color-mix(in srgb,var(--rabble-pink) 20%,transparent);border:1px solid var(--rabble-pink);border-radius:var(--rabble-radius-xl)"></div>
+              <span style="font-family:var(--rabble-font-mono);font-size:9px;color:var(--rabble-muted)">xl · 20px</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:var(--rabble-space-1)">
+              <div style="width:40px;height:40px;background:color-mix(in srgb,var(--rabble-green) 20%,transparent);border:1px solid var(--rabble-green);border-radius:var(--rabble-radius-pill)"></div>
+              <span style="font-family:var(--rabble-font-mono);font-size:9px;color:var(--rabble-muted)">pill</span>
+            </div>
+          </div>
+          <div class="atlas-entry-meta">
+            <span class="atlas-entry-name">--rabble-radius-{sm,md,lg,xl,pill}</span>
+            <span class="rabble-badge rabble-accent-magenta">Aether</span>
+          </div>
+          <code class="atlas-entry-code">border-radius: var(--rabble-radius-md); /* 8px */
+border-radius: var(--rabble-radius-pill); /* 9999px */</code>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer style="
+      margin-top: var(--rabble-space-7);
+      padding-top: var(--rabble-space-5);
+      border-top: 1px solid var(--rabble-border);
+      font-family: var(--rabble-font-mono);
+      font-size: 11px;
+      color: var(--rabble-dimmer);
+      letter-spacing: 0.06em;
+    ">
+      Atlas · RaBbLE Design Catalog · Episode 1 · Genesis · v0.0.0.1<br>
+      Aether commit a315d6d · NeBuLA commit a110de6 · World Track C<br>
+      Sovereign Accord license · source-available · free to clone and self-host
+    </footer>
+
+  </div><!-- #atlas-root -->
+
+  <!-- Page registry -->
+  <script src="js/RaBbLE-pages.js"></script>
+
+  <script>
+    /* ── Catalog page JS ────────────────────────────────────────────────────────
+     * Mounts live NeBuLA elements and activates effects after DOM is ready.
+     * No bespoke component CSS is added here — all styling is pure Aether.
+     */
+    (function () {
+      'use strict';
+
+      // ── Entity state cycling ────────────────────────────────────────────────
+      var ENTITY_STATES = ['idle', 'thinking', 'speaking'];
+      var entityStateIdx = 0;
+      var entityStateLabel = document.getElementById('entityStateLabel');
+
+      function cycleEntityState() {
+        entityStateIdx = (entityStateIdx + 1) % ENTITY_STATES.length;
+        var state = ENTITY_STATES[entityStateIdx];
+        var entity = document.getElementById('catalogEntity');
+        if (entity && typeof entity.setEntityState === 'function') {
+          entity.setEntityState(state);
+        }
+        if (entityStateLabel) {
+          entityStateLabel.textContent = '<rabble-entity> · ' + state;
+        }
+      }
+
+      // Cycle entity state every 3s after a short initial delay
+      setTimeout(function () {
+        setInterval(cycleEntityState, 3000);
+      }, 1500);
+
+      // ── Starfield ───────────────────────────────────────────────────────────
+      function mountStarfield() {
+        var host = document.getElementById('starfieldHost');
+        if (!host) return;
+        var NeBuLA = window.NeBuLA;
+        if (!NeBuLA || !NeBuLA.effects || !NeBuLA.effects.starfield) {
+          host.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;font-family:var(--rabble-font-mono);font-size:11px;color:var(--rabble-muted)">NeBuLA loading...</div>';
+          return;
+        }
+        var sf = NeBuLA.effects.starfield(host, {
+          count: 120,
+          drift: 0.8,
+          depthLayers: 3,
+          palette: null
+        });
+        sf.start();
+      }
+
+      // ── NeBuLA UI factories ─────────────────────────────────────────────────
+      function mountFactories() {
+        var NeBuLA = window.NeBuLA;
+        if (!NeBuLA || !NeBuLA.ui) return;
+
+        // createEntityMini
+        var miniMount = document.getElementById('mountEntityMini');
+        if (miniMount && NeBuLA.ui.createEntityMini) {
+          try {
+            var mini = NeBuLA.ui.createEntityMini({ palette: 'e-rabble', size: 80 });
+            if (mini && mini.el) miniMount.appendChild(mini.el);
+          } catch (e) { console.warn('[Atlas] createEntityMini:', e); }
+        }
+
+        // createGrimoireEye
+        var eyeMount = document.getElementById('mountGrimoireEye');
+        if (eyeMount && NeBuLA.ui.createGrimoireEye) {
+          try {
+            var eye = NeBuLA.ui.createGrimoireEye({ size: 80 });
+            if (eye && eye.el) eyeMount.appendChild(eye.el);
+          } catch (e) { console.warn('[Atlas] createGrimoireEye:', e); }
+        }
+
+        // createAmbientEye
+        var ambientMount = document.getElementById('mountAmbientEye');
+        if (ambientMount && NeBuLA.ui.createAmbientEye) {
+          try {
+            var ambient = NeBuLA.ui.createAmbientEye({ size: 80 });
+            if (ambient && ambient.el) ambientMount.appendChild(ambient.el);
+          } catch (e) { console.warn('[Atlas] createAmbientEye:', e); }
+        }
+
+        // createGrimoireRing
+        var ringMount = document.getElementById('mountGrimoireRing');
+        if (ringMount && NeBuLA.ui.createGrimoireRing) {
+          try {
+            var ring = NeBuLA.ui.createGrimoireRing({ size: 120 });
+            if (ring && ring.el) ringMount.appendChild(ring.el);
+          } catch (e) { console.warn('[Atlas] createGrimoireRing:', e); }
+        }
+      }
+
+      // ── rabble-floor setData ────────────────────────────────────────────────
+      function mountFloor() {
+        var floor = document.getElementById('catalogFloor');
+        if (!floor || typeof floor.setData !== 'function') return;
+
+        // Minimal placeholder data that satisfies the floor API
+        var MEMBER_UV = {
+          'self':       [0.50, 0.50],
+          'grimoire':   [0.50, 1.00],
+          'aether':     [0.95, 0.90],
+          'sCoRE':      [0.05, 0.05],
+          'os':         [0.90, 0.10],
+          'world':      [0.50, 0.10],
+          'collective': [0.15, 0.60]
+        };
+
+        var docs = [
+          { id: 'identity', title: 'Identity',    kind: 'doc', seal: null, owner: 'grimoire' },
+          { id: 'palette',  title: 'Palette',     kind: 'doc', seal: null, owner: 'aether'   },
+          { id: 'roadmap',  title: 'Roadmap',     kind: 'doc', seal: null, owner: 'grimoire' },
+          { id: 'e-rabble', title: 'RaBbLE',      kind: 'entity', seal: null, owner: 'self'  },
+          { id: 'e-aether', title: 'Aether',      kind: 'entity', seal: null, owner: 'aether'},
+          { id: 'e-nebula', title: 'NeBuLA',      kind: 'entity', seal: null, owner: 'aether'},
+          { id: 'e-score',  title: 'sCoRE',       kind: 'entity', seal: null, owner: 'sCoRE' },
+          { id: 'e-os',     title: 'RaBbLE-OS',   kind: 'entity', seal: null, owner: 'os'    }
+        ];
+
+        var kinds = [
+          { id: 'doc',    label: 'Document' },
+          { id: 'entity', label: 'Entity'   }
+        ];
+
+        var edges = [
+          ['identity', 'palette'],
+          ['identity', 'e-rabble'],
+          ['palette',  'e-aether'],
+          ['e-aether', 'e-nebula'],
+          ['e-score',  'e-rabble'],
+          ['e-nebula', 'e-rabble'],
+          ['roadmap',  'e-os'],
+          ['roadmap',  'e-score']
+        ];
+
+        floor.setData({ docs: docs, kinds: kinds, seals: {}, memberUV: MEMBER_UV, edges: edges });
+      }
+
+      // ── rabble-graph setData ────────────────────────────────────────────────
+      function mountGraph() {
+        var graph = document.getElementById('catalogGraph');
+        if (!graph || typeof graph.setData !== 'function') return;
+
+        var docs = [
+          { id: 'identity', title: 'Identity',  kind: 'doc',    seal: null, owner: 'grimoire' },
+          { id: 'palette',  title: 'Palette',   kind: 'doc',    seal: null, owner: 'aether'   },
+          { id: 'ethos',    title: 'Ethos',     kind: 'doc',    seal: null, owner: 'grimoire' },
+          { id: 'e-rabble', title: 'RaBbLE',    kind: 'entity', seal: null, owner: 'self'     },
+          { id: 'e-aether', title: 'Aether',    kind: 'entity', seal: null, owner: 'aether'   },
+          { id: 'e-nebula', title: 'NeBuLA',    kind: 'entity', seal: null, owner: 'aether'   },
+          { id: 'e-score',  title: 'sCoRE',     kind: 'entity', seal: null, owner: 'sCoRE'    },
+          { id: 'e-os',     title: 'RaBbLE-OS', kind: 'entity', seal: null, owner: 'os'       },
+          { id: 'atlas',    title: 'Atlas',     kind: 'doc',    seal: null, owner: 'world'    }
+        ];
+
+        var kinds = [
+          { id: 'doc',    label: 'Document' },
+          { id: 'entity', label: 'Entity'   }
+        ];
+
+        var edges = [
+          ['identity', 'palette'],
+          ['identity', 'ethos'],
+          ['identity', 'e-rabble'],
+          ['palette',  'e-aether'],
+          ['e-aether', 'e-nebula'],
+          ['e-nebula', 'e-rabble'],
+          ['e-score',  'e-rabble'],
+          ['e-os',     'e-score'],
+          ['atlas',    'e-aether'],
+          ['atlas',    'e-nebula']
+        ];
+
+        var MEMBER_UV = {
+          'self':       [0.50, 0.50],
+          'grimoire':   [0.50, 1.00],
+          'aether':     [0.95, 0.90],
+          'sCoRE':      [0.05, 0.05],
+          'os':         [0.90, 0.10],
+          'world':      [0.50, 0.10]
+        };
+
+        graph.setData({ docs: docs, kinds: kinds, seals: {}, memberUV: MEMBER_UV, edges: edges });
+      }
+
+      // ── Wait for NeBuLA to be available, then mount ─────────────────────────
+      function onReady() {
+        mountStarfield();
+        mountFactories();
+
+        // Floor/graph lazy-load Three.js — poll for element upgrade
+        var floorPollCount = 0;
+        var floorPoller = setInterval(function () {
+          var floor = document.getElementById('catalogFloor');
+          floorPollCount++;
+          if (floor && typeof floor.setData === 'function') {
+            clearInterval(floorPoller);
+            mountFloor();
+          } else if (floorPollCount > 60) {
+            clearInterval(floorPoller);
+            console.warn('[Atlas] rabble-floor did not upgrade within 30s');
+          }
+        }, 500);
+
+        var graphPollCount = 0;
+        var graphPoller = setInterval(function () {
+          var graph = document.getElementById('catalogGraph');
+          graphPollCount++;
+          if (graph && typeof graph.setData === 'function') {
+            clearInterval(graphPoller);
+            mountGraph();
+          } else if (graphPollCount > 60) {
+            clearInterval(graphPoller);
+            console.warn('[Atlas] rabble-graph did not upgrade within 30s');
+          }
+        }, 500);
+      }
+
+      // DOMContentLoaded is safest trigger (NeBuLA bundle is sync-loaded)
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', onReady);
+      } else {
+        onReady();
+      }
+
+    }());
+  </script>
+
+</body>
+</html>
