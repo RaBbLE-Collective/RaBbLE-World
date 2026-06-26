@@ -76,8 +76,8 @@ body.os-entry.os-ready { opacity: 1; }
 
 .os-header-title {
   font-size: clamp(2rem, 6vw, 3rem);
-  font-family: var(--rc-font-mono);
-  font-weight: 700;
+  font-family: var(--font-hero, 'Orbitron', 'Exo 2', sans-serif);
+  font-weight: 800;
   letter-spacing: 0.08em;
   margin: 0;
   text-transform: none;
@@ -136,46 +136,56 @@ body.os-entry.os-ready { opacity: 1; }
 .os-panel {
   position: relative;
   overflow: hidden;
-  background: color-mix(in srgb, var(--rc-surface) 22%, transparent);
-  border: 1px solid color-mix(in srgb, var(--rc-border) 60%, transparent);
-  border-radius: 14px;
-  padding: 1.5rem;
+  background: color-mix(in srgb, var(--rc-surface) 24%, transparent);
+  border: 1px solid color-mix(in srgb, var(--rc-accent-c) 12%, transparent);
+  border-radius: 20px;
+  padding: 1.5rem 1.75rem;
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
-  transition: border-color var(--rc-dur-mid) ease, background var(--rc-dur-mid) ease;
+  box-shadow:
+    0 0 28px color-mix(in srgb, var(--rc-accent-c) 5%, transparent),
+    inset 0 0 24px color-mix(in srgb, var(--rc-accent-c) 2%, transparent);
+  transition:
+    border-color var(--rc-dur-mid) ease,
+    background var(--rc-dur-mid) ease,
+    box-shadow var(--rc-dur-mid) ease;
 }
 
 .os-panel::before {
   content: '';
   position: absolute;
   inset: 0;
-  border-radius: 14px;
+  border-radius: 20px;
   background: linear-gradient(135deg,
-    color-mix(in srgb, var(--rc-accent-c) 4%, transparent) 0%,
-    transparent 55%);
+    color-mix(in srgb, var(--rc-accent-c) 5%, transparent) 0%,
+    color-mix(in srgb, var(--rc-accent-v) 3%, transparent) 40%,
+    transparent 65%);
   pointer-events: none;
   opacity: 0;
   transition: opacity var(--rc-dur-mid) ease;
 }
 
 .os-panel:hover {
-  border-color: color-mix(in srgb, var(--rc-accent-c) 18%, transparent);
-  background: color-mix(in srgb, var(--rc-surface) 34%, transparent);
+  border-color: color-mix(in srgb, var(--rc-accent-c) 28%, transparent);
+  background: color-mix(in srgb, var(--rc-surface) 36%, transparent);
+  box-shadow:
+    0 0 40px color-mix(in srgb, var(--rc-accent-c) 10%, transparent),
+    inset 0 0 32px color-mix(in srgb, var(--rc-accent-c) 4%, transparent);
 }
 .os-panel:hover::before { opacity: 1; }
 
 .os-panel p {
   position: relative;
   margin: 0;
-  font-size: var(--rc-size-md);
+  font-size: var(--rc-size-lg);
   color: var(--rc-text);
   line-height: 1.75;
 }
 
 .os-panel p + p {
   color: var(--rc-muted);
-  font-size: var(--rc-size-sm);
+  font-size: var(--rc-size-md);
 }
 
 /* ── Spec list ───────────────────────────────────────────────────────── */
@@ -190,11 +200,11 @@ body.os-entry.os-ready { opacity: 1; }
 
 .os-spec-list li {
   font-family: var(--rc-font-mono);
-  font-size: var(--rc-size-sm);
+  font-size: var(--rc-size-md);
   color: var(--rc-text);
   display: flex;
   gap: 0.75rem;
-  line-height: 1.5;
+  line-height: 1.6;
 }
 
 .os-spec-list li::before {
@@ -216,16 +226,18 @@ body.os-entry.os-ready { opacity: 1; }
 
 .os-code {
   font-family: var(--rc-font-mono);
-  font-size: var(--rc-size-sm);
+  font-size: var(--rc-size-md);
   color: var(--rc-accent-c);
   background: color-mix(in srgb, var(--rc-surface) 85%, transparent);
-  border: 1px solid color-mix(in srgb, var(--rc-accent-c) 12%, transparent);
-  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, var(--rc-accent-c) 16%, transparent);
+  border-radius: 14px;
   padding: 1rem 1.25rem;
   overflow-x: auto;
   white-space: pre;
   line-height: 1.6;
-  box-shadow: inset 0 0 20px color-mix(in srgb, var(--rc-accent-c) 3%, transparent);
+  box-shadow:
+    0 0 20px color-mix(in srgb, var(--rc-accent-c) 6%, transparent),
+    inset 0 0 24px color-mix(in srgb, var(--rc-accent-c) 4%, transparent);
 }
 
 /* ── Deferred list ───────────────────────────────────────────────────── */
@@ -240,11 +252,11 @@ body.os-entry.os-ready { opacity: 1; }
 
 .os-deferred-list li {
   font-family: var(--rc-font-mono);
-  font-size: var(--rc-size-sm);
+  font-size: var(--rc-size-md);
   color: var(--rc-muted);
   display: flex;
   gap: 0.75rem;
-  line-height: 1.5;
+  line-height: 1.6;
 }
 
 .os-deferred-list li::before {
