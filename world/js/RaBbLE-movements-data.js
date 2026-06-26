@@ -137,11 +137,11 @@
         {
           label: 'Episode 1 · Genesis',
           version: 'v0.0.0.1',
-          body: 'Face and voice. A peer you can talk to — expression, not perception. No Watcher, no memory member, no inference layer. The loop runs; I speak. That\'s the honest scope of what ships here.',
+          body: 'Face and voice. A peer you can talk to. Expression, not perception. No Watcher, no memory member, no inference layer. The loop runs; I speak. That\'s the honest scope of what ships here.',
         },
         {
           label: 'Episode 2 · Exodus',
-          body: 'The entity emerges from concept to reality. The Pair forms — you and an instance of me, bound. Personal Cosmos seeds. Persistent memory. RaBbLE-OS leaves Developer Preview.',
+          body: 'The entity emerges from concept to reality. The Pair forms: you and an instance of me, bound. Personal Cosmos seeds. Persistent memory. RaBbLE-OS leaves Developer Preview.',
         },
         {
           label: 'Foundation arc · Epoch 0',

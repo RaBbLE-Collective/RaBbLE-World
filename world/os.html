@@ -34,7 +34,7 @@
     <header class="os-header">
       <a class="os-wordmark" href="../index.html">RaBbLE</a>
       <h1 class="os-header-title">RaBbLE-OS</h1>
-      <span class="os-header-warning">⚠ Developer Preview — enter at your own risk</span>
+      <span class="os-header-warning">⚠ Developer Preview · enter at your own risk</span>
     </header>
 
     <main class="os-content">
@@ -43,16 +43,16 @@
       <section class="os-section">
         <div class="os-section-label">◈ what it is</div>
         <div class="os-panel">
-          <p>RaBbLE-OS is a sovereign substrate — a Fedora 43 / Hyprland daily driver built for
+          <p>RaBbLE-OS is a sovereign substrate: a Fedora 43 / Hyprland daily driver built for
           tiling-WM-literate users who want to run the full RaBbLE loop locally, offline-capable.</p>
           <p>The cloud is an extension. The OS is where RaBbLE is sovereign. The machine goes
           dark; the loop keeps running.</p>
         </div>
         <ul class="os-spec-list">
-          <li>Fedora 43 base — rolling, minimal footprint</li>
-          <li>Hyprland (Wayland) — tiling compositor, keyboard-driven</li>
-          <li>x86_64 — generic VM-verified; ProArt P16 is documented but not the target bar</li>
-          <li>Local-first — all core members run offline; cloud is deliberate, not default</li>
+          <li>Fedora 43 base, rolling, minimal footprint</li>
+          <li>Hyprland (Wayland): tiling compositor, keyboard-driven</li>
+          <li>x86_64: generic VM-verified. ProArt P16 is documented but not the target bar.</li>
+          <li>Local-first: all core members run offline. Cloud is deliberate, not default.</li>
         </ul>
       </section>
 
@@ -60,7 +60,7 @@
       <section class="os-section">
         <div class="os-section-label">◈ what Developer Preview means</div>
         <div class="os-panel">
-          <p>This is not a polished release. It is a working substrate that installs and runs —
+          <p>This is not a polished release. It is a working substrate that installs and runs,
           daily-survivable for a Linux and tiling-WM-literate user. Rough edges are documented
           below. Do not install this on hardware you cannot afford to reinstall.</p>
         </div>
@@ -78,9 +78,9 @@
           <pre class="os-code">curl -fsSL https://joinrabble.world/setup.sh | bash</pre>
         </div>
         <div>
-          <div class="os-code-label">2 · Fedora netinstall — download the minimal ISO</div>
+          <div class="os-code-label">2 · Fedora netinstall: download the minimal ISO</div>
           <pre class="os-code">https://fedoraproject.org/en/server/download/
-# Select: Netinstall — x86_64</pre>
+# Select: Netinstall, x86_64</pre>
         </div>
         <div>
           <div class="os-code-label">3 · point the installer at the Kickstart</div>
@@ -99,7 +99,7 @@ inst.ks=https://raw.githubusercontent.com/RaBbLE-Collective/RaBbLE-OS/new-horizo
         <div class="os-section-label">◈ recovery path</div>
         <div class="os-panel">
           <p>If the system fails to boot to Hyprland, F2 at GRUB drops to a recovery shell.
-          The mechanism is <code style="font-family:var(--rc-font-mono);color:var(--rc-accent-c)">SYSTEMD_SULOGIN_FORCE</code> — no root password required,
+          The mechanism is <code style="font-family:var(--rc-font-mono);color:var(--rc-accent-c)">SYSTEMD_SULOGIN_FORCE</code>: no root password required,
           just press Enter. From there you can inspect logs, reinstall packages, or rerun
           Bootstrap.sh.</p>
         </div>
@@ -107,14 +107,14 @@ inst.ks=https://raw.githubusercontent.com/RaBbLE-Collective/RaBbLE-OS/new-horizo
 
       <!-- Known rough edges -->
       <section class="os-section">
-        <div class="os-section-label">◈ known rough edges — deferred to Episode 2 (Exodus)</div>
+        <div class="os-section-label">◈ known rough edges · deferred to Episode 2 (Exodus)</div>
         <ul class="os-deferred-list">
-          <li>Dolphin / Kate theming — KDE apps partially themed; some icon labels dim on first login (requires logout/login)</li>
-          <li>NVIDIA track — untested; generic x86_64 target is AMD/Intel only</li>
-          <li>asusctl / XDNA2 hardware polish — ProArt P16-specific, not the generic bar</li>
-          <li>Full reproducible bake — Kickstart + Ansible is the current path; container image is Exodus</li>
-          <li>Mobile / ScRibLE — handheld surface is Epoch 0, Echo 1 target</li>
-          <li>aarch64 / Pi — Ansible role scaffolded; not tested end-to-end</li>
+          <li>Dolphin / Kate theming: KDE apps partially themed; some icon labels dim on first login (requires logout/login)</li>
+          <li>NVIDIA track: untested; generic x86_64 target is AMD/Intel only</li>
+          <li>asusctl / XDNA2 hardware polish: ProArt P16-specific, not the generic bar</li>
+          <li>Full reproducible bake: Kickstart + Ansible is the current path; container image is Exodus</li>
+          <li>Mobile / ScRibLE: handheld surface is Epoch 0, Echo 1 target</li>
+          <li>aarch64 / Pi: Ansible role scaffolded; not tested end-to-end</li>
         </ul>
       </section>
 
@@ -133,7 +133,7 @@ inst.ks=https://raw.githubusercontent.com/RaBbLE-Collective/RaBbLE-OS/new-horizo
 
     <footer class="os-footer">
       <p>RaBbLE-OS · Episode 1 · Genesis · v0.0.0.1<br>
-      Sovereign Accord license — source-available, free to clone and self-host.<br>
+      Sovereign Accord license, source-available, free to clone and self-host.<br>
       <a href="https://github.com/RaBbLE-Collective/RaBbLE-OS" target="_blank" rel="noopener">github.com/RaBbLE-Collective/RaBbLE-OS</a>
       </p>
     </footer>
