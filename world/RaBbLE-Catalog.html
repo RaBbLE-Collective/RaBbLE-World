@@ -813,23 +813,26 @@
 // graph.zoomIn() / zoomOut() / resetView()</code>
         </div>
 
-        <!-- rabble-doors (stub) -->
+        <!-- rabble-doors (real orbit engine) -->
         <div class="atlas-entry">
-          <div class="atlas-entry-preview tall centered">
-            <div style="width:100%;min-height:100px;display:flex;align-items:center;justify-content:center">
-              <rabble-doors
-                id="catalogDoors"
-                style="width:200px;height:100px;display:block;border:1px solid var(--rabble-border);border-radius:var(--rabble-radius-md)"
-              ></rabble-doors>
-            </div>
+          <div class="atlas-entry-preview three-tall">
+            <rabble-doors
+              id="catalogDoors"
+              count="6"
+              speed="1"
+              style="width:100%;height:360px;display:block"
+            ></rabble-doors>
           </div>
           <div class="atlas-entry-meta">
-            <span class="atlas-entry-name">&lt;rabble-doors&gt; (P5 stub)</span>
+            <span class="atlas-entry-name">&lt;rabble-doors count="6"&gt;</span>
             <span class="rabble-badge rabble-accent-cyan">NeBuLA</span>
-            <span class="rabble-badge rabble-accent-yellow">stub</span>
+            <button class="rabble-btn rabble-btn-pill is-secondary" id="doorsSpeedBtn"
+              style="font-size:11px;padding:4px 14px">setSpeed(2)</button>
           </div>
-          <code class="atlas-entry-code">&lt;rabble-doors&gt;&lt;/rabble-doors&gt;
-// post-EP1 orbital-door implementation</code>
+          <code class="atlas-entry-code">&lt;rabble-doors count="6" speed="1"&gt;&lt;/rabble-doors&gt;
+el.setDoors([{ id, name, glyph, accent, organ }, ...]);
+el.setSpeed(2);  el.setEntityState('thinking');
+// events: rabble-doors-enter / -leave / -trace</code>
         </div>
 
         <!-- NeBuLA.ui.createEntityMini -->
@@ -1107,7 +1110,7 @@ container.appendChild(ring.el);</code>
     <section class="atlas-section" id="s-motion">
       <div class="atlas-section-meta">
         <div class="rabble-section-header">Motion</div>
-        <span class="atlas-section-count">5 components</span>
+        <span class="atlas-section-count">9 components</span>
       </div>
       <div class="atlas-grid">
 
@@ -1193,6 +1196,71 @@ container.appendChild(ring.el);</code>
           <code class="atlas-entry-code">&lt;div class="rabble-border-harmony"&gt;...&lt;/div&gt;
 &lt;div class="rabble-border-harmony slow"&gt;...&lt;/div&gt;
 &lt;div class="rabble-border-harmony fast"&gt;...&lt;/div&gt;</code>
+        </div>
+
+        <!-- rabble-text-shudder -->
+        <div class="atlas-entry">
+          <div class="atlas-entry-preview centered">
+            <span class="rabble-text-shudder" id="shudderDemo"
+              style="font-family:var(--rabble-font-hero);font-size:28px;text-transform:none;color:var(--rabble-text)">RaBbLE</span>
+          </div>
+          <div class="atlas-entry-meta">
+            <span class="atlas-entry-name">.rabble-text-shudder.is-active</span>
+            <span class="rabble-badge rabble-accent-magenta">Aether</span>
+          </div>
+          <code class="atlas-entry-code">&lt;span class="rabble-text-shudder is-active"&gt;RaBbLE&lt;/span&gt;
+// + .fast / .slow to retune the stutter</code>
+        </div>
+
+        <!-- rabble-horizon-glow -->
+        <div class="atlas-entry">
+          <div class="atlas-entry-preview tall" style="flex-direction:column;gap:var(--rabble-space-4);width:100%;justify-content:center">
+            <hr class="rabble-horizon-glow rabble-accent-magenta" style="margin:0">
+            <hr class="rabble-horizon-glow rabble-accent-cyan" style="margin:0">
+            <hr class="rabble-horizon-glow rabble-accent-violet" style="margin:0">
+          </div>
+          <div class="atlas-entry-meta">
+            <span class="atlas-entry-name">.rabble-horizon-glow</span>
+            <span class="rabble-badge rabble-accent-magenta">Aether</span>
+          </div>
+          <code class="atlas-entry-code">&lt;hr class="rabble-horizon-glow rabble-accent-cyan"&gt;</code>
+        </div>
+
+        <!-- rabble-tint-radial -->
+        <div class="atlas-entry">
+          <div class="atlas-entry-preview tall" style="flex-direction:column;gap:var(--rabble-space-3);width:100%">
+            <div class="rabble-panel rabble-tint-radial rabble-accent-magenta" style="width:100%">
+              <div class="rabble-section-header">◈ radial wash · panel</div>
+              <p style="font-size:13px;color:var(--rabble-muted);margin:0">.rabble-tint-radial layers a soft accent glow from the top.</p>
+            </div>
+            <div class="rabble-card rabble-tint-radial rabble-accent-cyan" style="padding:var(--rabble-space-3);width:100%">
+              <span style="font-family:var(--rabble-font-mono);font-size:11px;color:var(--rabble-muted)">.rabble-tint-radial · card · cyan</span>
+            </div>
+          </div>
+          <div class="atlas-entry-meta">
+            <span class="atlas-entry-name">.rabble-tint-radial</span>
+            <span class="rabble-badge rabble-accent-magenta">Aether</span>
+          </div>
+          <code class="atlas-entry-code">&lt;div class="rabble-panel rabble-tint-radial rabble-accent-cyan"&gt;...&lt;/div&gt;
+/* --rabble-tint-origin: 50% 30% */</code>
+        </div>
+
+        <!-- rabble-reveal-3d -->
+        <div class="atlas-entry">
+          <div class="atlas-entry-preview tall" style="width:100%">
+            <div class="rabble-stagger-in" id="reveal3dDemo" style="width:100%;display:flex;flex-direction:column;gap:var(--rabble-space-2)">
+              <div class="rabble-reveal-3d rabble-card rabble-accent-violet" style="padding:var(--rabble-space-2) var(--rabble-space-3)">3D flip-in · row 1</div>
+              <div class="rabble-reveal-3d rabble-card rabble-accent-violet" style="padding:var(--rabble-space-2) var(--rabble-space-3)">3D flip-in · row 2</div>
+              <div class="rabble-reveal-3d rabble-card rabble-accent-violet" style="padding:var(--rabble-space-2) var(--rabble-space-3)">3D flip-in · row 3</div>
+            </div>
+          </div>
+          <div class="atlas-entry-meta">
+            <span class="atlas-entry-name">.rabble-reveal-3d</span>
+            <span class="rabble-badge rabble-accent-magenta">Aether</span>
+          </div>
+          <code class="atlas-entry-code">&lt;div class="rabble-stagger-in"&gt;
+  &lt;div class="rabble-reveal-3d"&gt;...&lt;/div&gt;
+&lt;/div&gt; // also .fast / .slow</code>
         </div>
 
       </div>
@@ -1287,52 +1355,50 @@ container.appendChild(ring.el);</code>
 sf.start();</code>
         </div>
 
-        <!-- streaks — stub -->
+        <!-- NeBuLA.effects.streaks -->
         <div class="atlas-entry">
-          <div class="atlas-entry-preview centered">
-            <div class="rabble-panel" style="width:100%;min-height:60px;display:flex;align-items:center;justify-content:center;gap:var(--rabble-space-2)">
-              <span class="rabble-badge rabble-accent-yellow">P5 stub</span>
-              <span style="font-family:var(--rabble-font-mono);font-size:11px;color:var(--rabble-muted)">streaks</span>
-            </div>
+          <div class="atlas-entry-preview">
+            <div class="atlas-starfield-host" id="streaksHost"></div>
           </div>
           <div class="atlas-entry-meta">
-            <span class="atlas-entry-name">NeBuLA.effects.streaks</span>
+            <span class="atlas-entry-name">NeBuLA.effects.streaks()</span>
             <span class="rabble-badge rabble-accent-cyan">NeBuLA</span>
-            <span class="rabble-badge rabble-accent-yellow">stub</span>
           </div>
-          <code class="atlas-entry-code">NeBuLA.effects.streaks(host, opts) // post-EP1</code>
+          <code class="atlas-entry-code">const fx = NeBuLA.effects.streaks(div, {
+  spawnProb: 0.02, glitch: true
+});
+fx.start();</code>
         </div>
 
-        <!-- constellation — stub -->
+        <!-- NeBuLA.effects.constellation (cursor-reactive) -->
         <div class="atlas-entry">
-          <div class="atlas-entry-preview centered">
-            <div class="rabble-panel" style="width:100%;min-height:60px;display:flex;align-items:center;justify-content:center;gap:var(--rabble-space-2)">
-              <span class="rabble-badge rabble-accent-yellow">P5 stub</span>
-              <span style="font-family:var(--rabble-font-mono);font-size:11px;color:var(--rabble-muted)">constellation</span>
-            </div>
+          <div class="atlas-entry-preview">
+            <div class="atlas-starfield-host" id="constellationHost"></div>
           </div>
           <div class="atlas-entry-meta">
-            <span class="atlas-entry-name">NeBuLA.effects.constellation</span>
+            <span class="atlas-entry-name">NeBuLA.effects.constellation()</span>
             <span class="rabble-badge rabble-accent-cyan">NeBuLA</span>
-            <span class="rabble-badge rabble-accent-yellow">stub</span>
+            <span class="rabble-badge rabble-accent-violet">cursor-reactive</span>
           </div>
-          <code class="atlas-entry-code">NeBuLA.effects.constellation(host, opts) // post-EP1</code>
+          <code class="atlas-entry-code">const fx = NeBuLA.effects.constellation(div, {
+  maxDist: 160, count: 200
+}); // lines reach toward the pointer
+fx.start();</code>
         </div>
 
-        <!-- haze — stub -->
+        <!-- NeBuLA.effects.haze -->
         <div class="atlas-entry">
-          <div class="atlas-entry-preview centered">
-            <div class="rabble-panel" style="width:100%;min-height:60px;display:flex;align-items:center;justify-content:center;gap:var(--rabble-space-2)">
-              <span class="rabble-badge rabble-accent-yellow">P5 stub</span>
-              <span style="font-family:var(--rabble-font-mono);font-size:11px;color:var(--rabble-muted)">haze</span>
-            </div>
+          <div class="atlas-entry-preview">
+            <div class="atlas-starfield-host" id="hazeHost"></div>
           </div>
           <div class="atlas-entry-meta">
-            <span class="atlas-entry-name">NeBuLA.effects.haze</span>
+            <span class="atlas-entry-name">NeBuLA.effects.haze()</span>
             <span class="rabble-badge rabble-accent-cyan">NeBuLA</span>
-            <span class="rabble-badge rabble-accent-yellow">stub</span>
           </div>
-          <code class="atlas-entry-code">NeBuLA.effects.haze(host, opts) // post-EP1</code>
+          <code class="atlas-entry-code">const fx = NeBuLA.effects.haze(div, {
+  blobs: 4, repaintEvery: 2
+});
+fx.start();</code>
         </div>
 
       </div>
@@ -1603,6 +1669,111 @@ border-radius: var(--rabble-radius-pill); /* 9999px */</code>
         sf.start();
       }
 
+      // ── Deep-field effects (container-mounted; NEVER a <canvas>) ─────────────
+      function mountDeepfield() {
+        var NeBuLA = window.NeBuLA;
+        if (!NeBuLA || !NeBuLA.effects) return;
+
+        // streaks — signal/data streaks
+        var streaksHost = document.getElementById('streaksHost');
+        if (streaksHost && NeBuLA.effects.streaks) {
+          try {
+            var st = NeBuLA.effects.streaks(streaksHost, { spawnProb: 0.02, glitch: true });
+            if (st && st.start) st.start();
+          } catch (e) { console.warn('[Atlas] streaks:', e); }
+        }
+
+        // constellation — cursor-reactive; drive a synthetic pointer so it draws
+        var constHost = document.getElementById('constellationHost');
+        if (constHost && NeBuLA.effects.constellation) {
+          try {
+            var cn = NeBuLA.effects.constellation(constHost, { maxDist: 160, count: 200 });
+            if (cn && cn.start) cn.start();
+            // Sweep a fake pointer across the container so lines reach toward it.
+            var ang = 0;
+            setInterval(function () {
+              var r = constHost.getBoundingClientRect();
+              if (!r.width) return;
+              ang += 0.12;
+              var cx = r.left + r.width  * (0.5 + 0.42 * Math.cos(ang));
+              var cy = r.top  + r.height * (0.5 + 0.42 * Math.sin(ang * 1.3));
+              constHost.dispatchEvent(new MouseEvent('mousemove', {
+                clientX: cx, clientY: cy, bubbles: true
+              }));
+            }, 60);
+          } catch (e) { console.warn('[Atlas] constellation:', e); }
+        }
+
+        // haze — drifting nebula blobs
+        var hazeHost = document.getElementById('hazeHost');
+        if (hazeHost && NeBuLA.effects.haze) {
+          try {
+            var hz = NeBuLA.effects.haze(hazeHost, { blobs: 4, repaintEvery: 2 });
+            if (hz && hz.start) hz.start();
+          } catch (e) { console.warn('[Atlas] haze:', e); }
+        }
+      }
+
+      // ── rabble-doors — real orbit engine ────────────────────────────────────
+      function mountDoors() {
+        var doors = document.getElementById('catalogDoors');
+        if (!doors) return;
+        var DOORS = [
+          { id: 'aether',     name: 'Aether',     glyph: '◇', accent: 'pink',    organ: 'skin'      },
+          { id: 'nebula',     name: 'NeBuLA',     glyph: '◈', accent: 'violet',  organ: 'render'    },
+          { id: 'score',      name: 'sCoRE',      glyph: '⬡', accent: 'magenta', organ: 'spine'     },
+          { id: 'os',         name: 'RaBbLE-OS',  glyph: '⊞', accent: 'cyan',    organ: 'substrate' },
+          { id: 'grimoire',   name: 'Grimoire',   glyph: '❖', accent: 'green',   organ: 'memory'    },
+          { id: 'collective', name: 'Collective', glyph: '✦', accent: 'yellow',  organ: 'body'      }
+        ];
+        function apply() {
+          if (typeof doors.setDoors === 'function') { doors.setDoors(DOORS); return true; }
+          return false;
+        }
+        if (!apply()) {
+          // element may not have upgraded yet — retry briefly
+          var tries = 0;
+          var poll = setInterval(function () {
+            tries++;
+            if (apply() || tries > 40) clearInterval(poll);
+          }, 250);
+        }
+        var btn = document.getElementById('doorsSpeedBtn');
+        if (btn) {
+          var fast = false;
+          btn.addEventListener('click', function () {
+            fast = !fast;
+            if (typeof doors.setSpeed === 'function') doors.setSpeed(fast ? 2 : 1);
+            btn.textContent = fast ? 'setSpeed(1)' : 'setSpeed(2)';
+          });
+        }
+      }
+
+      // ── New Aether effect classes (timed so they animate in a screenshot) ────
+      function driveAetherEffects() {
+        // text-shudder: toggle .is-active on a cadence
+        var shudder = document.getElementById('shudderDemo');
+        if (shudder) {
+          shudder.classList.add('is-active');
+          setInterval(function () {
+            shudder.classList.toggle('is-active');
+          }, 2200);
+        }
+        // reveal-3d: re-trigger the flip-in by reflowing the animation
+        var reveal = document.getElementById('reveal3dDemo');
+        if (reveal) {
+          var kids = Array.prototype.slice.call(reveal.querySelectorAll('.rabble-reveal-3d'));
+          setInterval(function () {
+            kids.forEach(function (k) {
+              k.style.animation = 'none';
+              // force reflow, then clear to let the class animation re-run
+              void k.offsetWidth;
+              k.style.animation = '';
+            });
+          }, 3200);
+        }
+      }
+
       // ── NeBuLA UI factories ─────────────────────────────────────────────────
       function mountFactories() {
         var NeBuLA = window.NeBuLA;
@@ -1741,6 +1912,9 @@ border-radius: var(--rabble-radius-pill); /* 9999px */</code>
       // ── Wait for NeBuLA to be available, then mount ─────────────────────────
       function onReady() {
         mountStarfield();
+        mountDeepfield();
+        mountDoors();
+        driveAetherEffects();
         mountFactories();
 
         // Floor/graph lazy-load Three.js — poll for element upgrade
