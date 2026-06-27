@@ -3,8 +3,8 @@
  *
  * Defines window.RaBbLE_PAGES — a map of page IDs to page metadata.
  * Page IDs must match the data-page-id attribute on <body> for each page.
- * Consumed by RaBbLE-page-runtime.js to populate the global nav and
- * any other shared chrome that needs to know the site map.
+ * Intended for a shared page runtime to populate global nav; that runtime
+ * (RaBbLE-page-runtime.js) was removed in the RC1 prune and is not yet rebuilt.
  *
  * Conventions:
  *   id:    matches <body data-page-id="…">

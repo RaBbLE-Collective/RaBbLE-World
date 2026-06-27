@@ -19,44 +19,41 @@ RaBbLE-World is the public-facing web presence and entity chat surface for the C
 **`world/` — all site source**
 | Path | What |
 |---|---|
-| `world/RaBbLE-Boot.html` | Cinematic boot sequence and login surface |
-| `world/RaBbLE-Chat.html` | Main chat surface |
-| `world/RaBbLE-Docs.html` | Technical documentation viewer |
-| `world/RaBbLE-OS.html` | RaBbLE-OS intro, bootstrap, and expansion cards |
-| `world/RaBbLE-Studio.html` | NeBuLA Studio — visual playground for entity tuning and page structure reference |
+| `world/account.html` | Account settings surface |
+| `world/os.html` | RaBbLE-OS developer preview: intro, bootstrap, expansion cards |
+| `world/summon.html` | Summoning Ceremony — invite and onboarding surface |
+| `world/RaBbLE-Catalog.html` | Atlas: live catalog of every Aether class and NeBuLA element/effect |
 
 **`world/css/`**
 | Path | What |
 |---|---|
 | `world/css/RaBbLE-theme.css` | Shared identity layer — palette vars, typography, overlays |
-| `world/css/RaBbLE-chrome.css` | Shared page chrome — global ◈ page navigator (all pages) |
-| `world/css/RaBbLE-docs.css` | Docs page layout |
-| `world/css/RaBbLE-landing.css` | Landing page styles and CSS custom properties |
-| `world/css/RaBbLE-landing-shell.css` | Shell/statusbar layout, .main grid, .panel shared styles |
-| `world/css/RaBbLE-landing-stage.css` | Entity stage, .entity-wrap sizing, wordmark, CTAs, ask-box |
-| `world/css/RaBbLE-landing-panels.css` | Organ list, log panel, overlays, organ detail panel |
-| `world/css/RaBbLE-landing-login.css` | Login modal, iOS entry surface |
-| `world/css/RaBbLE-boot.css` | Boot sequence layout |
-| `world/css/RaBbLE-chat.css` | Chat surface layout |
-| `world/css/RaBbLE-OS.css` | OS page styles |
-| `world/css/RaBbLE-Studio.css` | NeBuLA Studio page layout |
+| `world/css/RaBbLE-unified.css` | RC1 surface: design tokens + base layout (Aether tokens only) |
+| `world/css/RaBbLE-panels.css` | RC1 UI component styles (RaBbLEUI factory output) |
+| `world/css/RaBbLE-dock.css` | Persistent curator dock + expand-to-converse surface |
+| `world/css/RaBbLE-floor.css` | Layout for the Grimoire floor Three.js surface |
+| `world/css/RaBbLE-account.css` | Account page layout and keyframes |
+| `world/css/RaBbLE-summon.css` | Summon ceremony layout and keyframes |
+| `world/css/RaBbLE-os.css` | OS developer preview install guide layout |
 
 **`world/js/`**
 | Path | What |
 |---|---|
+| `world/js/RaBbLE-config.js` | THE FLIP POINT — CDN + backend base URLs; load first on every page |
 | `world/js/RaBbLE-aether.js` | Aether loader + monitor — injects CSS bundle, shows failure banner |
 | `world/js/RaBbLE-NeBuLA.js` | NeBuLA loader + monitor — injects JS bundle, shows failure banner |
-| `world/js/RaBbLE-bg.js` | Ambient background — particles, grid, cursor effects |
-| `world/js/RaBbLE-landing.js` | Alpine.js component assembly only — data constants in `RaBbLE-landing-data.js`, boot sequence in `RaBbLE-landing-boot.js`, metrics in `RaBbLE-landing-metrics.js` |
-| `world/js/RaBbLE-landing-data.js` | Data constants for landing page (ORGANS, BOOT_LOG_LINES, etc.) — edit this for content changes |
-| `world/js/RaBbLE-landing-metrics.js` | Pulse measurement loop, entropy computation, substrate detection — exposed as `window.LandingMetrics` |
-| `world/js/RaBbLE-landing-boot.js` | Boot log playback timeline — exposed as `window.LandingBoot` with callback API |
 | `world/js/RaBbLE-pages.js` | Page registry (`window.RaBbLE_PAGES`) — add an entry here when adding a new page |
-| `world/js/RaBbLE-page-runtime.js` | Shared page runtime — background, copy buttons, entity minis, global ◈ nav (auto-mounts when `<body data-page-id="…">` is set) |
-| `world/js/RaBbLE-Studio.js` | NeBuLA Studio page logic — vanilla JS, no Alpine |
-| `world/js/RaBbLE-boot.js` | Boot sequence behavior and login |
-| `world/js/RaBbLE-chat.js` | Chat surface behavior |
-| `world/js/RaBbLE-ios-install.js` | iOS PWA install prompt |
+| `world/js/RaBbLE-stage.js` | RC1 stage: movement state machine + persistent chrome (`window.RaBbLEStage`) |
+| `world/js/RaBbLE-movements.js` | RC1 visitor journey: five movements wired to the stage |
+| `world/js/RaBbLE-movements-data.js` | Content layer for all five RC1 movements (entity voice copy) |
+| `world/js/RaBbLE-curator.js` | Entity-as-curator: shared engine for dock and deep-conversation view |
+| `world/js/RaBbLE-curator-transmissions.js` | Curator scripted voice — authored transmissions (zero backend dep) |
+| `world/js/RaBbLE-dock.js` | Persistent curator dock (`window.RaBbLEDock`: `say()`, `expand()`) |
+| `world/js/RaBbLE-floor.js` | Grimoire floor renderer wrapping Three.js graph; requires `RaBbLE-Grimoire-Data.js` first |
+| `world/js/RaBbLE-Grimoire-Data.js` | Grimoire docs corpus and filter helpers (`window.GRIMOIRE_*` globals) |
+| `world/js/RaBbLE-ui.js` | RC1 Aether UI component kit — DOM factory functions (`window.RaBbLEUI`) |
+| `world/js/RaBbLE-account.js` | Account page logic |
+| `world/js/RaBbLE-summon.js` | Summon ceremony page logic |
 
 **Note:** `<rabble-entity>` is now defined inside the NeBuLA bundle (`/nebula/v0.0.0.0/nebula.iife.js`). Do not redefine it in World.
 
@@ -107,4 +104,4 @@ bash ../RaBbLE-Grimoire/spells/visual-screenshot.sh --url http://localhost:8000 
 # Use Read tool on that path — most LLM agent CLIs can read PNG files directly
 ```
 
-Use `--url http://localhost:8000/world/Boot.html` for specific pages. See `../RaBbLE-Grimoire/SPELLS.md → visual-screenshot.sh` for full options.
+Use `--url http://localhost:8000/world/os.html` for specific pages. See `../RaBbLE-Grimoire/SPELLS.md → visual-screenshot.sh` for full options.
