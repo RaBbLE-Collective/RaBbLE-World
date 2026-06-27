@@ -28,10 +28,13 @@
       font-family: var(--rabble-font-ui);
       font-size: 14px;
       line-height: 1.5;
-      overflow-y: auto;
       min-height: 100vh;
       -webkit-font-smoothing: antialiased;
     }
+    /* Root scroll: do NOT set overflow on html/body. overflow-y:auto on <html> — or
+       overflow-x:hidden on body (which forces overflow-y to compute to auto) — turns
+       them into self-sized scroll containers (= content height) and pins document
+       scroll at 0. Default visible overflow lets the viewport scroll normally. */
 
     /* ── Ambient layer ─────────────────────────────────────────────────── */
     .atlas-ambient {
