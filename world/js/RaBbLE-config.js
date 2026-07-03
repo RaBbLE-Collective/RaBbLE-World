@@ -21,11 +21,16 @@
   var PROD_API_URL    = 'https://score.joinrabble.world';             // sCoRE (CF Worker → Render)
   var PROD_AETHER_URL = 'https://aether.joinrabble.world/v0.0.0.1-rc.1/aether.min.css'; // Aether CDN — bump version on deploy
   var PROD_NEBULA_URL = 'https://nebula.joinrabble.world/v0.0.0.1-rc.1/nebula.iife.js'; // NeBuLA CDN — bump version on deploy
+  // Three.js stays external (peer dep) — pinned to the same version WS-A's
+  // shared loader uses (RaBbLE-NeBuLA/src/utils/three-loader.js THREE_CDN).
+  // No World-owned mirror yet; both envs read the same jsDelivr pin.
+  var PROD_THREE_URL  = 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js';
 
   // ── Local endpoints (harness/local.sh + dev-serve.sh CDN mock) ──────────────
   var LOCAL_API_URL    = 'http://localhost:8000';
   var LOCAL_AETHER_URL = '/aether/v0.0.0.0/aether.css';
   var LOCAL_NEBULA_URL = '/nebula/v0.0.0.0/nebula.iife.js';
+  var LOCAL_THREE_URL  = 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js';
 
   var host = window.location.hostname;
   var isLocal =
@@ -39,7 +44,13 @@
   set('RABBLE_API_URL',    LOCAL_API_URL,    PROD_API_URL);
   set('RABBLE_AETHER_URL', LOCAL_AETHER_URL, PROD_AETHER_URL);
   set('RABBLE_NEBULA_URL', LOCAL_NEBULA_URL, PROD_NEBULA_URL);
+  set('RABBLE_THREE_URL',  LOCAL_THREE_URL,  PROD_THREE_URL);
   window.RABBLE_ENV = isLocal ? 'local' : 'production';
+
+  // The Descent (Act III/IV, EP1 Liminal plan WS-C) flip point: which entity
+  // backend the passage mounts. 'canvas2d' today; flip to 'threejs' once
+  // WS-B (NeBuLA entity aliveness parity) lands and is visually verified.
+  set('RABBLE_RENDER_BACKEND', 'canvas2d', 'canvas2d');
 
   // ── Guest conversation (the curator's live voice) ───────────────────────────
   // The entity always guides via scripted transmissions (RaBbLE-curator.js).

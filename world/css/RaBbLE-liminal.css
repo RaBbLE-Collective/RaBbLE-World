@@ -1,0 +1,342 @@
+/**
+ * RaBbLE-liminal.css — structure + behavior for the single-page Genesis passage.
+ *
+ * Aether owns look (colors, glow, type, motion keyframes). This file positions
+ * and sizes things only — every color/spacing/radius/font reference below goes
+ * through a var(--rabble-*) token. No hex values. No font-family declarations.
+ *
+ * Page: RaBbLE-World/index.html — Acts 0-IV, one persistent <rabble-entity>.
+ * See: RaBbLE-Grimoire/log/plans/EP1-Liminal-Experience-Plan.md (WS-C)
+ */
+
+html, body {
+  height: 100%;
+}
+
+body.liminal {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--rabble-bg, #0a0010);
+  color: var(--rabble-text);
+  font-family: var(--rabble-font-ui);
+  overflow-x: hidden;
+}
+
+/* ── Deep-field hosts — full-bleed, fixed behind everything ─────────────── */
+.liminal-deepfield {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.liminal-deepfield.is-haze { z-index: 1; opacity: 0.7; }
+
+/* ── Progress rail — thin fixed strip at the very top ────────────────────── */
+.liminal-rail-host {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+}
+
+/* ── Top chrome — statusbar 3-zone ───────────────────────────────────────── */
+.liminal-statusbar {
+  position: fixed;
+  top: 2px; left: 0; right: 0;
+  z-index: 90;
+}
+
+.liminal-statusbar-brand {
+  display: flex;
+  align-items: baseline;
+  gap: var(--rabble-space-2);
+}
+
+.liminal-state-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.liminal-presence {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ── Entity — ONE persistent mount, repositions/rescales per act ────────── */
+.liminal-entity-host {
+  position: fixed;
+  z-index: 40;
+  pointer-events: none;
+  left: 50%;
+  top: 13%;
+  transform: translate(-50%, -50%);
+  width: min(26vw, 220px);
+  height: min(26vw, 220px);
+  transition: left 900ms cubic-bezier(0.16, 1, 0.3, 1),
+              top 900ms cubic-bezier(0.16, 1, 0.3, 1),
+              right 900ms cubic-bezier(0.16, 1, 0.3, 1),
+              width 900ms cubic-bezier(0.16, 1, 0.3, 1),
+              height 900ms cubic-bezier(0.16, 1, 0.3, 1),
+              transform 900ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.liminal-entity-host rabble-entity {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* From Act I onward: entity docks into a small companion badge, tucked under
+   the statusbar — never competing with a centered headline for space, but
+   always in frame ("never leaves the viewport"). */
+body[data-current-act="1"] .liminal-entity-host,
+body[data-current-act="2"] .liminal-entity-host,
+body[data-current-act="3"] .liminal-entity-host,
+body[data-current-act="4"] .liminal-entity-host {
+  left: auto;
+  right: clamp(12px, 3vw, 32px);
+  top: 56px;
+  transform: none;
+  width: 104px;
+  height: 104px;
+}
+
+@media (max-width: 720px) {
+  .liminal-entity-host {
+    width: min(60vw, 300px);
+    height: min(60vw, 300px);
+    top: 38%;
+  }
+  body[data-current-act="1"] .liminal-entity-host,
+  body[data-current-act="2"] .liminal-entity-host,
+  body[data-current-act="3"] .liminal-entity-host,
+  body[data-current-act="4"] .liminal-entity-host {
+    width: 72px;
+    height: 72px;
+    right: 8px;
+    top: 46px;
+  }
+}
+
+/* ── Passage — the act-driven scroll spine ───────────────────────────────── */
+.liminal-passage {
+  position: relative;
+  z-index: 10;
+}
+
+.liminal-act {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(96px, 14vh, 160px) clamp(20px, 6vw, 64px) clamp(140px, 18vh, 200px);
+  scroll-margin-top: 60px;
+}
+
+.liminal-act-inner {
+  width: 100%;
+  max-width: 880px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--rabble-space-5);
+}
+
+.liminal-act-inner.is-wide { max-width: 1180px; }
+
+/* ── Act 0 — The Signal ───────────────────────────────────────────────────── */
+.liminal-wordmark {
+  font-family: var(--rabble-font-hero);
+  font-size: clamp(40px, 8vw, 86px);
+  line-height: 1;
+  margin: 0;
+  /* Reserves clear air below the fixed entity mount (Act 0 only — the
+     entity relocates to the corner from Act I onward). */
+  margin-top: clamp(150px, 20vh, 210px);
+}
+
+.liminal-wordmark-sep {
+  opacity: 0.55;
+  margin: 0 0.06em;
+}
+
+.liminal-whisper-copy {
+  max-width: 620px;
+  font-family: var(--rabble-font-mono);
+  font-size: clamp(13px, 1.6vw, 15px);
+  line-height: 1.85;
+  color: var(--rabble-text);
+}
+
+.liminal-whisper-copy .is-dim { color: var(--rabble-muted); }
+
+/* ── Act headers (shared across acts) ────────────────────────────────────── */
+.liminal-act-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: var(--rabble-space-2);
+}
+
+.liminal-act-title {
+  margin: 0;
+  font-family: var(--rabble-font-hero);
+  font-size: clamp(28px, 5vw, 48px);
+}
+
+/* ── Act I — Genesis passages ─────────────────────────────────────────────── */
+.liminal-genesis-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--rabble-space-4);
+  width: 100%;
+  text-align: left;
+}
+
+@media (max-width: 760px) {
+  .liminal-genesis-grid { grid-template-columns: 1fr; }
+}
+
+.liminal-genesis-passage p {
+  margin: 0;
+}
+
+/* ── Act II — The Collective constellation ───────────────────────────────── */
+.liminal-constellation-host {
+  width: 100%;
+  height: clamp(360px, 52vh, 560px);
+  display: block;
+}
+
+.liminal-constellation-host rabble-doors {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.liminal-organ-lore {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--rabble-space-3);
+  width: 100%;
+  text-align: left;
+}
+
+@media (max-width: 900px) {
+  .liminal-organ-lore { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 560px) {
+  .liminal-organ-lore { grid-template-columns: 1fr; }
+}
+
+.liminal-organ-lore .rabble-card {
+  padding: var(--rabble-space-3) var(--rabble-space-4);
+}
+
+.liminal-organ-name {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-family: var(--rabble-font-mono);
+}
+
+.liminal-organ-tagline {
+  font-family: var(--rabble-font-mono);
+  font-size: 12px;
+  color: var(--rabble-muted);
+  margin: 6px 0 0;
+}
+
+/* ── Acts III-IV — pending shells ─────────────────────────────────────────── */
+.liminal-act.is-pending .liminal-act-inner {
+  gap: var(--rabble-space-3);
+  opacity: 0.92;
+}
+
+.liminal-pending-glyph {
+  font-family: var(--rabble-font-mono);
+  font-size: 32px;
+  color: var(--rabble-muted);
+}
+
+/* ── Ambient pulse log — floats top-left, under the statusbar ────────────
+   Deliberately NOT bottom-anchored: act content is centered and can run
+   long (Act I/II card grids reach near the fold), so a bottom-left log
+   would collide with it. Top-left stays clear across every act. */
+.liminal-pulse-log {
+  position: fixed;
+  left: clamp(12px, 3vw, 28px);
+  top: 54px;
+  z-index: 25;
+  width: min(400px, 70vw);
+  max-height: 108px;
+  overflow: hidden;
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(to bottom, black 65%, transparent 100%);
+          mask-image: linear-gradient(to bottom, black 65%, transparent 100%);
+}
+
+.liminal-pulse-log .rabble-log-line {
+  font-size: 11px;
+}
+
+@media (max-width: 720px) {
+  .liminal-pulse-log { display: none; }
+}
+
+/* ── Bottom movement nav ──────────────────────────────────────────────────── */
+.liminal-nav {
+  position: fixed;
+  left: 50%;
+  bottom: clamp(14px, 2.4vh, 26px);
+  transform: translateX(-50%);
+  z-index: 95;
+  display: flex;
+  align-items: center;
+  gap: var(--rabble-space-3);
+  padding: 10px clamp(14px, 2vw, 22px);
+  max-width: min(94vw, 900px);
+  overflow-x: auto;
+}
+
+.liminal-nav-links {
+  display: flex;
+  align-items: center;
+  gap: var(--rabble-space-2);
+  flex-wrap: nowrap;
+  white-space: nowrap;
+}
+
+.liminal-nav-link {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--rabble-font-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--rabble-muted);
+  padding: 4px 6px;
+  transition: color 180ms ease;
+}
+
+.liminal-nav-link:hover { color: var(--rabble-cyan); }
+.liminal-nav-link.is-active { color: var(--rabble-magenta); }
+
+.liminal-nav-sep {
+  color: var(--rabble-border);
+  font-size: 11px;
+}
+
+.liminal-descend-btn {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .liminal-nav-links .liminal-nav-label-full { display: none; }
+}
