@@ -3,11 +3,13 @@
  * Owns: act-progression (IntersectionObserver → body[data-current-act] +
  * nav highlight + progress rail), the one persistent <rabble-entity> state
  * shifts per act, the presence chip (real sCoRE /health ping, degrades
- * gracefully offline), the ambient pulse-protocol log, and Act II's
- * <rabble-doors> constellation of the six organs.
+ * gracefully offline), the ambient pulse-protocol log, Act II's
+ * <rabble-doors> constellation of the six organs, Act III's 2D->3D descent
+ * crossfade, and Act IV's live sCoRE summoning chat.
  *
- * Local-first: everything except the presence chip works with zero network.
- * See: RaBbLE-Grimoire/log/plans/EP1-Liminal-Experience-Plan.md (WS-C)
+ * Local-first: everything except the presence chip and Act IV chat works
+ * with zero network.
+ * See: RaBbLE-Grimoire/log/plans/EP1-Liminal-Experience-Plan.md (WS-C/WS-D)
  */
 (function () {
   'use strict';
@@ -105,10 +107,12 @@
     function setOnline(count) {
       dot.classList.remove('offline');
       label.textContent = (count || 1) + ' presence';
+      window.dispatchEvent(new CustomEvent('rabble:presence', { detail: { online: true } }));
     }
     function setOffline() {
       dot.classList.add('offline');
       label.textContent = 'signal dark';
+      window.dispatchEvent(new CustomEvent('rabble:presence', { detail: { online: false } }));
     }
 
     function ping() {
@@ -305,12 +309,194 @@
     }
   }
 
+  // ── WebGL capability check (mirrors NeBuLA element.js hasWebGL()) ───────
+  // Duplicated here (not imported — World never reaches into NeBuLA internals)
+  // so the passage can decide whether to attempt the descent AT ALL before
+  // touching the DOM. Never blank the stage: no WebGL, no 3D layer, no fade.
+  function hasWebGLSupport() {
+    try {
+      var c = document.createElement('canvas');
+      return !!(window.WebGLRenderingContext &&
+        (c.getContext('webgl2') || c.getContext('webgl') || c.getContext('experimental-webgl')));
+    } catch (e) {
+      return false;
+    }
+  }
+
+  // ── Act III — The Descent: layered Canvas2D/Three.js crossfade ─────────
+  // Two <rabble-entity> instances stacked in one host. The 3D one is created
+  // lazily (never at page load) once Act III approaches — this is what pays
+  // the WebGL/Three.js cost, and it happens just before it's needed, not
+  // before. The actual crossfade only fires once Act III becomes the ACTIVE
+  // act (via the 'rabble:liminal-act' event from initActProgression above —
+  // extending that machinery, not replacing it). No WebGL: the 2D entity
+  // simply persists; no 3D layer is ever created, no blank stage.
+  function initDescent() {
+    var stage = document.getElementById('liminalDescentStage');
+    if (!stage) return;
+
+    var webglOk = hasWebGLSupport();
+    var created = false;
+    var descended = false;
+
+    function ensure3dLayer() {
+      if (created || !webglOk) return;
+      created = true;
+      var layer = document.createElement('div');
+      layer.className = 'liminal-descent-layer is-3d';
+      var entity = document.createElement('rabble-entity');
+      entity.id = 'liminalEntity3D';
+      entity.setAttribute('backend', 'threejs');
+      entity.setAttribute('mode', 'idle');
+      entity.setAttribute('particle-count', '260');
+      entity.setAttribute('overscan', '1.6');
+      layer.appendChild(entity);
+      stage.appendChild(layer);
+    }
+
+    // Preload a little before the visitor actually arrives (rootMargin
+    // extends the trigger zone above/below the stage's real viewport entry).
+    if (webglOk && 'IntersectionObserver' in window) {
+      var preloadIo = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            ensure3dLayer();
+            preloadIo.disconnect();
+          }
+        });
+      }, { rootMargin: '400px 0px 400px 0px', threshold: 0 });
+      preloadIo.observe(stage);
+    }
+
+    window.addEventListener('rabble:liminal-act', function (e) {
+      if (!e.detail || e.detail.act !== '3' || descended || !webglOk) return;
+      ensure3dLayer(); // safety net if a fast jump (deep link) beat the preload observer
+      descended = true;
+      stage.classList.add('is-descended');
+    });
+  }
+
+  // ── Act IV — The Summoning: live sCoRE chat, gated on real presence ─────
+  // Reuses the SAME curator engine (RaBbLE-curator.js) the rest of World's
+  // chat surfaces use: same guest endpoint, same SSE parsing, same graceful
+  // scripted-degrade. Visibility is gated on the presence chip's real
+  // /health ping (initPresence above) — quiet offline copy instead of a
+  // broken input when sCoRE is unreachable.
+  function initSummoning() {
+    var liveEl = document.getElementById('liminalSummonLive');
+    var offlineEl = document.getElementById('liminalSummonOffline');
+    var chatLog = document.getElementById('liminalChatLog');
+    var inputEl = document.getElementById('liminalChatInput');
+    var sendBtn = document.getElementById('liminalChatSend');
+    if (!liveEl || !offlineEl || !chatLog || !inputEl || !sendBtn) return;
+
+    var curator = (window.RaBbLECurator && typeof window.RaBbLECurator.create === 'function')
+      ? window.RaBbLECurator.create({ room: 'summoning' })
+      : null;
+    var sending = false;
+
+    function showOnline(isOnline) {
+      liveEl.hidden = !isOnline;
+      offlineEl.hidden = !!isOnline;
+    }
+    showOnline(false); // quiet until the presence ping proves otherwise
+
+    window.addEventListener('rabble:presence', function (e) {
+      showOnline(!!(e.detail && e.detail.online));
+    });
+
+    function appendBubble(text, role) {
+      var el = document.createElement('div');
+      el.className = 'rabble-chat-bubble ' + (role === 'user' ? 'is-user' : 'is-entity');
+      el.textContent = text;
+      chatLog.appendChild(el);
+      chatLog.scrollTop = chatLog.scrollHeight;
+      return el;
+    }
+
+    // Drives the SAME persistent entity that never leaves the viewport
+    // (#liminalEntity) — the chat is talking TO the entity on screen, not
+    // to a separate one. %THINKING%/%SPEAKING%/%RESONANT% is the label
+    // vocabulary shown in the statusbar chip during a chat turn.
+    function setChatState(key) {
+      var entity = document.getElementById('liminalEntity');
+      var backendState = key === 'thinking' ? 'thinking' : key === 'speaking' ? 'speaking' : 'idle';
+      if (entity && typeof entity.setEntityState === 'function') entity.setEntityState(backendState);
+      var label = document.getElementById('liminalStateLabel');
+      if (label) label.textContent = '%' + key.toUpperCase() + '%';
+    }
+
+    function send() {
+      if (sending) return;
+      var text = inputEl.value.trim();
+      if (!text) return;
+
+      if (!curator) {
+        appendBubble('the channel is dark. no curator instance is available.', 'entity');
+        return;
+      }
+
+      inputEl.value = '';
+      sending = true;
+      sendBtn.disabled = true;
+      appendBubble(text, 'user');
+      var replyBubble = appendBubble('', 'entity');
+      var acc = '';
+      var first = true;
+      setChatState('thinking');
+
+      curator.converse(text, {
+        onChunk: function (piece) {
+          if (first) { first = false; setChatState('speaking'); }
+          acc += piece;
+          replyBubble.textContent = acc;
+          chatLog.scrollTop = chatLog.scrollHeight;
+        }
+      }).catch(function () {
+        replyBubble.textContent = 'the signal wavers. ask again.';
+      }).then(function () {
+        setChatState('resonant');
+      }).finally(function () {
+        sending = false;
+        sendBtn.disabled = false;
+      });
+    }
+
+    sendBtn.addEventListener('click', send);
+    inputEl.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') { e.preventDefault(); send(); }
+    });
+  }
+
+  // ── Deep link — ?act=N or #act-N jumps straight to an act ───────────────
+  // Small permanent feature: useful for QA captures and for sharing a link
+  // straight to a specific act, not just a debug shim.
+  function initDeepLink() {
+    var act = null;
+    try {
+      act = new URLSearchParams(window.location.search).get('act');
+    } catch (e) { /* URLSearchParams unsupported — fall through to hash */ }
+    if (!act && window.location.hash) {
+      var m = /^#act-(\d)$/.exec(window.location.hash);
+      if (m) act = m[1];
+    }
+    if (act === null || act === '') return;
+    var target = document.getElementById('act-' + act);
+    if (!target) return;
+    window.setTimeout(function () {
+      target.scrollIntoView({ behavior: 'auto', block: 'start' });
+    }, 50);
+  }
+
   function boot() {
     initActProgression();
     initPresence();
     initPulseLog();
     initDeepfield();
     initConstellation();
+    initDescent();
+    initSummoning();
+    initDeepLink();
   }
 
   if (document.readyState === 'loading') {

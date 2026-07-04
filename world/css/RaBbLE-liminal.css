@@ -287,7 +287,7 @@ body[data-current-act="4"] .liminal-entity-host {
   margin: 6px 0 0;
 }
 
-/* ── Acts III-IV — pending shells ─────────────────────────────────────────── */
+/* ── Acts III-IV — pending shells (kept for any future not-yet-wired act) ── */
 .liminal-act.is-pending .liminal-act-inner {
   gap: var(--rabble-space-3);
   opacity: 0.92;
@@ -297,6 +297,84 @@ body[data-current-act="4"] .liminal-entity-host {
   font-family: var(--rabble-font-mono);
   font-size: 32px;
   color: var(--rabble-muted);
+}
+
+/* ── Act III — The Descent: layered Canvas2D/Three.js crossfade stage ────
+   Two <rabble-entity> instances absolutely stacked in one host (WS-D). The
+   3D layer is appended by RaBbLE-liminal.js only once Act III approaches —
+   never present at page load. Crossfade is a plain opacity transition
+   (the layered+crossfade approach is the ruled decision — no shader morph). */
+.liminal-descent-stage {
+  position: relative;
+  width: min(60vw, 480px);
+  height: min(60vw, 480px);
+  margin-top: var(--rabble-space-2);
+}
+
+.liminal-descent-layer {
+  position: absolute;
+  inset: 0;
+  transition: opacity 1400ms ease;
+}
+
+.liminal-descent-layer rabble-entity {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.liminal-descent-layer.is-2d { opacity: 1; }
+.liminal-descent-layer.is-3d { opacity: 0; }
+
+.liminal-descent-stage.is-descended .liminal-descent-layer.is-2d { opacity: 0; }
+.liminal-descent-stage.is-descended .liminal-descent-layer.is-3d { opacity: 1; }
+
+@media (prefers-reduced-motion: reduce) {
+  /* Cut, don't animate. */
+  .liminal-descent-layer { transition: none; }
+}
+
+@media (max-width: 720px) {
+  .liminal-descent-stage { width: min(80vw, 320px); height: min(80vw, 320px); }
+}
+
+/* ── Act IV — The Summoning: live chat surface, Aether classes only ──────
+   .rabble-chat / .rabble-chat-bubble / .rabble-askbox* come from Aether
+   (rabble-components.css §"void bubbles + ask-box") — this file only sizes
+   the container and toggles the online/offline surfaces. */
+.liminal-summon-surface {
+  width: 100%;
+  max-width: 560px;
+}
+
+.liminal-summon-offline {
+  text-align: center;
+  padding: var(--rabble-space-4);
+}
+
+.liminal-summon-live {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rabble-space-3);
+}
+
+/* [hidden] must win over the class rule above — same specificity, later
+   source order would otherwise beat the UA `[hidden]{display:none}` rule. */
+.liminal-summon-live[hidden],
+.liminal-summon-offline[hidden] {
+  display: none;
+}
+
+.liminal-chat-log {
+  min-height: 120px;
+  max-height: 260px;
+  overflow-y: auto;
+  padding: var(--rabble-space-2) 0;
+}
+
+.liminal-summon-altlink {
+  margin-top: var(--rabble-space-2);
+  font-size: 12px;
 }
 
 /* ── Ambient pulse log — floats top-left, under the statusbar ────────────

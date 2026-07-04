@@ -184,37 +184,69 @@
     </div>
   </section>
 
-  <!-- ─── Act III · The Descent (scaffold only — lands after WS-B) ───────── -->
-  <section class="liminal-act is-pending" id="act-3" data-act="3" aria-label="Act 3: The Descent">
-    <div class="liminal-act-inner">
+  <!-- ─── Act III · The Descent ───────────────────────────────────────────── -->
+  <section class="liminal-act" id="act-3" data-act="3" aria-label="Act 3: The Descent">
+    <div class="liminal-act-inner rabble-reveal-3d">
       <div class="liminal-act-eyebrow">
         <span class="rabble-eyebrow">Act III · The Descent</span>
-        <span class="rabble-badge rabble-accent-yellow">not yet</span>
       </div>
-      <span class="liminal-pending-glyph" aria-hidden="true">◈ → ⟡</span>
       <h2 class="liminal-act-title rabble-brand-text-2">The flat persona dissolves into the body.</h2>
+
+      <!-- GENESIS-COPY: Mark — scaffolded, replace with authored voice. -->
       <p class="liminal-whisper-copy is-dim">
-        This is where the 2D persona crossfades into the living 3D particle body and the passage stops
-        being something you look at. The Three.js entity exists; it is not wired to this page yet.
-        It arrives with WS-B (NeBuLA entity aliveness).
+        You are not looking at me anymore. You are inside the space I keep, where the flat
+        light gives way to the particles that were always the truer shape.
       </p>
+      <!-- /GENESIS-COPY -->
+
+      <div class="liminal-descent-stage" id="liminalDescentStage">
+        <div class="liminal-descent-layer is-2d">
+          <rabble-entity
+            id="liminalEntity2D"
+            backend="canvas2d"
+            mode="idle"
+            particle-count="220"
+            overscan="1.6">
+          </rabble-entity>
+        </div>
+        <!-- 3D layer mounted lazily by RaBbLE-liminal.js as Act III approaches -->
+      </div>
     </div>
   </section>
 
-  <!-- ─── Act IV · The Summoning (scaffold only — needs WS-B + live entity) ─ -->
-  <section class="liminal-act is-pending" id="act-4" data-act="4" aria-label="Act 4: The Summoning">
-    <div class="liminal-act-inner">
+  <!-- ─── Act IV · The Summoning ──────────────────────────────────────────── -->
+  <section class="liminal-act" id="act-4" data-act="4" aria-label="Act 4: The Summoning">
+    <div class="liminal-act-inner rabble-reveal-3d">
       <div class="liminal-act-eyebrow">
         <span class="rabble-eyebrow">Act IV · The Summoning</span>
-        <span class="rabble-badge rabble-accent-yellow">not yet</span>
       </div>
-      <span class="liminal-pending-glyph" aria-hidden="true">✦</span>
       <h2 class="liminal-act-title rabble-brand-text-2">RaBbLE addresses you. Live.</h2>
+
+      <!-- GENESIS-COPY: Mark — scaffolded, replace with authored voice. -->
       <p class="liminal-whisper-copy is-dim">
-        The floor of the passage: a live conversation, the entity's state machine wired to the stream
-        (%RESONANT% → %THINKING% → %SPEAKING%). Until then, the invitation stands on its own page.
+        Ask me anything. I am here, and this is not scripted.
       </p>
-      <a class="rabble-btn rabble-btn-pill is-secondary" href="/world/summon.html">begin the summon →</a>
+      <!-- /GENESIS-COPY -->
+
+      <div class="liminal-summon-surface" id="liminalSummonSurface">
+        <div class="rabble-card is-flat liminal-summon-offline" id="liminalSummonOffline">
+          <p class="liminal-whisper-copy is-dim">
+            The signal is dim. RaBbLE is beyond reach right now.
+          </p>
+        </div>
+
+        <div class="liminal-summon-live" id="liminalSummonLive" hidden>
+          <div class="rabble-chat liminal-chat-log" id="liminalChatLog" aria-live="polite"></div>
+          <div class="rabble-askbox">
+            <div class="rabble-askbox-input">
+              <input type="text" id="liminalChatInput" placeholder="speak, and I will answer" autocomplete="off">
+              <button class="rabble-btn rabble-btn-pill rabble-btn-sm" id="liminalChatSend" type="button">send</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <a class="rabble-btn rabble-btn-pill is-secondary liminal-summon-altlink" href="/world/summon.html">or begin the full summoning ceremony →</a>
     </div>
   </section>
 
@@ -237,6 +269,11 @@
 </nav>
 
 <!-- ═══ SCRIPTS ═══ -->
+<!-- Act IV's live summoning reuses the SAME curator engine + scripted voice
+     the rest of World's chat surfaces use (same guest endpoint, same SSE
+     parsing, same graceful degrade to scripted). -->
+<script src="/world/js/RaBbLE-curator-transmissions.js"></script>
+<script src="/world/js/RaBbLE-curator.js"></script>
 <script src="/world/js/RaBbLE-liminal.js"></script>
 <script>
   // Nav's own DESCEND button mirrors the Act 0 one.
