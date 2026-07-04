@@ -184,6 +184,7 @@
     function apply() {
       if (typeof doors.setDoors === 'function') {
         doors.setDoors(ORGANS);
+        initConstellationLinks(doors);
         return true;
       }
       return false;
@@ -195,6 +196,90 @@
         tries++;
         if (apply() || tries > 60) clearInterval(poll);
       }, 500);
+    }
+  }
+
+  // ── Act II — faint connection lines tracing the six organs ──────────────
+  // <rabble-doors> (NeBuLA) owns the orbit itself and has no built-in
+  // "connect the nodes" primitive, so this reads the live door-orb positions
+  // each frame (throttled ~15fps — the orbit drifts slowly, no need for 60fps
+  // here) and paints a faint hexagonal trace behind them. Runs once per
+  // <rabble-doors> instance (guarded via _linksMounted).
+  function initConstellationLinks(doors) {
+    if (doors._linksMounted) return;
+    doors._linksMounted = true;
+
+    var host = doors.parentElement;
+    if (!host) return;
+
+    var canvas = document.createElement('canvas');
+    canvas.className = 'liminal-constellation-lines';
+    canvas.setAttribute('aria-hidden', 'true');
+    host.insertBefore(canvas, doors);
+
+    var ctx = canvas.getContext('2d');
+    var dpr = window.devicePixelRatio || 1;
+    var lastDraw = 0;
+    var prefersStill = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function resize() {
+      var rect = host.getBoundingClientRect();
+      canvas.width  = Math.max(1, Math.round(rect.width  * dpr));
+      canvas.height = Math.max(1, Math.round(rect.height * dpr));
+    }
+
+    function lineColor() {
+      var v = getComputedStyle(document.documentElement).getPropertyValue('--rabble-cyan');
+      return (v && v.trim()) || '#00f5ff';
+    }
+
+    function paint() {
+      var hostRect = host.getBoundingClientRect();
+      if (canvas.width !== Math.round(hostRect.width * dpr) ||
+          canvas.height !== Math.round(hostRect.height * dpr)) resize();
+
+      var orbs = doors.querySelectorAll('.rabble-door-orb');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      if (orbs.length < 2) return;
+
+      var pts = [];
+      for (var i = 0; i < orbs.length; i++) {
+        var r = orbs[i].getBoundingClientRect();
+        pts.push({
+          x: (r.left + r.width / 2 - hostRect.left) * dpr,
+          y: (r.top + r.height / 2 - hostRect.top) * dpr
+        });
+      }
+
+      ctx.save();
+      ctx.strokeStyle = lineColor();
+      ctx.globalAlpha = 0.22;
+      ctx.lineWidth = Math.max(1, dpr);
+      ctx.beginPath();
+      for (var j = 0; j < pts.length; j++) {
+        var a = pts[j], b = pts[(j + 1) % pts.length];
+        ctx.moveTo(a.x, a.y);
+        ctx.lineTo(b.x, b.y);
+      }
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function loop(ts) {
+      if (!doors.isConnected) return; // element removed — stop the loop
+      requestAnimationFrame(loop);
+      if (ts - lastDraw < 66) return; // ~15fps throttle
+      lastDraw = ts;
+      paint();
+    }
+
+    resize();
+    window.addEventListener('resize', resize, { passive: true });
+    if (!prefersStill) {
+      requestAnimationFrame(loop);
+    } else {
+      // Reduced motion: draw one static trace, no rAF loop.
+      paint();
     }
   }
 

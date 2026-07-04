@@ -65,15 +65,19 @@ body.liminal {
 }
 
 /* ── Entity — ONE persistent mount, repositions/rescales per act ────────── */
+/* Sized/anchored by top-edge (not vertical translate) so the box — plus its
+   canvas overscan bleed (see NeBuLA element.js resize(): cssW = hostW *
+   overscan) — never renders above y:0. Host stays under 220px so overscan
+   clamps to 1.8x (element.js), keeping the bleed predictable. */
 .liminal-entity-host {
   position: fixed;
   z-index: 40;
   pointer-events: none;
   left: 50%;
-  top: 13%;
-  transform: translate(-50%, -50%);
-  width: min(26vw, 220px);
-  height: min(26vw, 220px);
+  top: clamp(100px, 12vh, 130px);
+  transform: translateX(-50%);
+  width: min(18vw, 160px);
+  height: min(18vw, 160px);
   transition: left 900ms cubic-bezier(0.16, 1, 0.3, 1),
               top 900ms cubic-bezier(0.16, 1, 0.3, 1),
               right 900ms cubic-bezier(0.16, 1, 0.3, 1),
@@ -90,33 +94,35 @@ body.liminal {
 
 /* From Act I onward: entity docks into a small companion badge, tucked under
    the statusbar — never competing with a centered headline for space, but
-   always in frame ("never leaves the viewport"). */
+   always in frame ("never leaves the viewport"). Insets are generous enough
+   to absorb the overscan bleed on all sides (top + right), not just clear
+   the box itself. */
 body[data-current-act="1"] .liminal-entity-host,
 body[data-current-act="2"] .liminal-entity-host,
 body[data-current-act="3"] .liminal-entity-host,
 body[data-current-act="4"] .liminal-entity-host {
   left: auto;
-  right: clamp(12px, 3vw, 32px);
-  top: 56px;
+  right: clamp(20px, 4.5vw, 52px);
+  top: 92px;
   transform: none;
-  width: 104px;
-  height: 104px;
+  width: 92px;
+  height: 92px;
 }
 
 @media (max-width: 720px) {
   .liminal-entity-host {
-    width: min(60vw, 300px);
-    height: min(60vw, 300px);
-    top: 38%;
+    width: min(50vw, 220px);
+    height: min(50vw, 220px);
+    top: clamp(72px, 14vh, 110px);
   }
   body[data-current-act="1"] .liminal-entity-host,
   body[data-current-act="2"] .liminal-entity-host,
   body[data-current-act="3"] .liminal-entity-host,
   body[data-current-act="4"] .liminal-entity-host {
-    width: 72px;
-    height: 72px;
-    right: 8px;
-    top: 46px;
+    width: 68px;
+    height: 68px;
+    right: 20px;
+    top: 68px;
   }
 }
 
@@ -150,14 +156,20 @@ body[data-current-act="4"] .liminal-entity-host {
 .liminal-act-inner.is-wide { max-width: 1180px; }
 
 /* ── Act 0 — The Signal ───────────────────────────────────────────────────── */
+/* The eyebrow is the FIRST child of .liminal-act-inner, so it is what needs
+   to clear the fixed entity mount above it — reserving the air here (not on
+   the wordmark below) keeps "ACT 0 · THE SIGNAL" from sitting under the
+   entity's eyes/bokeh field. See .liminal-entity-host above for the mount's
+   own box + overscan-bleed sizing this clearance is tuned against. */
+.liminal-signal-eyebrow {
+  margin-top: clamp(230px, 30vh, 280px);
+}
+
 .liminal-wordmark {
   font-family: var(--rabble-font-hero);
   font-size: clamp(40px, 8vw, 86px);
   line-height: 1;
   margin: 0;
-  /* Reserves clear air below the fixed entity mount (Act 0 only — the
-     entity relocates to the corner from Act I onward). */
-  margin-top: clamp(150px, 20vh, 210px);
 }
 
 .liminal-wordmark-sep {
@@ -206,16 +218,40 @@ body[data-current-act="4"] .liminal-entity-host {
 }
 
 /* ── Act II — The Collective constellation ───────────────────────────────── */
+/* <rabble-doors> derives its orbit radius from this host's own clientWidth/
+   clientHeight (base = min(w*0.40, h*0.55) — see NeBuLA elements/doors.js).
+   Taller host = wider orbit that actually fills the act stage instead of
+   sitting bunched in a thin band. position:relative anchors the connection-
+   line canvas liminal.js mounts here (see initConstellationLinks). */
 .liminal-constellation-host {
   width: 100%;
-  height: clamp(360px, 52vh, 560px);
+  height: clamp(420px, 72vh, 640px);
   display: block;
+  position: relative;
+  /* The orbit is a squashed disc (doors.js y-spread = r * 0.42), so this box
+     is much taller than the visible door band. Negative margins recenter the
+     band in the act stage: pull the host up into the dead air under the intro
+     copy, and pull the lore grid up under the disc's lower edge. */
+  margin-top: clamp(-120px, -12vh, -60px);
+  margin-bottom: clamp(-100px, -8vh, -40px);
 }
 
 .liminal-constellation-host rabble-doors {
   width: 100%;
   height: 100%;
   display: block;
+}
+
+/* Faint SVG/canvas line layer drawn by liminal.js, tracing the six organs —
+   sits behind the doors (z-index:0, DOM-order-before) so orbs/labels stay
+   crisp on top. */
+.liminal-constellation-lines {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
 }
 
 .liminal-organ-lore {
