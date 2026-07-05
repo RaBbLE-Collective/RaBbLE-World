@@ -37,8 +37,8 @@ Zero CSS/JS duplication — everything reuses Aether + NeBuLA
 ## Easy Page Template
 
 ```html
-<link rel="stylesheet" href="https://cdn.joinrabble.world/aether/v0.0.0/aether.min.css">
-<script src="https://cdn.joinrabble.world/nebula/v0.0.0/nebula.iife.js"></script>
+<link rel="stylesheet" href="https://aether.joinrabble.world/v0.0.0/aether.min.css">
+<script src="https://nebula.joinrabble.world/v0.0.0/nebula.iife.js"></script>
 <!-- Use Aether classes + window.NeBuLA API -->
 ```
 
