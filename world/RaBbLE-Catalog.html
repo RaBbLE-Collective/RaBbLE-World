@@ -1689,9 +1689,17 @@ border-radius: var(--rabble-radius-pill); /* 9999px */</code>
           try {
             var cn = NeBuLA.effects.constellation(constHost, { maxDist: 160, count: 200 });
             if (cn && cn.start) cn.start();
-            // Sweep a fake pointer across the container so lines reach toward it.
+            // Sweep a fake pointer across the container so lines reach toward it
+            // when nobody's hovering. The effect listens on `window` for real
+            // mousemove too, so a real cursor over the host would otherwise be
+            // fought every 60ms by this synthetic dispatch — pause it on hover
+            // so the real cursor actually drives the effect while present.
+            var constHovered = false;
+            constHost.addEventListener('mouseenter', function () { constHovered = true; });
+            constHost.addEventListener('mouseleave', function () { constHovered = false; });
             var ang = 0;
             setInterval(function () {
+              if (constHovered) return;
               var r = constHost.getBoundingClientRect();
               if (!r.width) return;
               ang += 0.12;
