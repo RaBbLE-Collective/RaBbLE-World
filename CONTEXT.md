@@ -38,7 +38,7 @@ build output of the NeBuLA bundle itself (`var NeBuLA=(()=>{...})()`), copied in
 committed. There is no CDN fetch, no `<link>`/`<script src="https://...">` injection, and no
 failure banner for NeBuLA — if the file is stale, nothing detects it. `RaBbLE-config.js` still
 defines `RABBLE_NEBULA_URL` / `RABBLE_THREE_URL` for a CDN mode, but nothing in the live pages
-reads them (`RaBbLE-liminal.js` hardcodes its rendering backend). This contradiction is an open
+reads them. This contradiction is an open
 decision for Mark (see World's audit section) — not resolved by this doc pass.
 
 Per-page CSS is layout-only and loads after `RaBbLE-theme.css` (an Aether alias bridge). Three of
@@ -49,7 +49,7 @@ five pages (`os.html`, `account.html`, `summon.html`) also load `RaBbLE-unified.
 
 | Path | What | Loaded by |
 |---|---|---|
-| `index.html` | Landing / Episode-2 liminal passage — entity stage, Acts 0–IV | — |
+| `index.html` | Landing — the entity-forward face: entity centered, conversation as the input surface, no scroll (S203; liminal passage retired to Chrysalis) | — |
 | `world/os.html` | RaBbLE-OS developer-preview surface | — |
 | `world/account.html` | Account settings surface | — |
 | `world/summon.html` | Summoning Ceremony — invite/onboarding | — |
@@ -58,14 +58,14 @@ five pages (`os.html`, `account.html`, `summon.html`) also load `RaBbLE-unified.
 | `world/js/RaBbLE-aether.js` | Real Aether CDN loader + failure-banner monitor | all 5 pages |
 | `world/js/RaBbLE-NeBuLA.js` | **Vendored NeBuLA IIFE bundle** (not a loader — see above) | index, account, summon, catalog |
 | `world/js/RaBbLE-pages.js` | Page registry (`window.RaBbLE_PAGES`) | account, summon, catalog |
-| `world/js/RaBbLE-curator.js` | Entity-as-curator engine (liminal passage) | index only |
+| `world/js/RaBbLE-curator.js` | Entity-as-curator engine (face conversation surface) | index only |
 | `world/js/RaBbLE-curator-transmissions.js` | Curator scripted voice / authored transmissions | index only |
-| `world/js/RaBbLE-liminal.js` | Liminal passage orchestration (Acts, entity state, Canvas2D constellation) | index only |
+| `world/js/RaBbLE-face.js` | Face runtime — presence ping, atmosphere mounts, entity state, conversation + ambient whispers | index only |
 | `world/js/RaBbLE-account.js` | Account page logic | account only |
 | `world/js/RaBbLE-summon.js` | Summon ceremony page logic | summon only |
 | `world/css/RaBbLE-theme.css` | Aether alias bridge | index, os, account, summon (not catalog) |
 | `world/css/RaBbLE-unified.css` | Legacy `.rc-*` compatibility layer — still load-bearing | os, account, summon |
-| `world/css/RaBbLE-liminal.css` | Liminal passage layout | index only |
+| `world/css/RaBbLE-face.css` | Face layout — one-viewport grid, voice column, ask row | index only |
 | `world/css/RaBbLE-os.css` | OS developer-preview layout | os only |
 | `world/css/RaBbLE-account.css` | Account page layout | account only |
 | `world/css/RaBbLE-summon.css` | Summon page layout | summon only |
@@ -80,7 +80,7 @@ five pages (`os.html`, `account.html`, `summon.html`) also load `RaBbLE-unified.
 
 | Track | Status |
 |---|---|
-| Landing / liminal passage (Acts 0–IV) | **Done** — S190, entity awakened |
+| Landing — entity-forward face | **Done** — S203 first cut, Mark's sign-off pending; liminal passage (S190) retired to Chrysalis reliquary |
 | Aether CDN integration (all pages) | **Done** — real loader, failure banner verified |
 | NeBuLA delivery | **Live but unresolved** — vendored IIFE bundle in-repo since S190, not CDN; config flip point is dead code (open decision, audit §2.3) |
 | `<rabble-entity>` owned by NeBuLA | **Done** — element defined in bundle |

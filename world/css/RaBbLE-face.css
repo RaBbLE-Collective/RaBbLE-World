@@ -1,0 +1,145 @@
+/* RaBbLE-face.css — the entity-forward EP1 face (S203).
+ *
+ * Structure and behavior ONLY — Aether owns look and feel via tokens
+ * (aliased in RaBbLE-theme.css). No raw hex, no font stacks.
+ *
+ * One viewport. No scroll. The entity holds the room; conversation is
+ * the input surface; navigation recedes to quiet affordances.
+ * Plan of record: RaBbLE-Grimoire/log/plans/EP1-Air-Push-Plan.md (A4).
+ */
+
+body.face {
+  height: 100dvh;
+  margin: 0;
+  overflow: hidden;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+}
+
+/* ── Deep-field atmosphere — NeBuLA mounts on the inner DIVs and may force
+ * their position inline, so the FIXED WRAPPER (which NeBuLA never touches)
+ * is what keeps them out of the body grid flow. ── */
+.face-atmosphere {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+.face-deepfield {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.face-deepfield.is-haze { opacity: .55; }
+
+/* ── Top chrome ── */
+.face-statusbar { position: relative; z-index: 4; grid-row: 1; }
+
+/* ── Stage — the entity holds the room ── */
+.face-stage {
+  position: relative;
+  z-index: 1;
+  min-height: 0;
+  grid-row: 2;
+}
+.face-entity-host {
+  position: absolute;
+  inset: 0;
+}
+.face-entity-host rabble-entity {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Wordmark — quiet, recedes further once conversation begins */
+.face-mark {
+  position: absolute;
+  top: clamp(1rem, 5vh, 3.5rem);
+  left: 0;
+  right: 0;
+  display: grid;
+  justify-items: center;
+  gap: .3rem;
+  z-index: 2;
+  pointer-events: none;
+  transition: opacity 1.4s ease;
+}
+body.has-conversed .face-mark { opacity: .4; }
+
+/* ── The voice — RaBbLE's lines materialize in the space ── */
+.face-voice {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: clamp(.6rem, 3vh, 2rem);
+  width: min(92vw, 68ch);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .55rem;
+  z-index: 2;
+  pointer-events: none;
+}
+.face-voice-line {
+  font-family: var(--font-mono);
+  font-size: .95rem;
+  line-height: 1.55;
+  text-align: center;
+  color: var(--text);
+  max-width: 68ch;
+  transition: opacity .9s ease;
+}
+.face-voice-line.is-entity  { text-shadow: 0 0 18px var(--violet); }
+.face-voice-line.is-user    { color: var(--text-dim); font-size: .78rem; }
+.face-voice-line.is-whisper { color: var(--text-dim); font-size: .85rem; }
+.face-voice-line.is-past    { opacity: .38; }
+.face-voice-line.is-oldest  { opacity: .14; }
+
+/* ── The ask — conversation is the input surface ── */
+.face-ask-row {
+  position: relative;
+  z-index: 3;
+  grid-row: 3;
+  display: grid;
+  grid-template-columns: 1fr min(68ch, 62vw) 1fr;
+  align-items: center;
+  gap: 1rem;
+  padding: .85rem clamp(1rem, 3vw, 2rem) calc(.95rem + env(safe-area-inset-bottom));
+}
+.face-ask { grid-column: 2; }
+
+/* Quiet affordances — navigation recedes */
+.face-nav {
+  grid-column: 3;
+  justify-self: end;
+  display: flex;
+  gap: 1rem;
+}
+.face-nav a {
+  font-family: var(--font-mono);
+  font-size: .72rem;
+  letter-spacing: .14em;
+  color: var(--text-dim);
+  text-decoration: none;
+  transition: color .3s ease;
+}
+.face-nav a:hover,
+.face-nav a:focus-visible { color: var(--cyan); }
+
+@media (max-width: 720px) {
+  .face-ask-row {
+    grid-template-columns: 1fr;
+    gap: .55rem;
+  }
+  .face-ask { grid-column: 1; }
+  .face-nav { grid-column: 1; justify-self: center; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .face-mark,
+  .face-voice-line,
+  .face-nav a { transition: none; }
+}
