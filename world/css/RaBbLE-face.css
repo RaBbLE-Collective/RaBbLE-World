@@ -90,8 +90,13 @@ body[data-beat="boot"] .face-statusbar { opacity: 0; pointer-events: none; }
   transform: translateX(-50%);
   bottom: calc(var(--face-dock-h, 8rem) + .75rem);
   width: min(calc(100vw - 2rem), 68ch);
+  height: clamp(5.5rem, 24vh, 11rem); /* fixed room: the entity is inset above it, so it never resizes per line */
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(to bottom, transparent, black 2.2rem);
+          mask-image: linear-gradient(to bottom, transparent, black 2.2rem);
   display: flex;
   flex-direction: column;
+  justify-content: flex-end;
   align-items: center;
   gap: .55rem;
   z-index: 2;
@@ -232,7 +237,7 @@ body:not([data-beat="meet"]) .face-voice { opacity: 0; }
   .face-sheet-copy { display: none; }
   .face-door { padding: .35rem .55rem; }
   .face-door-note { display: none; }
-  .face-voice { gap: .3rem; }
+  .face-voice { gap: .3rem; height: clamp(3.2rem, 20vh, 5rem); }
   .face-voice-line.is-oldest { display: none; }
   .face-voice-line { font-size: .82rem; line-height: 1.4; }
 }

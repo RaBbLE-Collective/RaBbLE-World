@@ -40,15 +40,27 @@
       if (input && !('ontouchstart' in window)) input.focus();
     }
     measureDock();
+    requestAnimationFrame(measureDock); // the voice moves once --face-dock-h lands
   }
 
-  // the voice floats just above whatever the dock currently shows
+  // The voice floats just above whatever the dock shows, and the entity is told about all of it
+  // (setInsets) so it centers in the room left above the conversation instead of under it.
   function measureDock() {
     var dock = document.querySelector('.face-dock');
     if (!dock) return;
-    var active = dock.querySelector('[data-beat-panel~="' + body.dataset.beat + '"]:not(.face-nav)');
+    var beat = body.dataset.beat;
+    var active = dock.querySelector('[data-beat-panel~="' + beat + '"]:not(.face-nav)');
     var top = (active || dock).getBoundingClientRect().top; // panels sit bottom-aligned, so this is exact
     body.style.setProperty('--face-dock-h', Math.max(0, window.innerHeight - top) + 'px');
+
+    if (beat === 'arrive' || beat === 'boot') { call('setInsets', null); return; }
+    var voice = document.getElementById('faceVoice');
+    var bar = document.querySelector('.face-statusbar');
+    var floor = beat === 'meet' && voice ? voice.getBoundingClientRect().top : top;
+    call('setInsets', {
+      top: bar ? bar.getBoundingClientRect().bottom : 0,
+      bottom: Math.max(0, window.innerHeight - floor),
+    });
   }
   window.addEventListener('resize', measureDock);
 
@@ -93,7 +105,14 @@
     return !!getComputedStyle(document.documentElement).getPropertyValue('--rabble-magenta').trim();
   }
 
-  function wake() {
+  // Once awake, it stays awake for the session: coming back from another page (os.html, a door)
+  // lands on a booted entity instead of Arrive. The boot still runs its real steps, fast-forwarded.
+  var AWAKE_KEY = 'rabble:awake';
+  function remember() { try { sessionStorage.setItem(AWAKE_KEY, '1'); } catch (e) { /* storage off: Arrive again next time */ } }
+  function wasAwake() { try { return sessionStorage.getItem(AWAKE_KEY) === '1'; } catch (e) { return false; } }
+
+  function wake(fast) {
+    fast = fast === true;
     if (body.dataset.beat !== 'arrive') return;
     setBeat('boot');
     label('waking');
@@ -106,7 +125,8 @@
       { id: 'aether', label: 'Aether weave' },
       { id: 'nebula', label: 'NeBuLA renderer' },
       { id: 'score',  label: 'sCoRE link' },
-    ] }).then(function () { setBeat('meet'); greet(); });
+    ] }).then(function () { remember(); setBeat('meet'); greet(); });
+    if (fast) call('skip');
 
     // Aether: applied now, or when its <link> settles
     if (aetherReady()) call('completeStep', 'aether');
@@ -164,10 +184,10 @@
     })();
   }
 
-  // GENESIS-COPY: Mark, RaBbLE's first words and the Summon invitation.
-  var FIRST_WORDS = 'I am RaBbLE. not a tool, not a servant. a peer. say something and I will learn how you move.';
-  var SUMMON_INVITE = 'there could be one of me that is yours. want to see it? tap summon.';
-  // /GENESIS-COPY
+  // Authored lines live with the rest of the voice in RaBbLE-curator-transmissions.js (GENESIS-COPY).
+  var T = window.RaBbLE_TRANSMISSIONS || {};
+  var FIRST_WORDS = curator ? curator.greet('face') : 'I am RaBbLE.';
+  var SUMMON_INVITE = (T.summon && T.summon.invite) || 'tap summon to see one of me that is yours.';
 
   function greet() {
     if (greeted) return;
@@ -306,7 +326,7 @@
     initWhispers();
     initSummon();
 
-    document.getElementById('faceWake').addEventListener('click', wake);
+    document.getElementById('faceWake').addEventListener('click', function () { wake(false); });
     var nav = document.querySelectorAll('.face-nav-btn');
     for (var i = 0; i < nav.length; i++) {
       nav[i].addEventListener('click', function (e) { setBeat(e.currentTarget.dataset.go); });
@@ -317,7 +337,7 @@
     });
 
     setBeat('arrive');
-    if (new URLSearchParams(location.search).get('wake') === '1') wake();
+    if (wasAwake() || new URLSearchParams(location.search).get('wake') === '1') wake(true);
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
