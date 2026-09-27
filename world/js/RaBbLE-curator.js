@@ -36,9 +36,17 @@
   function create(opts) {
     var o = opts || {};
     var room = o.room || 'chat';
-    // live availability: optimistic until proven otherwise this session
+    // live availability: optimistic. A failure benches live for LIVE_RETRY_MS,
+    // then the next message tries again, so a cold sCoRE (Render wakes in ~30 s)
+    // recovers mid-conversation instead of latching scripted for the session.
+    var LIVE_RETRY_MS = 20000;
     var liveEnabled = window.RABBLE_GUEST_CHAT !== false;
-    var liveDown = false;
+    var liveDownUntil = 0;
+    function liveDown() { return Date.now() < liveDownUntil; }
+    // a healthy /health ping clears the bench early
+    window.addEventListener('rabble:presence', function (e) {
+      if (e.detail && e.detail.online) liveDownUntil = 0;
+    });
     var history = []; // {role:'user'|'assistant', content}
 
     function apiUrl(path) {
@@ -139,7 +147,7 @@
       history.push({ role: 'user', content: text });
       onState('thinking');
 
-      var useLive = liveEnabled && !liveDown;
+      var useLive = liveEnabled && !liveDown();
       var attempt = useLive
         ? liveConverse(text, onChunk).then(function (full) {
             if (!full || !full.trim()) throw new Error('empty live reply');
@@ -148,8 +156,8 @@
         : Promise.reject(new Error('live disabled'));
 
       return attempt.catch(function (err) {
-        // mark live unavailable for the rest of the session; degrade gracefully
-        if (useLive) { liveDown = true; if (window.console) console.warn('[curator] live down → scripted:', err.message); }
+        // bench live for a while; degrade gracefully meanwhile
+        if (useLive) { liveDownUntil = Date.now() + LIVE_RETRY_MS; if (window.console) console.warn('[curator] live down → scripted:', err.message); }
         var reply = scriptedReply(text);
         onChunk(reply); // deliver whole
         return { text: reply, source: 'scripted' };
@@ -171,7 +179,7 @@
       subEntityNote: subEntityNote,
       idle: idle,
       converse: converse,
-      isLive: function () { return liveEnabled && !liveDown; },
+      isLive: function () { return liveEnabled && !liveDown(); },
       transmissions: T,
     };
   }

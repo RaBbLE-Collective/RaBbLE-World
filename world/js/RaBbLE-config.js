@@ -47,11 +47,6 @@
   set('RABBLE_THREE_URL',  LOCAL_THREE_URL,  PROD_THREE_URL);
   window.RABBLE_ENV = isLocal ? 'local' : 'production';
 
-  // The Descent (Act III/IV, EP1 Liminal plan WS-C) flip point: which entity
-  // backend the passage mounts. 'canvas2d' today; flip to 'threejs' once
-  // WS-B (NeBuLA entity aliveness parity) lands and is visually verified.
-  set('RABBLE_RENDER_BACKEND', 'canvas2d', 'canvas2d');
-
   // ── Guest conversation (the curator's live voice) ───────────────────────────
   // The entity always guides via scripted transmissions (RaBbLE-curator.js).
   // When guest chat is enabled AND the backend answers, conversation upgrades to
@@ -63,6 +58,18 @@
   set('RABBLE_GUEST_CHAT_TIER', 'fast', 'fast');        // model tier for guest dialogue
 
   // Render free tier sleeps after inactivity — kick /health immediately so the
-  // backend is warming up during the NeBuLA boot animation, not during first chat.
-  if (!isLocal) fetch(window.RABBLE_API_URL + '/health').catch(function () {});
+  // backend is warming up while the visitor arrives, not during first chat.
+  // window.RABBLE_HEALTH is that one request as a Promise; it never rejects and
+  // resolves { ok, status, ms }. The face's boot holds its "sCoRE" step on it.
+  // Fires locally too (local sCoRE on :8000 answers fast or refuses fast).
+  // 50 s cap: longer than the entity's 45 s step timeout, so the entity decides.
+  if (!window.RABBLE_HEALTH) {
+    var t0 = Date.now();
+    var ctrl = ('AbortController' in window) ? new AbortController() : null;
+    var cap = ctrl ? setTimeout(function () { ctrl.abort(); }, 50000) : null;
+    window.RABBLE_HEALTH = fetch(window.RABBLE_API_URL + '/health', ctrl ? { signal: ctrl.signal } : {})
+      .then(function (res) { return { ok: res.ok, status: res.status, ms: Date.now() - t0 }; })
+      .catch(function () { return { ok: false, status: 0, ms: Date.now() - t0 }; })
+      .then(function (r) { if (cap) clearTimeout(cap); return r; });
+  }
 }());

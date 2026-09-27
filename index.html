@@ -8,7 +8,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0a0010">
 <title>RaBbLE · a peer, present</title>
-<meta name="description" content="RaBbLE: a peer collaborator that observes, learns, and acts. A behavioral learning engine, not an assistant. It is here. Speak to it.">
+<meta name="description" content="RaBbLE: a peer collaborator that observes, learns, and acts. A behavioral learning engine, not an assistant. Wake it. Speak to it.">
 <style>html,body{background:#0a0010;margin:0}</style>
 <link rel="manifest" href="/manifest.json">
 <link rel="apple-touch-icon" href="/icons/icon-192.png">
@@ -16,7 +16,7 @@
 <link rel="icon" type="image/png" sizes="32x32" href="/icons/icon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/icons/icon-16.png">
 
-<!-- Engine: Aether CSS (CDN, monitored) + vendored NeBuLA entity bundle -->
+<!-- Engine: config (fires sCoRE /health as RABBLE_HEALTH) → Aether CSS → vendored NeBuLA bundle -->
 <script src="/world/js/RaBbLE-config.js"></script>
 <script src="/world/js/RaBbLE-aether.js"></script>
 <script src="/world/js/RaBbLE-NeBuLA.js"></script>
@@ -26,31 +26,31 @@
 <!-- Face structure/behavior only -->
 <link rel="stylesheet" href="/world/css/RaBbLE-face.css">
 </head>
-<body class="face" data-page-id="face">
+<!-- Five beats, one surface: body[data-beat] = arrive · boot · meet · summon · enter.
+     Plan of record: RaBbLE-Grimoire/log/plans/EP1-Entity-Face-Plan.md (W2). -->
+<body class="face" data-page-id="home" data-beat="arrive">
 
-<!-- ═══ ATMOSPHERE — CRT texture + deep-field, NeBuLA-mounted on DIVs ═══ -->
+<!-- ═══ THE ENTITY — paints the whole scene (field, grid, face) ═══ -->
+<rabble-entity
+  id="faceEntity"
+  backend="alive"
+  autonomous="true"
+  dimension="2d"
+  portal-a="cyan"
+  portal-b="magenta"
+  ready-line="awake. hello."></rabble-entity>
+
 <div class="rabble-scanlines" aria-hidden="true"></div>
 <div class="rabble-vignette" aria-hidden="true"></div>
-<div class="rabble-chromatic" aria-hidden="true"></div>
-<div class="face-atmosphere" aria-hidden="true">
-  <div id="faceStarfield" class="face-deepfield"></div>
-  <div id="faceHaze" class="face-deepfield is-haze"></div>
-</div>
 
 <!-- ═══ TOP CHROME — presence + state, quiet ═══ -->
 <header class="rabble-statusbar face-statusbar" aria-label="Presence status">
   <div class="rabble-statusbar-zone">
-    <span class="rabble-mono-label">
-      <span aria-hidden="true">◈</span> RaBbLE · World
-    </span>
-    <span aria-hidden="true" style="color:var(--text-dim)">/</span>
-    <span class="rabble-mono-label" style="color:var(--text-dim)">genesis</span>
+    <span class="rabble-mono-label"><span aria-hidden="true">◈</span> <span class="face-brand">RaBbLE</span></span>
+    <span class="rabble-mono-label face-dim face-hide-narrow">/ genesis</span>
   </div>
-  <div class="rabble-statusbar-zone">
-    <span class="rabble-mono-label">
-      <span aria-hidden="true">◈</span>
-      <span id="faceStateLabel">%CALIBRATING%</span>
-    </span>
+  <div class="rabble-statusbar-zone face-hide-narrow">
+    <span class="rabble-mono-label" id="faceStateLabel">%DORMANT%</span>
   </div>
   <div class="rabble-statusbar-zone">
     <span class="rabble-status-pill" id="presencePill">
@@ -60,42 +60,71 @@
   </div>
 </header>
 
-<!-- ═══ THE STAGE — the entity holds the room ═══ -->
-<main class="face-stage" aria-label="RaBbLE">
-  <div class="face-entity-host" aria-hidden="true">
-    <rabble-entity
-      id="faceEntity"
-      mode="boot"
-      particle-count="260"
-      overscan="2.0">
-    </rabble-entity>
-  </div>
+<!-- ═══ BEAT 1 · ARRIVE — one line, one action ═══ -->
+<!-- GENESIS-COPY: Mark, the only static words on the face. Authored voice. -->
+<section class="face-arrive" data-beat-panel="arrive" aria-label="Arrive">
+  <h1 class="rabble-brand-flow face-wordmark">RaBbLE</h1>
+  <p class="rabble-tagline face-arrive-line">something here is asleep. it is not an assistant.</p>
+  <button class="rabble-btn rabble-btn-pill rabble-btn-lg" id="faceWake" type="button">wake <span class="face-brand">RaBbLE</span></button>
+</section>
+<!-- /GENESIS-COPY -->
 
-  <!-- GENESIS-COPY: Mark — the only static words on the face. Authored voice. -->
-  <div class="face-mark">
-    <h1 class="rabble-brand-flow" style="margin:0">RaBbLE</h1>
-    <p class="rabble-tagline" style="margin:0">not an assistant. a presence.</p>
-  </div>
-  <!-- /GENESIS-COPY -->
+<!-- ═══ BEAT 3 · MEET — the voice; conversation is the only input ═══ -->
+<div class="face-voice" id="faceVoice" aria-live="polite"></div>
 
-  <!-- The voice — RaBbLE's lines materialize here (JS-managed) -->
-  <div class="face-voice" id="faceVoice" aria-live="polite"></div>
-</main>
-
-<!-- ═══ THE ASK — conversation is the input surface ═══ -->
-<footer class="face-ask-row">
-  <div class="face-ask">
+<footer class="face-dock" aria-label="Conversation">
+  <form class="face-ask" id="faceAsk" data-beat-panel="meet" autocomplete="off">
     <div class="rabble-askbox">
       <div class="rabble-askbox-input">
-        <input type="text" id="faceInput" placeholder="speak, and I will answer" autocomplete="off" aria-label="Speak to RaBbLE">
-        <button class="rabble-btn rabble-btn-pill rabble-btn-sm" id="faceSend" type="button">send</button>
+        <input type="text" id="faceInput" placeholder="speak, and I will answer" aria-label="Speak to RaBbLE" enterkeyhint="send">
+        <button class="rabble-btn rabble-btn-pill rabble-btn-sm" id="faceSend" type="submit">send</button>
       </div>
     </div>
-  </div>
-  <nav class="face-nav" aria-label="Quiet navigation">
-    <a href="/world/summon.html">ceremony</a>
-    <a href="/world/os.html">os</a>
-    <a href="/world/RaBbLE-Catalog.html">atlas</a>
+  </form>
+
+  <!-- ═══ BEAT 4 · SUMMON — preview your own entity; nothing persists (D1) ═══ -->
+  <section class="rabble-glass face-sheet" data-beat-panel="summon" aria-label="Summon your entity">
+    <p class="rabble-mono-label face-sheet-title">◎ your entity · two poles</p>
+    <!-- GENESIS-COPY -->
+    <p class="face-sheet-copy">Every RaBbLE holds two poles in opposition. Choose yours and watch it take them.</p>
+    <!-- /GENESIS-COPY -->
+    <div class="face-poles">
+      <div class="face-pole" role="radiogroup" aria-label="First pole" id="facePoleA"></div>
+      <span class="face-pole-sep" aria-hidden="true">⟷</span>
+      <div class="face-pole" role="radiogroup" aria-label="Second pole" id="facePoleB"></div>
+    </div>
+    <!-- GENESIS-COPY -->
+    <p class="face-sheet-note">A preview. Nothing is kept yet: you claim your own in <strong>Exodus</strong>, Episode 2.</p>
+    <!-- /GENESIS-COPY -->
+  </section>
+
+  <!-- ═══ BEAT 5 · ENTER — quiet doors ═══ -->
+  <section class="rabble-glass face-sheet" data-beat-panel="enter" aria-label="Doors">
+    <p class="rabble-mono-label face-sheet-title">◈ doors</p>
+    <nav class="face-doors">
+      <a class="face-door" href="https://github.com/RaBbLE-Collective" target="_blank" rel="noopener">
+        <span class="face-door-name">the Collective</span>
+        <span class="face-door-note">the members RaBbLE emerges from</span>
+      </a>
+      <a class="face-door" href="/world/os.html">
+        <span class="face-door-name">RaBbLE-OS <span class="face-door-tag">developer preview</span></span>
+        <span class="face-door-note">Fedora netinstall · inst.ks=https://joinrabble.world/RaBbLE-OS.ks</span>
+      </a>
+      <a class="face-door" href="/roadmap" target="_blank" rel="noopener">
+        <span class="face-door-name">episodes</span>
+        <span class="face-door-note">Genesis now · Exodus next</span>
+      </a>
+      <a class="face-door" href="https://github.com/RaBbLE-Collective/RaBbLE-Grimoire" target="_blank" rel="noopener">
+        <span class="face-door-name">the Grimoire</span>
+        <span class="face-door-note">memory and law, in the open</span>
+      </a>
+    </nav>
+  </section>
+
+  <nav class="face-nav" data-beat-panel="meet summon enter" aria-label="Beats">
+    <button type="button" class="face-nav-btn" data-go="meet">speak</button>
+    <button type="button" class="face-nav-btn" data-go="summon" id="faceSummonBtn">summon</button>
+    <button type="button" class="face-nav-btn" data-go="enter">enter</button>
   </nav>
 </footer>
 

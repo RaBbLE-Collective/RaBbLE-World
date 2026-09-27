@@ -25,25 +25,11 @@
       tags:  ['landing', 'entry']
     },
     {
-      id:    'summon',
-      title: 'Summoning Ceremony',
-      href:  'summon.html',
-      icon:  '◎',
-      tags:  ['auth', 'invite', 'onboarding']
-    },
-    {
       id:    'os',
       title: 'RaBbLE-OS',
       href:  'os.html',
       icon:  '⊞',
       tags:  ['os', 'developer-preview', 'substrate']
-    },
-    {
-      id:    'account',
-      title: 'Account',
-      href:  'account.html',
-      icon:  '◇',
-      tags:  ['auth', 'profile', 'settings']
     },
     {
       id:    'catalog',

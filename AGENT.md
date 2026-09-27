@@ -12,28 +12,25 @@ RaBbLE-World is the public-facing web presence and entity chat surface for the C
 **Root** — only `index.html` and config live here
 | Path | What |
 |---|---|
-| `index.html` | Landing page — entry point for joinrabble.world |
+| `index.html` | The EP1 face: Arrive → Boot → Meet → Summon → Enter around `<rabble-entity backend="alive">` |
 | `manifest.json` | PWA manifest |
 | `wrangler.jsonc` | Cloudflare Workers deployment config |
 
 **`world/` — all site source**
 | Path | What |
 |---|---|
-| `world/account.html` | Account settings surface |
 | `world/os.html` | RaBbLE-OS developer preview: intro, bootstrap, expansion cards |
-| `world/summon.html` | Summoning Ceremony — invite and onboarding surface |
 | `world/RaBbLE-Catalog.html` | Atlas: live catalog of every Aether class and NeBuLA element/effect |
 
 **`world/css/`**
 | Path | What |
 |---|---|
 | `world/css/RaBbLE-theme.css` | Shared identity layer — palette vars, typography, overlays |
+| `world/css/RaBbLE-face.css` | The face: beat panels, voice, dock (structure only) |
 | `world/css/RaBbLE-unified.css` | RC1 surface: design tokens + base layout (Aether tokens only) |
 | `world/css/RaBbLE-panels.css` | RC1 UI component styles (RaBbLEUI factory output) |
 | `world/css/RaBbLE-dock.css` | Persistent curator dock + expand-to-converse surface |
 | `world/css/RaBbLE-floor.css` | Layout for the Grimoire floor Three.js surface |
-| `world/css/RaBbLE-account.css` | Account page layout and keyframes |
-| `world/css/RaBbLE-summon.css` | Summon ceremony layout and keyframes |
 | `world/css/RaBbLE-os.css` | OS developer preview install guide layout |
 
 **`world/js/`**
@@ -41,21 +38,20 @@ RaBbLE-World is the public-facing web presence and entity chat surface for the C
 |---|---|
 | `world/js/RaBbLE-config.js` | THE FLIP POINT — CDN + backend base URLs; load first on every page |
 | `world/js/RaBbLE-aether.js` | Aether loader + monitor — injects CSS bundle, shows failure banner |
-| `world/js/RaBbLE-NeBuLA.js` | NeBuLA loader + monitor — injects JS bundle, shows failure banner |
+| `world/js/RaBbLE-NeBuLA.js` | Vendored NeBuLA bundle (`cp ../RaBbLE-NeBuLA/dist/nebula.iife.js` after a NeBuLA build) |
 | `world/js/RaBbLE-pages.js` | Page registry (`window.RaBbLE_PAGES`) — add an entry here when adding a new page |
 | `world/js/RaBbLE-stage.js` | RC1 stage: movement state machine + persistent chrome (`window.RaBbLEStage`) |
 | `world/js/RaBbLE-movements.js` | RC1 visitor journey: five movements wired to the stage |
 | `world/js/RaBbLE-movements-data.js` | Content layer for all five RC1 movements (entity voice copy) |
+| `world/js/RaBbLE-face.js` | Face runtime: beats, real boot steps, presence chip, conversation → entity state, Summon preview |
 | `world/js/RaBbLE-curator.js` | Entity-as-curator: shared engine for dock and deep-conversation view |
 | `world/js/RaBbLE-curator-transmissions.js` | Curator scripted voice — authored transmissions (zero backend dep) |
 | `world/js/RaBbLE-dock.js` | Persistent curator dock (`window.RaBbLEDock`: `say()`, `expand()`) |
 | `world/js/RaBbLE-floor.js` | Grimoire floor renderer wrapping Three.js graph; requires `RaBbLE-Grimoire-Data.js` first |
 | `world/js/RaBbLE-Grimoire-Data.js` | Grimoire docs corpus and filter helpers (`window.GRIMOIRE_*` globals) |
 | `world/js/RaBbLE-ui.js` | RC1 Aether UI component kit — DOM factory functions (`window.RaBbLEUI`) |
-| `world/js/RaBbLE-account.js` | Account page logic |
-| `world/js/RaBbLE-summon.js` | Summon ceremony page logic |
 
-**Note:** `<rabble-entity>` is now defined inside the NeBuLA bundle (`/nebula/v0.0.0.0/nebula.iife.js`). Do not redefine it in World.
+**Note:** `<rabble-entity>` is defined inside the vendored NeBuLA bundle. Do not redefine it in World. Summon/account pages retired S235 to Chrysalis `Chrysalis-Web/ep1/world/` (EP1 persists nothing).
 
 ## Commits & Branches
 

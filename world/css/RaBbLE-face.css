@@ -1,145 +1,246 @@
-/* RaBbLE-face.css — the entity-forward EP1 face (S203).
+/* RaBbLE-face.css — the EP1 face: Arrive → Boot → Meet → Summon → Enter (S235, W2).
  *
- * Structure and behavior ONLY — Aether owns look and feel via tokens
+ * Structure and behavior ONLY. Aether owns look and feel via tokens
  * (aliased in RaBbLE-theme.css). No raw hex, no font stacks.
  *
- * One viewport. No scroll. The entity holds the room; conversation is
- * the input surface; navigation recedes to quiet affordances.
- * Plan of record: RaBbLE-Grimoire/log/plans/EP1-Air-Push-Plan.md (A4).
+ * One viewport, no scroll. <rabble-entity backend="alive"> fills the page and
+ * paints the whole scene; World floats its UI over it. The beats are states of
+ * the same surface: body[data-beat] shows the panels whose data-beat-panel
+ * lists that beat. Boot shows nothing: the entity owns the screen until
+ * entity-boot-complete (landscape keeps the left quarter + right-of-center
+ * text column clear, portrait the top and the 60% band).
+ * Plan of record: RaBbLE-Grimoire/log/plans/EP1-Entity-Face-Plan.md (W2).
  */
 
 body.face {
+  --face-safe-top: var(--rbl-safe-top, env(safe-area-inset-top, 0px));
+  --face-safe-bottom: var(--rbl-safe-bottom, env(safe-area-inset-bottom, 0px));
   height: 100dvh;
   margin: 0;
   overflow: hidden;
-  display: grid;
-  grid-template-rows: auto 1fr auto;
+  background: var(--bg-surface);
+  color: var(--text);
+  font-family: var(--font-ui);
 }
 
-/* ── Deep-field atmosphere — NeBuLA mounts on the inner DIVs and may force
- * their position inline, so the FIXED WRAPPER (which NeBuLA never touches)
- * is what keeps them out of the body grid flow. ── */
-.face-atmosphere {
+/* ── The entity: host sizes it, the alive stage fills it ── */
+body.face rabble-entity {
   position: fixed;
   inset: 0;
   z-index: 0;
+}
+body.face .rabble-scanlines,
+body.face .rabble-vignette { pointer-events: none; }
+
+/* ── Beat panels: hidden unless the current beat is listed ── */
+[data-beat-panel] {
+  opacity: 0;
+  visibility: hidden;
   pointer-events: none;
+  transition: opacity .7s ease, visibility 0s linear .7s;
 }
-.face-deepfield {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
+body[data-beat="arrive"] [data-beat-panel~="arrive"],
+body[data-beat="meet"]   [data-beat-panel~="meet"],
+body[data-beat="summon"] [data-beat-panel~="summon"],
+body[data-beat="enter"]  [data-beat-panel~="enter"] {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition: opacity .7s ease, visibility 0s;
 }
-.face-deepfield.is-haze { opacity: .55; }
 
 /* ── Top chrome ── */
-.face-statusbar { position: relative; z-index: 4; grid-row: 1; }
-
-/* ── Stage — the entity holds the room ── */
-.face-stage {
-  position: relative;
-  z-index: 1;
-  min-height: 0;
-  grid-row: 2;
-}
-.face-entity-host {
-  position: absolute;
-  inset: 0;
-}
-.face-entity-host rabble-entity {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-}
-
-/* Wordmark — quiet, recedes further once conversation begins */
-.face-mark {
-  position: absolute;
-  top: clamp(1rem, 5vh, 3.5rem);
+.face-statusbar {
+  position: fixed;
+  top: 0;
   left: 0;
   right: 0;
-  display: grid;
-  justify-items: center;
-  gap: .3rem;
-  z-index: 2;
-  pointer-events: none;
-  transition: opacity 1.4s ease;
+  z-index: 4;
+  padding-top: var(--face-safe-top);
+  padding-left: max(env(safe-area-inset-left), .75rem);
+  padding-right: max(env(safe-area-inset-right), .75rem);
+  transition: opacity .7s ease;
 }
-body.has-conversed .face-mark { opacity: .4; }
+body[data-beat="boot"] .face-statusbar { opacity: 0; pointer-events: none; }
+.face-dim { color: var(--text-dim); }
 
-/* ── The voice — RaBbLE's lines materialize in the space ── */
+/* ── Beat 1 · Arrive ── */
+.face-arrive {
+  position: fixed;
+  inset: 0;
+  z-index: 3;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 1.1rem;
+  padding: 1.5rem max(1rem, env(safe-area-inset-right)) calc(1.5rem + var(--face-safe-bottom)) max(1rem, env(safe-area-inset-left));
+  text-align: center;
+}
+.face-wordmark {
+  margin: 0;
+  text-transform: none;
+}
+.face-arrive-line { margin: 0; }
+.face-brand { text-transform: none; }
+
+/* ── Beat 3 · Meet: the voice floats above the dock ── */
 .face-voice {
-  position: absolute;
+  position: fixed;
   left: 50%;
   transform: translateX(-50%);
-  bottom: clamp(.6rem, 3vh, 2rem);
-  width: min(92vw, 68ch);
+  bottom: calc(var(--face-dock-h, 8rem) + .75rem);
+  width: min(calc(100vw - 2rem), 68ch);
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: .55rem;
   z-index: 2;
   pointer-events: none;
+  transition: opacity .7s ease;
 }
+body:not([data-beat="meet"]) .face-voice { opacity: 0; }
 .face-voice-line {
   font-family: var(--font-mono);
   font-size: .95rem;
   line-height: 1.55;
   text-align: center;
   color: var(--text);
-  max-width: 68ch;
+  text-shadow: 0 0 4px var(--bg), 0 0 10px var(--bg), 0 0 18px var(--bg);
   transition: opacity .9s ease;
 }
-.face-voice-line.is-entity  { text-shadow: 0 0 18px var(--violet); }
+.face-voice-line.is-entity  { text-shadow: 0 0 4px var(--bg), 0 0 10px var(--bg), 0 0 18px var(--violet); }
 .face-voice-line.is-user    { color: var(--text-dim); font-size: .78rem; }
 .face-voice-line.is-whisper { color: var(--text-dim); font-size: .85rem; }
 .face-voice-line.is-past    { opacity: .38; }
 .face-voice-line.is-oldest  { opacity: .14; }
 
-/* ── The ask — conversation is the input surface ── */
-.face-ask-row {
-  position: relative;
+/* ── The dock: ask / summon / enter share one slot at the bottom ── */
+.face-dock {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
   z-index: 3;
-  grid-row: 3;
   display: grid;
-  grid-template-columns: 1fr min(68ch, 62vw) 1fr;
-  align-items: center;
-  gap: 1rem;
-  padding: .85rem clamp(1rem, 3vw, 2rem) calc(.95rem + env(safe-area-inset-bottom));
+  justify-items: center;
+  gap: .6rem;
+  padding: .75rem max(1rem, env(safe-area-inset-right)) calc(.8rem + var(--face-safe-bottom)) max(1rem, env(safe-area-inset-left));
+  pointer-events: none;       /* only the visible beat panel takes input; the rest reaches the entity */
 }
-.face-ask { grid-column: 2; }
+.face-dock > [data-beat-panel]:not(.face-nav) {
+  grid-area: 1 / 1;           /* stacked: beats cross-fade in place */
+  align-self: end;
+  width: min(100%, 64ch);
+}
+.face-nav { grid-row: 2; }
+.face-ask { margin: 0; }
 
-/* Quiet affordances — navigation recedes */
-.face-nav {
-  grid-column: 3;
-  justify-self: end;
-  display: flex;
-  gap: 1rem;
+/* Summon + Enter sheets */
+.face-sheet {
+  display: grid;
+  gap: .7rem;
+  padding: 1rem 1.1rem;
+  border-radius: 14px;
 }
-.face-nav a {
+.face-sheet-title,
+.face-sheet-copy,
+.face-sheet-note { margin: 0; }
+.face-sheet-copy { font-size: .92rem; line-height: 1.5; }
+.face-sheet-note { font-size: .8rem; line-height: 1.5; color: var(--text-dim); }
+.face-sheet-note strong { color: var(--violet); font-weight: 600; }
+
+.face-poles {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .9rem;
+  flex-wrap: wrap;
+}
+.face-pole { display: flex; gap: .5rem; }
+.face-pole-sep { color: var(--text-dim); }
+.face-swatch {
+  width: 2.1rem;
+  height: 2.1rem;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  background: var(--swatch);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--swatch) 45%, transparent);
+  cursor: pointer;
+  padding: 0;
+  transition: transform .2s ease, border-color .2s ease, opacity .2s ease;
+}
+.face-swatch[aria-checked="true"] { border-color: var(--text); transform: scale(1.12); }
+.face-swatch:disabled { opacity: .22; cursor: not-allowed; box-shadow: none; }
+.face-swatch:focus-visible { outline: 2px solid var(--cyan); outline-offset: 3px; }
+
+.face-doors { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 26ch), 1fr)); gap: .35rem; }
+.face-door {
+  display: grid;
+  gap: .15rem;
+  padding: .55rem .7rem;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  color: var(--text);
+  text-decoration: none;
+  transition: border-color .25s ease, background-color .25s ease;
+}
+.face-door:hover,
+.face-door:focus-visible { border-color: var(--border); background: color-mix(in srgb, var(--raised) 60%, transparent); }
+.face-door-name { font-family: var(--font-ui); font-weight: 600; letter-spacing: .04em; }
+.face-door-note { font-family: var(--font-mono); font-size: .72rem; color: var(--text-dim); overflow-wrap: anywhere; }
+.face-door-tag {
+  font-family: var(--font-mono);
+  font-size: .62rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--yellow);
+  margin-left: .4rem;
+}
+
+/* Quiet beat navigation */
+.face-nav {
+  display: flex;
+  gap: 1.2rem;
+}
+.face-nav-btn {
   font-family: var(--font-mono);
   font-size: .72rem;
   letter-spacing: .14em;
   color: var(--text-dim);
-  text-decoration: none;
-  transition: color .3s ease;
+  background: none;
+  border: 0;
+  padding: .3rem .1rem;
+  cursor: pointer;
+  transition: color .3s ease, text-shadow .3s ease;
 }
-.face-nav a:hover,
-.face-nav a:focus-visible { color: var(--cyan); }
+.face-nav-btn:hover,
+.face-nav-btn:focus-visible,
+.face-nav-btn[aria-current="true"] { color: var(--cyan); }
+.face-nav-btn.is-beckoning { color: var(--violet); text-shadow: 0 0 12px var(--violet); }
 
-@media (max-width: 720px) {
-  .face-ask-row {
-    grid-template-columns: 1fr;
-    gap: .55rem;
-  }
-  .face-ask { grid-column: 1; }
-  .face-nav { grid-column: 1; justify-self: center; }
+@media (max-width: 560px) {
+  .face-hide-narrow { display: none; }
+  .face-voice-line { font-size: .88rem; }
+  .face-poles { flex-direction: column; gap: .55rem; }
+  .face-pole-sep { transform: rotate(90deg); line-height: 1; }
+}
+
+/* short landscape (phones on their side): keep the sheets below the face */
+@media (max-height: 500px) {
+  .face-dock { gap: .3rem; padding-top: .4rem; }
+  .face-sheet { gap: .45rem; padding: .6rem .9rem; }
+  .face-sheet-copy { display: none; }
+  .face-door { padding: .35rem .55rem; }
+  .face-door-note { display: none; }
+  .face-voice { gap: .3rem; }
+  .face-voice-line.is-oldest { display: none; }
+  .face-voice-line { font-size: .82rem; line-height: 1.4; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .face-mark,
+  [data-beat-panel],
+  .face-voice,
   .face-voice-line,
-  .face-nav a { transition: none; }
+  .face-swatch,
+  .face-nav-btn { transition: none; }
 }
