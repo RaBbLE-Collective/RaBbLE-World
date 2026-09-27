@@ -1,0 +1,4 @@
+# Bootstrap + OS netinstall entry points (S234). Sources live in their own repos; World only points.
+# RaBbLE-OS.ks exists only on new-horizons until EP1 airs; repoint to main at the air merge.
+/setup.sh      https://raw.githubusercontent.com/RaBbLE-Collective/RaBbLE-Collective/main/setup.sh  302
+/RaBbLE-OS.ks  https://raw.githubusercontent.com/RaBbLE-Collective/RaBbLE-OS/new-horizons/RaBbLE-OS.ks  302

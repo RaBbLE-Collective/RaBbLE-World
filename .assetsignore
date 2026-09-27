@@ -2,3 +2,15 @@
 .gitignore
 node_modules
 *.log
+# agent/docs files: repo-internal, not part of the public site (S234)
+AGENT.md
+CLAUDE.md
+CODEX.md
+GEMINI.md
+CONTEXT.md
+README.md
+gist
+scripts
+.github
+.wrangler
+wrangler*.jsonc
