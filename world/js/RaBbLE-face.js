@@ -54,14 +54,33 @@
     body.style.setProperty('--face-dock-h', Math.max(0, window.innerHeight - top) + 'px');
 
     if (beat === 'arrive' || beat === 'boot') { call('setInsets', null); return; }
-    var voice = document.getElementById('faceVoice');
     var bar = document.querySelector('.face-statusbar');
+    var barBottom = bar ? bar.getBoundingClientRect().bottom : 0;
+    if (sideColumn.matches) {   // landscape phone: the entity keeps the left, text lives in the right column
+      call('setInsets', { top: barBottom, right: Math.max(0, window.innerWidth - dock.getBoundingClientRect().left) });
+      return;
+    }
+    var voice = document.getElementById('faceVoice');
     var floor = beat === 'meet' && voice ? voice.getBoundingClientRect().top : top;
-    call('setInsets', {
-      top: bar ? bar.getBoundingClientRect().bottom : 0,
-      bottom: Math.max(0, window.innerHeight - floor),
-    });
+    call('setInsets', { top: barBottom, bottom: Math.max(0, window.innerHeight - floor) });
   }
+  var sideColumn = window.matchMedia('(orientation: landscape) and (max-height: 500px)');
+
+  // iOS keeps the layout viewport put when the keyboard opens and pans the visual one, which leaves
+  // a fixed dock under the keys. Ride the visual viewport instead, and undo the pan on blur.
+  function syncViewport() {
+    var vv = window.visualViewport;
+    if (!vv) return;
+    var kb = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
+    body.style.setProperty('--face-kb', (kb > 40 ? kb : 0) + 'px'); // ignore the collapsing URL bar
+    measureDock();
+  }
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', syncViewport);
+    window.visualViewport.addEventListener('scroll', syncViewport);
+  }
+  window.addEventListener('orientationchange', function () { setTimeout(function () { syncViewport(); measureDock(); }, 250); });
+  document.addEventListener('focusout', function () { setTimeout(function () { window.scrollTo(0, 0); syncViewport(); }, 60); });
   window.addEventListener('resize', measureDock);
 
   /* ── Entity state + statusbar vocabulary ───────────────────────────────── */
@@ -148,7 +167,7 @@
   }
 
   /* ── Beat 3 · Meet: the voice ──────────────────────────────────────────── */
-  var MAX_VOICE_LINES = 4;
+  var MAX_VOICE_LINES = 80;
   var curator = (window.RaBbLECurator && typeof window.RaBbLECurator.create === 'function')
     ? window.RaBbLECurator.create({ room: 'chat' }) : null;
   var lastInteraction = Date.now();
@@ -156,19 +175,55 @@
   var greeted = false;
   var beckoned = false;
 
+  // The voice is a scrollable stack. Each line gets --d (0 front … 1 far back) from its distance to a
+  // focus line that slides from the bottom (newest) to the top (oldest) with scroll progress, so paging
+  // back through the history pulls each older line forward while the rest recede into depth.
+  var voiceHost = null;
+  var stick = true;          // follow the newest line unless the visitor has scrolled back
+  var depthQueued = false;
+
+  function updateDepth() {
+    depthQueued = false;
+    var host = voiceHost;
+    if (!host) return;
+    var h = host.clientHeight, max = host.scrollHeight - h;
+    var focus = max > 1 ? h * (host.scrollTop / max) : h;
+    var span = Math.max(h * .85, 1);
+    for (var i = 0; i < host.children.length; i++) {
+      var el = host.children[i];
+      var mid = el.offsetTop - host.scrollTop + el.offsetHeight / 2;
+      var d = Math.min(1, Math.abs(mid - focus) / span);
+      el.style.setProperty('--d', (Math.round(d * 100) / 100).toString());
+    }
+  }
+  function queueDepth() { if (!depthQueued) { depthQueued = true; requestAnimationFrame(updateDepth); } }
+  function keepBottom(smooth) {
+    var host = voiceHost;
+    if (!host || !stick) return;
+    if (smooth && !prefersStill && host.scrollTo) host.scrollTo({ top: host.scrollHeight, behavior: 'smooth' });
+    else host.scrollTop = host.scrollHeight;
+    queueDepth();
+  }
+  function initVoiceScroll() {
+    voiceHost = document.getElementById('faceVoice');
+    if (!voiceHost) return;
+    voiceHost.addEventListener('scroll', function () {
+      stick = voiceHost.scrollHeight - voiceHost.scrollTop - voiceHost.clientHeight < 32;
+      queueDepth();
+    }, { passive: true });
+    window.addEventListener('resize', function () { keepBottom(false); queueDepth(); });
+  }
+
   function addVoiceLine(kind, text) {
-    var host = document.getElementById('faceVoice');
+    var host = voiceHost || document.getElementById('faceVoice');
     if (!host) return null;
     var el = document.createElement('div');
     el.className = 'face-voice-line is-' + kind;
     el.textContent = text || '';
     host.appendChild(el);
     while (host.children.length > MAX_VOICE_LINES) host.removeChild(host.firstChild);
-    for (var i = 0; i < host.children.length; i++) {
-      var fromEnd = host.children.length - 1 - i;
-      host.children[i].classList.toggle('is-past', fromEnd === 1 || fromEnd === 2);
-      host.children[i].classList.toggle('is-oldest', fromEnd >= 3);
-    }
+    if (kind === 'user') stick = true;   // sending always returns you to the front of the stack
+    keepBottom(true);
     return el;
   }
 
@@ -180,6 +235,7 @@
     (function step() {
       if (!el.isConnected) return;
       el.textContent = text.slice(0, ++i);
+      keepBottom(false);
       if (i < text.length) setTimeout(step, 16);
     })();
   }
@@ -237,11 +293,11 @@
         onChunk: function (piece) {
           if (first) { first = false; call('setMood', 'idle'); entityState('speaking'); }
           acc += piece;
-          if (replyEl) replyEl.textContent = acc;
+          if (replyEl) { replyEl.textContent = acc; keepBottom(false); }
         },
       }).then(function (result) {
         // a live stream that broke mid-reply falls back whole; show only the fallback
-        if (replyEl && result && result.source === 'scripted') replyEl.textContent = result.text;
+        if (replyEl && result && result.source === 'scripted') { replyEl.textContent = result.text; keepBottom(false); }
       }).catch(function () {
         if (replyEl) replyEl.textContent = 'the signal wavers. ask again.';
       }).then(function () {
@@ -322,6 +378,7 @@
   /* ── Wiring ────────────────────────────────────────────────────────────── */
   function init() {
     initPresence();
+    initVoiceScroll();
     initConversation();
     initWhispers();
     initSummon();
