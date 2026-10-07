@@ -188,11 +188,15 @@
     if (!host) return;
     var h = host.clientHeight, max = host.scrollHeight - h;
     var focus = max > 1 ? h * (host.scrollTop / max) : h;
-    var span = Math.max(h * .85, 1);
+    var band = h * .5;                       // readable zone around the focus line: anything touching it stays flat and sharp
+    var lo = focus - band / 2, hi = focus + band / 2;
+    var fall = Math.max(h * .6, 1);
     for (var i = 0; i < host.children.length; i++) {
       var el = host.children[i];
-      var mid = el.offsetTop - host.scrollTop + el.offsetHeight / 2;
-      var d = Math.min(1, Math.abs(mid - focus) / span);
+      var top = el.offsetTop - host.scrollTop, bottom = top + el.offsetHeight;
+      // distance from the band to the line's NEAREST edge, so a reply taller than the view is never tilted or faded mid-read
+      var gap = bottom < lo ? lo - bottom : (top > hi ? top - hi : 0);
+      var d = Math.min(1, gap / fall);
       el.style.setProperty('--d', (Math.round(d * 100) / 100).toString());
     }
   }
