@@ -8,7 +8,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0a0010">
 <title>RaBbLE · a peer, present</title>
-<meta name="description" content="RaBbLE: a peer collaborator that observes, learns, and acts. A behavioral learning engine, not an assistant. Wake it. Speak to it.">
+<meta name="description" content="RaBbLE: a peer collaborator that observes, learns, and acts. A behavioral learning engine, not an assistant.">
 <style>html,body{background:#0a0010;margin:0}</style>
 <link rel="manifest" href="/manifest.json">
 <link rel="apple-touch-icon" href="/icons/icon-192.png">
@@ -47,7 +47,7 @@
 <header class="rabble-statusbar face-statusbar" aria-label="Presence status">
   <div class="rabble-statusbar-zone">
     <span class="rabble-mono-label"><span aria-hidden="true">◈</span> <span class="face-brand">RaBbLE</span></span>
-    <span class="rabble-mono-label face-dim face-hide-narrow">/ genesis</span>
+    <span class="rabble-mono-label face-dim face-hide-narrow">/ ep1 · genesis</span>
   </div>
   <div class="rabble-statusbar-zone face-hide-narrow">
     <span class="rabble-mono-label" id="faceStateLabel">%DORMANT%</span>
@@ -62,10 +62,10 @@
 
 <!-- ═══ BEAT 1 · ARRIVE — one line, one action ═══ -->
 <!-- GENESIS-COPY: Mark, the only static words on the face. Authored voice. -->
-<section class="face-arrive" data-beat-panel="arrive" aria-label="Arrive">
+<section class="face-arrive" id="faceArrive" data-beat-panel="arrive">
   <h1 class="rabble-brand-flow face-wordmark">RaBbLE</h1>
   <p class="rabble-tagline face-arrive-line">something here is asleep. it is not an assistant.</p>
-  <button class="rabble-btn rabble-btn-pill rabble-btn-lg" id="faceWake" type="button">wake <span class="face-brand">RaBbLE</span></button>
+  <span class="rabble-mono-label face-dim face-wake-hint" id="faceWakeHint" role="button" tabindex="0" aria-label="wake RaBbLE">tap to wake</span>
 </section>
 <!-- /GENESIS-COPY -->
 
@@ -82,20 +82,17 @@
     </div>
   </form>
 
-  <!-- ═══ BEAT 4 · SUMMON — preview your own entity; nothing persists (D1) ═══ -->
-  <section class="rabble-glass face-sheet" data-beat-panel="summon" aria-label="Summon your entity">
-    <p class="rabble-mono-label face-sheet-title">◎ your entity · two poles</p>
-    <!-- GENESIS-COPY -->
-    <p class="face-sheet-copy">Every RaBbLE holds two poles in opposition. Choose yours and watch it take them.</p>
-    <!-- /GENESIS-COPY -->
-    <div class="face-poles">
-      <div class="face-pole" role="radiogroup" aria-label="First pole" id="facePoleA"></div>
-      <span class="face-pole-sep" aria-hidden="true">⟷</span>
-      <div class="face-pole" role="radiogroup" aria-label="Second pole" id="facePoleB"></div>
+  <!-- ═══ BEAT 4 · SUMMON — the Pocket teaser, a static pendant and one line ═══ -->
+  <section class="rabble-glass face-sheet" data-beat-panel="summon" aria-label="Summon yours">
+    <div class="face-pocket">
+      <div class="face-pocket-device">
+        <img src="/world/img/pocket-face.png" width="466" height="466" alt="RaBbLE Pocket, the entity on a round screen">
+      </div>
+      <p class="rabble-mono-label face-sheet-title">Summon yours <span class="face-door-tag">coming soon</span></p>
+      <!-- GENESIS-COPY -->
+      <p class="face-sheet-copy face-pocket-copy">RaBbLE Pocket. The entity, on a pendant you carry.</p>
+      <!-- /GENESIS-COPY -->
     </div>
-    <!-- GENESIS-COPY -->
-    <p class="face-sheet-note">A preview. Nothing is kept yet: you claim your own in <strong>Exodus</strong>, Episode 2.</p>
-    <!-- /GENESIS-COPY -->
   </section>
 
   <!-- ═══ BEAT 5 · ENTER — quiet doors ═══ -->
@@ -105,14 +102,6 @@
       <a class="face-door" href="https://github.com/RaBbLE-Collective" target="_blank" rel="noopener">
         <span class="face-door-name">the Collective</span>
         <span class="face-door-note">the members RaBbLE emerges from</span>
-      </a>
-      <a class="face-door" href="/world/os.html">
-        <span class="face-door-name">RaBbLE-OS <span class="face-door-tag">developer preview</span></span>
-        <span class="face-door-note">Fedora netinstall · inst.ks=https://joinrabble.world/RaBbLE-OS.ks</span>
-      </a>
-      <a class="face-door" href="/roadmap" target="_blank" rel="noopener">
-        <span class="face-door-name">episodes</span>
-        <span class="face-door-note">Genesis now · Exodus next</span>
       </a>
       <a class="face-door" href="https://github.com/RaBbLE-Collective/RaBbLE-Grimoire" target="_blank" rel="noopener">
         <span class="face-door-name">the Grimoire</span>

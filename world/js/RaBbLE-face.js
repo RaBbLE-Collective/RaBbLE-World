@@ -2,13 +2,13 @@
  *
  * Drives <rabble-entity backend="alive"> through the NeBuLA contract
  * (HANDOFF-S234 "The contract W2 codes against") and owns the presence chip,
- * the conversation (shared RaBbLE-curator.js engine), the Summon preview and
+ * the conversation (shared RaBbLE-curator.js engine), the Summon teaser and
  * the beat state (body[data-beat]).
  *
  * Boot steps are real work only: Aether CSS applied, NeBuLA element upgraded,
  * sCoRE /health (window.RABBLE_HEALTH from RaBbLE-config.js). The entity holds
  * its boot until they settle; after 45 s it fails pending steps and wakes anyway.
- * Summon persists nothing (D1): it is a setPortals preview, claimed in Exodus.
+ * Summon is a static Pocket teaser: no runtime, nothing persisted.
  * Plan of record: RaBbLE-Grimoire/log/plans/EP1-Entity-Face-Plan.md (W2).
  */
 (function () {
@@ -124,7 +124,7 @@
     return !!getComputedStyle(document.documentElement).getPropertyValue('--rabble-magenta').trim();
   }
 
-  // Once awake, it stays awake for the session: coming back from another page (os.html, a door)
+  // Once awake, it stays awake for the session: coming back from another page (a door)
   // lands on a booted entity instead of Arrive. The boot still runs its real steps, fast-forwarded.
   var AWAKE_KEY = 'rabble:awake';
   function remember() { try { sessionStorage.setItem(AWAKE_KEY, '1'); } catch (e) { /* storage off: Arrive again next time */ } }
@@ -336,58 +336,23 @@
     }, 25000);
   }
 
-  /* ── Beat 4 · Summon: two poles, palette tokens only, preview only ─────── */
-  var POLES = ['cyan', 'magenta', 'violet', 'pink'];
-  var chosen = { a: 'cyan', b: 'magenta' };
-
-  function initSummon() {
-    var groups = { a: document.getElementById('facePoleA'), b: document.getElementById('facePoleB') };
-    if (!groups.a || !groups.b) return;
-    ['a', 'b'].forEach(function (side) {
-      POLES.forEach(function (name) {
-        var btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'face-swatch';
-        btn.setAttribute('role', 'radio');
-        btn.setAttribute('aria-label', name);
-        btn.dataset.side = side;
-        btn.dataset.pole = name;
-        btn.style.setProperty('--swatch', 'var(--' + name + ')');
-        btn.addEventListener('click', function () { choose(side, name); });
-        groups[side].appendChild(btn);
-      });
-    });
-    render();
-
-    function choose(side, name) {
-      var other = side === 'a' ? 'b' : 'a';
-      if (chosen[other] === name) return;       // pole opposition: never the same color
-      var next = { a: chosen.a, b: chosen.b };
-      next[side] = name;
-      if (call('setPortals', next.a, next.b) === false) return;
-      chosen = next;
-      call('pulse', 'ring');
-      render();
-    }
-    function render() {
-      var sw = document.querySelectorAll('.face-swatch');
-      for (var i = 0; i < sw.length; i++) {
-        var side = sw[i].dataset.side, other = side === 'a' ? 'b' : 'a';
-        sw[i].setAttribute('aria-checked', chosen[side] === sw[i].dataset.pole ? 'true' : 'false');
-        sw[i].disabled = chosen[other] === sw[i].dataset.pole;
-      }
-    }
-  }
-
   /* ── Wiring ────────────────────────────────────────────────────────────── */
   function init() {
     initPresence();
     initVoiceScroll();
     initConversation();
     initWhispers();
-    initSummon();
 
-    document.getElementById('faceWake').addEventListener('click', function () { wake(false); });
+    // Arrive: tap anywhere (the section fills the viewport), or Enter / Space on the hint, wakes it
+    var arrive = document.getElementById('faceArrive');
+    var hint = document.getElementById('faceWakeHint');
+    arrive.addEventListener('click', function () { wake(false); });
+    document.addEventListener('keydown', function (e) {
+      if ((e.key !== 'Enter' && e.key !== ' ') || body.dataset.beat !== 'arrive') return;
+      if (e.target !== body && e.target !== hint) return;
+      e.preventDefault();
+      wake(false);
+    });
     var nav = document.querySelectorAll('.face-nav-btn');
     for (var i = 0; i < nav.length; i++) {
       nav[i].addEventListener('click', function (e) { setBeat(e.currentTarget.dataset.go); });

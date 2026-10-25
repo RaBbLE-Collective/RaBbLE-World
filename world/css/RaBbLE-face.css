@@ -68,6 +68,7 @@ body[data-beat="enter"]  [data-beat-panel~="enter"] {
 }
 body[data-beat="boot"] .face-statusbar { opacity: 0; pointer-events: none; }
 .face-dim { color: var(--text-dim); }
+body[data-beat="arrive"] .face-statusbar { pointer-events: none; }  /* a tap anywhere wakes */
 
 /* ── Beat 1 · Arrive ── */
 .face-arrive {
@@ -86,6 +87,9 @@ body[data-beat="boot"] .face-statusbar { opacity: 0; pointer-events: none; }
   text-transform: none;
 }
 .face-arrive-line { margin: 0; }
+.face-arrive { cursor: pointer; }
+.face-wake-hint:focus-visible { outline: 1px solid var(--cyan); outline-offset: 6px; }
+.face-wake-hint { letter-spacing: .2em; margin-top: .6rem; }
 .face-brand { text-transform: none; }
 
 /* ── Beat 3 · Meet: the voice, a scrollable stack of pages ──
@@ -174,35 +178,29 @@ body.face .rabble-askbox-input input { font-size: max(16px, 1rem) !important; }
   border-radius: 14px;
 }
 .face-sheet-title,
-.face-sheet-copy,
-.face-sheet-note { margin: 0; }
+.face-sheet-copy { margin: 0; }
 .face-sheet-copy { font-size: .92rem; line-height: 1.5; }
-.face-sheet-note { font-size: .8rem; line-height: 1.5; color: var(--text-dim); }
-.face-sheet-note strong { color: var(--violet); font-weight: 600; }
 
-.face-poles {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: .9rem;
-  flex-wrap: wrap;
-}
-.face-pole { display: flex; gap: .5rem; }
-.face-pole-sep { color: var(--text-dim); }
-.face-swatch {
-  width: 2.1rem;
-  height: 2.1rem;
+/* Summon: the Pocket teaser, a round pendant behind a portal-colour bezel */
+.face-pocket-copy { text-wrap: balance; }
+.face-pocket { display: grid; justify-items: center; gap: .6rem; text-align: center; }
+.face-pocket-device {
+  width: clamp(120px, 40vw, 180px);
+  aspect-ratio: 1;
+  padding: 5px;
   border-radius: 50%;
-  border: 2px solid var(--border);
-  background: var(--swatch);
-  box-shadow: 0 0 10px color-mix(in srgb, var(--swatch) 45%, transparent);
-  cursor: pointer;
-  padding: 0;
-  transition: transform .2s ease, border-color .2s ease, opacity .2s ease;
+  background: linear-gradient(135deg, var(--cyan), var(--magenta));
+  box-shadow: 0 0 22px color-mix(in srgb, var(--cyan) 30%, transparent), 0 0 34px color-mix(in srgb, var(--magenta) 22%, transparent);
 }
-.face-swatch[aria-checked="true"] { border-color: var(--text); transform: scale(1.12); }
-.face-swatch:disabled { opacity: .22; cursor: not-allowed; box-shadow: none; }
-.face-swatch:focus-visible { outline: 2px solid var(--cyan); outline-offset: 3px; }
+.face-pocket-device img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: var(--bg);
+  border: 4px solid var(--bg);
+  object-fit: cover;
+}
 
 .face-doors { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 26ch), 1fr)); gap: .35rem; }
 .face-door {
@@ -252,15 +250,14 @@ body.face .rabble-askbox-input input { font-size: max(16px, 1rem) !important; }
 @media (max-width: 560px) {
   .face-hide-narrow { display: none; }
   .face-voice-line { font-size: .9rem; }
-  .face-poles { flex-direction: column; gap: .55rem; }
-  .face-pole-sep { transform: rotate(90deg); line-height: 1; }
 }
 
 /* short landscape (phones on their side): the entity keeps the left, voice + dock take a column on the right */
 @media (max-height: 500px) {
   .face-dock { gap: .3rem; padding-top: .4rem; }
   .face-sheet { gap: .45rem; padding: .6rem .9rem; }
-  .face-sheet-copy { display: none; }
+  .face-sheet-copy:not(.face-pocket-copy) { display: none; }
+  .face-pocket-device { width: clamp(80px, 30vh, 120px); }
   .face-door { padding: .35rem .55rem; }
   .face-door-note { display: none; }
   .face-voice-line { font-size: .82rem; line-height: 1.4; }
@@ -289,6 +286,5 @@ body.face .rabble-askbox-input input { font-size: max(16px, 1rem) !important; }
   [data-beat-panel],
   .face-voice,
   .face-voice-line,
-  .face-swatch,
   .face-nav-btn { transition: none; }
 }
