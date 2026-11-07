@@ -3,3 +3,5 @@
 /setup.sh      https://raw.githubusercontent.com/RaBbLE-Collective/RaBbLE-Collective/main/setup.sh  302
 /RaBbLE-OS.ks  https://raw.githubusercontent.com/RaBbLE-Collective/RaBbLE-OS/new-horizons/RaBbLE-OS.ks  302
 /roadmap       https://github.com/RaBbLE-Collective/RaBbLE-Grimoire/blob/new-horizons/RaBbLE-Agent/RaBbLE-Roadmap.md  302
+/chrysalis      https://chrysalis.joinrabble.world/  301
+/chrysalis/*    https://chrysalis.joinrabble.world/:splat  301
