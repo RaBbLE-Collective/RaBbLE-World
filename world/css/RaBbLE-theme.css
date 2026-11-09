@@ -27,7 +27,7 @@
   --red:        var(--rabble-red,      #e05c6f);
 
   /* ── Void / backgrounds ─────────────────────────────────────────── */
-  --bg:         var(--rabble-void,     #03000b);   /* deepest void — boot screens */
+  --bg:         var(--rabble-bg,       #0a0010);   /* Deep Void */
   --bg-surface: var(--rabble-bg,       #0a0010);   /* standard page background */
   --surface:    var(--rabble-surface,  #12132a);
   --raised:     var(--rabble-raised,   #1a1b2e);
