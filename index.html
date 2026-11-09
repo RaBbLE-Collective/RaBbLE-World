@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0a0010">
+<title>RaBbLE · a peer, present</title>
+<meta name="description" content="RaBbLE: a peer collaborator that observes, learns, and acts. A behavioral learning engine, not an assistant.">
+<style>html,body{background:#0a0010;margin:0}</style>
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/icons/icon-192.png">
+<link rel="icon" type="image/x-icon" href="/icons/favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/icon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/icons/icon-16.png">
+
+<!-- Engine: config (fires sCoRE /health as RABBLE_HEALTH) → Aether CSS → vendored NeBuLA bundle -->
+<script src="/world/js/RaBbLE-config.js"></script>
+<script src="/world/js/RaBbLE-aether.js"></script>
+<script src="/world/js/RaBbLE-NeBuLA.js"></script>
+
+<!-- Shared identity layer -->
+<link rel="stylesheet" href="/world/css/RaBbLE-theme.css">
+<!-- Face structure/behavior only -->
+<link rel="stylesheet" href="/world/css/RaBbLE-face.css">
+</head>
+<!-- Five beats, one surface: body[data-beat] = arrive · boot · meet · summon · enter.
+     Plan of record: RaBbLE-Grimoire/log/plans/EP1-Entity-Face-Plan.md (W2). -->
+<body class="face" data-page-id="home" data-beat="arrive">
+
+<!-- ═══ THE ENTITY — paints the whole scene (field, grid, face) ═══ -->
+<rabble-entity
+  id="faceEntity"
+  backend="alive"
+  autonomous="true"
+  dimension="2d"
+  portal-a="cyan"
+  portal-b="magenta"
+  ready-line="awake. hello."></rabble-entity>
+
+<div class="rabble-scanlines" aria-hidden="true"></div>
+<div class="rabble-vignette" aria-hidden="true"></div>
+
+<!-- ═══ TOP CHROME — presence + state, quiet ═══ -->
+<header class="rabble-statusbar face-statusbar" aria-label="Presence status">
+  <div class="rabble-statusbar-zone">
+    <span class="rabble-mono-label"><span aria-hidden="true">◈</span> <span class="face-brand">RaBbLE</span></span>
+    <span class="rabble-mono-label face-dim face-hide-narrow">/ ep1 · genesis</span>
+  </div>
+  <div class="rabble-statusbar-zone face-hide-narrow">
+    <span class="rabble-mono-label" id="faceStateLabel">%DORMANT%</span>
+  </div>
+  <div class="rabble-statusbar-zone">
+    <span class="rabble-status-pill" id="presencePill">
+      <span class="rabble-status-dot offline" id="presenceDot" aria-hidden="true"></span>
+      <span id="presenceLabel">signal dark</span>
+    </span>
+  </div>
+</header>
+
+<!-- ═══ BEAT 1 · ARRIVE — one line, one action ═══ -->
+<!-- GENESIS-COPY: Mark, the only static words on the face. Authored voice. -->
+<section class="face-arrive" id="faceArrive" data-beat-panel="arrive">
+  <h1 class="rabble-brand-flow face-wordmark">RaBbLE</h1>
+  <p class="rabble-tagline face-arrive-line">something here is asleep. it is not an assistant.</p>
+  <span class="rabble-mono-label face-dim face-wake-hint" id="faceWakeHint" role="button" tabindex="0" aria-label="wake RaBbLE">tap to wake</span>
+</section>
+<!-- /GENESIS-COPY -->
+
+<!-- ═══ BEAT 3 · MEET — the voice; conversation is the only input ═══ -->
+<div class="face-voice" id="faceVoice" aria-live="polite"></div>
+
+<footer class="face-dock" aria-label="Conversation">
+  <form class="face-ask" id="faceAsk" data-beat-panel="meet" autocomplete="off">
+    <div class="rabble-askbox">
+      <div class="rabble-askbox-input">
+        <input type="text" id="faceInput" placeholder="speak, and I will answer" aria-label="Speak to RaBbLE" enterkeyhint="send">
+        <button class="rabble-btn rabble-btn-pill rabble-btn-sm" id="faceSend" type="submit">send</button>
+      </div>
+    </div>
+  </form>
+
+  <!-- ═══ BEAT 4 · SUMMON — the Pocket teaser, a static pendant and one line ═══ -->
+  <section class="rabble-glass face-sheet" data-beat-panel="summon" aria-label="Summon yours">
+    <div class="face-pocket">
+      <div class="face-pocket-device">
+        <img src="/world/img/pocket-face.png" width="466" height="466" alt="RaBbLE Pocket, the entity on a round screen">
+      </div>
+      <p class="rabble-mono-label face-sheet-title">Summon yours <span class="face-door-tag">coming soon</span></p>
+      <!-- GENESIS-COPY -->
+      <p class="face-sheet-copy face-pocket-copy">RaBbLE Pocket. The entity, on a pendant you carry.</p>
+      <!-- /GENESIS-COPY -->
+    </div>
+  </section>
+
+  <!-- ═══ BEAT 5 · ENTER — quiet doors ═══ -->
+  <section class="rabble-glass face-sheet" data-beat-panel="enter" aria-label="Doors">
+    <p class="rabble-mono-label face-sheet-title">◈ doors</p>
+    <nav class="face-doors">
+      <a class="face-door" href="https://github.com/RaBbLE-Collective" target="_blank" rel="noopener">
+        <span class="face-door-name">the Collective</span>
+        <span class="face-door-note">the members RaBbLE emerges from</span>
+      </a>
+      <a class="face-door" href="https://github.com/RaBbLE-Collective/RaBbLE-Grimoire" target="_blank" rel="noopener">
+        <span class="face-door-name">the Grimoire</span>
+        <span class="face-door-note">memory and law, in the open</span>
+      </a>
+    </nav>
+  </section>
+
+  <nav class="face-nav" data-beat-panel="meet summon enter" aria-label="Beats">
+    <button type="button" class="face-nav-btn" data-go="meet">speak</button>
+    <button type="button" class="face-nav-btn" data-go="summon" id="faceSummonBtn">summon</button>
+    <button type="button" class="face-nav-btn" data-go="enter">enter</button>
+  </nav>
+</footer>
+
+<!-- ═══ SCRIPTS — same curator engine as every World chat surface ═══ -->
+<script src="/world/js/RaBbLE-curator-transmissions.js"></script>
+<script src="/world/js/RaBbLE-curator.js"></script>
+<script src="/world/js/RaBbLE-face.js"></script>
+
+</body>
+</html>

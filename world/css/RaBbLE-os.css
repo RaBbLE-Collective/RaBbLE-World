@@ -1,0 +1,423 @@
+/* ── RaBbLE-os.css — Developer Preview install guide ──────────────────── */
+/* Aether tokens only. Atmospheric treatment, Chrysalis-tuned.             */
+/* Gradient borders: mask-composite exclude technique (works with glass).  */
+
+@keyframes osPageRise {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Override stage overflow — scroll page, not a stage ──────────────── */
+html, body {
+  min-height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+body.os-entry { opacity: 0; transition: opacity 0.85s ease; }
+body.os-entry.os-ready { opacity: 1; }
+
+#bgCanvas {
+  position: fixed; inset: 0;
+  z-index: 0; pointer-events: none;
+}
+
+/* ── Root layout ─────────────────────────────────────────────────────── */
+#root {
+  position: relative; z-index: 1;
+  min-height: 100dvh;
+  max-width: 760px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: max(2rem, env(safe-area-inset-top)) 2rem max(5rem, env(safe-area-inset-bottom));
+}
+
+/* ── Back nav ────────────────────────────────────────────────────────── */
+.os-backnav {
+  align-self: flex-start;
+  font-family: var(--rc-font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--rc-muted);
+  text-decoration: none;
+  margin-bottom: 2rem;
+  opacity: 0.7;
+  transition: opacity 150ms ease, color 150ms ease, text-shadow 150ms ease;
+}
+.os-backnav:hover {
+  opacity: 1;
+  color: var(--rc-accent-m);
+  text-shadow: 0 0 10px color-mix(in srgb, var(--rc-accent-m) 55%, transparent);
+}
+
+/* ── Header ──────────────────────────────────────────────────────────── */
+.os-header {
+  text-align: center;
+  margin-bottom: 4rem;
+  animation: osPageRise 0.7s var(--rc-ease) forwards;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.os-wordmark {
+  font-family: var(--rc-font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--rc-muted);
+  text-decoration: none;
+  transition: color 150ms ease, text-shadow 150ms ease;
+}
+.os-wordmark:hover {
+  color: var(--rc-accent-c);
+  text-shadow: 0 0 8px color-mix(in srgb, var(--rc-accent-c) 50%, transparent);
+}
+
+.os-header-title {
+  font-size: clamp(2rem, 6vw, 3rem);
+  font-family: var(--font-hero, 'Orbitron', 'Exo 2', sans-serif);
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  margin: 0;
+  text-transform: none;
+  background: linear-gradient(135deg,
+    var(--rc-accent-m) 0%,
+    var(--rc-accent-v) 50%,
+    var(--rc-accent-c) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.os-header-warning {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--rc-font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--rc-accent-y);
+  background: color-mix(in srgb, var(--rc-accent-y) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--rc-accent-y) 40%, transparent);
+  border-radius: 999px;
+  padding: 0.4rem 1rem;
+  box-shadow: 0 0 16px color-mix(in srgb, var(--rc-accent-y) 12%, transparent);
+}
+
+/* ── Content container ───────────────────────────────────────────────── */
+.os-content {
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+  animation: osPageRise 0.8s var(--rc-ease) 0.1s both;
+}
+
+/* ── Section ─────────────────────────────────────────────────────────── */
+.os-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.os-section-label {
+  position: relative;
+  font-family: var(--rc-font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--rc-accent-c);
+  text-shadow: 0 0 8px color-mix(in srgb, var(--rc-accent-c) 45%, transparent);
+  padding-bottom: 0.6rem;
+}
+
+/* Gradient bottom rule: magenta → violet → cyan → transparent */
+.os-section-label::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg,
+    var(--rc-accent-m),
+    var(--rc-accent-v) 40%,
+    var(--rc-accent-c) 70%,
+    transparent
+  );
+  opacity: 0.5;
+}
+
+/* ── Glass panel — conic gradient border via mask-composite ──────────── */
+/*                                                                         */
+/*  ::before = the border ring.                                            */
+/*    • fills the panel area with the conic gradient                       */
+/*    • mask punches out the content-box, leaving only the 2px ring        */
+/*  ::after  = inner atmospheric wash (hover)                              */
+.os-panel {
+  position: relative;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--rc-surface) 28%, transparent);
+  border-radius: 20px;
+  padding: 1.5rem 1.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  box-shadow:
+    0 0 32px color-mix(in srgb, var(--rc-accent-m) 6%, transparent),
+    0 0 32px color-mix(in srgb, var(--rc-accent-c) 6%, transparent);
+  transition: box-shadow var(--rc-dur-mid) ease;
+}
+
+/* Conic gradient border ring */
+.os-panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 20px;
+  padding: 2px;
+  background: conic-gradient(from 225deg,
+    var(--rc-accent-m)   0deg,
+    var(--rc-accent-v)  90deg,
+    var(--rc-accent-c) 180deg,
+    var(--rc-accent-v) 270deg,
+    var(--rc-accent-m) 360deg
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* Inner atmospheric wash — visible on hover */
+.os-panel::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 20px;
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--rc-accent-m) 5%, transparent) 0%,
+    color-mix(in srgb, var(--rc-accent-v) 3%, transparent) 45%,
+    color-mix(in srgb, var(--rc-accent-c) 5%, transparent) 100%);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--rc-dur-mid) ease;
+}
+
+.os-panel:hover {
+  box-shadow:
+    0 0 48px color-mix(in srgb, var(--rc-accent-m) 12%, transparent),
+    0 0 48px color-mix(in srgb, var(--rc-accent-c) 12%, transparent);
+}
+.os-panel:hover::after { opacity: 1; }
+
+.os-panel p {
+  position: relative; z-index: 1;
+  margin: 0;
+  font-size: var(--rc-size-lg);
+  color: var(--rc-text);
+  line-height: 1.8;
+  font-weight: 400;
+}
+
+.os-panel p + p {
+  color: color-mix(in srgb, var(--rc-text) 65%, transparent);
+  font-size: var(--rc-size-md);
+  line-height: 1.75;
+}
+
+/* ── Spec list ───────────────────────────────────────────────────────── */
+.os-spec-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.os-spec-list li {
+  font-family: var(--rc-font-mono);
+  font-size: var(--rc-size-md);
+  color: var(--rc-text);
+  display: flex;
+  gap: 0.75rem;
+  line-height: 1.6;
+}
+
+.os-spec-list li::before {
+  content: '◈';
+  color: var(--rc-accent-m);
+  text-shadow: 0 0 8px color-mix(in srgb, var(--rc-accent-m) 60%, transparent);
+  flex-shrink: 0;
+}
+
+/* ── Code block — same mask-composite gradient border ────────────────── */
+.os-code-label {
+  font-family: var(--rc-font-mono);
+  font-size: var(--rc-size-xs);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--rc-muted);
+  margin-bottom: 0.35rem;
+}
+
+.os-code {
+  position: relative;
+  font-family: var(--rc-font-mono);
+  font-size: var(--rc-size-md);
+  color: var(--rc-accent-c);
+  background: color-mix(in srgb, var(--rc-surface) 85%, transparent);
+  border-radius: 14px;
+  padding: 1rem 1.25rem;
+  overflow-x: auto;
+  white-space: pre;
+  line-height: 1.6;
+  box-shadow:
+    0 0 18px color-mix(in srgb, var(--rc-accent-c) 7%, transparent),
+    inset 0 0 20px color-mix(in srgb, var(--rc-accent-c) 4%, transparent);
+}
+
+/* Conic gradient border ring on code blocks */
+.os-code::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+  padding: 1.5px;
+  background: conic-gradient(from 180deg,
+    var(--rc-accent-c)   0deg,
+    var(--rc-accent-v)  90deg,
+    var(--rc-accent-m) 180deg,
+    var(--rc-accent-v) 270deg,
+    var(--rc-accent-c) 360deg
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* ── Deferred list ───────────────────────────────────────────────────── */
+.os-deferred-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.os-deferred-list li {
+  font-family: var(--rc-font-mono);
+  font-size: var(--rc-size-md);
+  color: var(--rc-muted);
+  display: flex;
+  gap: 0.75rem;
+  line-height: 1.6;
+}
+
+.os-deferred-list li::before {
+  content: '–';
+  color: var(--rc-accent-y);
+  flex-shrink: 0;
+}
+
+/* ── Back CTA — gradient border pill ────────────────────────────────── */
+.os-back-cta {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 42px;
+  padding: 0 1.5rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--rc-void) 55%, transparent);
+  font-family: var(--rc-font-mono);
+  font-size: var(--rc-size-xs);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--rc-accent-c);
+  transition: transform 150ms ease, box-shadow 150ms ease, color 150ms ease;
+  align-self: flex-start;
+}
+
+/* Full conic gradient border ring on CTA pill */
+.os-back-cta::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  padding: 1.5px;
+  background: conic-gradient(from 0deg,
+    var(--rc-accent-m)   0deg,
+    var(--rc-accent-v)  90deg,
+    var(--rc-accent-c) 180deg,
+    var(--rc-accent-v) 270deg,
+    var(--rc-accent-m) 360deg
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.os-back-cta:hover {
+  transform: translateY(-1px);
+  color: var(--rc-accent-m);
+  box-shadow:
+    0 0 20px color-mix(in srgb, var(--rc-accent-m) 18%, transparent),
+    0 0 20px color-mix(in srgb, var(--rc-accent-c) 12%, transparent);
+}
+
+/* ── Footer — gradient top border ───────────────────────────────────── */
+.os-footer {
+  position: relative;
+  margin-top: 2rem;
+  padding-top: 2.5rem;
+  text-align: center;
+  font-family: var(--rc-font-mono);
+  font-size: var(--rc-size-xs);
+  color: var(--rc-muted);
+  letter-spacing: 0.08em;
+  line-height: 1.8;
+}
+
+.os-footer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg,
+    transparent,
+    var(--rc-accent-m) 25%,
+    var(--rc-accent-v) 50%,
+    var(--rc-accent-c) 75%,
+    transparent
+  );
+  opacity: 0.4;
+}
+
+.os-footer a {
+  color: var(--rc-accent-c);
+  text-decoration: none;
+  transition: text-shadow 150ms ease, color 150ms ease;
+}
+.os-footer a:hover {
+  color: var(--rc-accent-m);
+  text-shadow: 0 0 10px color-mix(in srgb, var(--rc-accent-m) 55%, transparent);
+}

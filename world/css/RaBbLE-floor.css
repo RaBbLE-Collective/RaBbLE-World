@@ -1,0 +1,43 @@
+/* RaBbLE-floor.css — layout for the Grimoire floor Three.js surface
+ *
+ * Mounts inside #centerpiece-host (defined by RaBbLE-stage.js).
+ * Three.js owns all visual rendering — this file is layout only.
+ * No colors, no raw hex values. Aether tokens (var(--rc-*)) for anything visual.
+ */
+
+/* Floor container fills centerpieceHost */
+#centerpiece-host {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Three.js canvas — absolute fill, forced by renderer.setSize() too */
+#centerpiece-host canvas {
+  position: absolute;
+  inset: 0;
+  width:  100% !important;
+  height: 100% !important;
+}
+
+/* Label overlay layer — injected by RaBbLE-floor.js above the canvas */
+#centerpiece-host .floor-graph-label {
+  position: absolute;
+  transform: translateX(-50%);
+  font-family: var(--rc-font-mono, monospace);
+  font-size: 0.65rem;
+  letter-spacing: 0.04em;
+  color: var(--rc-muted);
+  pointer-events: none;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.6s ease, color 0.2s ease;
+}
+
+#centerpiece-host .floor-graph-label.floor-label-visible {
+  opacity: 1;
+}
+
+#centerpiece-host .floor-graph-label.floor-label-hover {
+  color: var(--rc-text);
+  opacity: 1;
+}

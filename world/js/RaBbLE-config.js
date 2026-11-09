@@ -1,0 +1,75 @@
+/* RaBbLE-config.js — single source of truth for all backend/CDN base URLs.
+ *
+ * THE FLIP POINT. One file decides where World talks to sCoRE and where it
+ * pulls the Aether (CSS) and NeBuLA (entity) bundles from. Load this FIRST —
+ * before RaBbLE-aether.js, RaBbLE-NeBuLA.js, and the page scripts, all of which
+ * read the window.RABBLE_*_URL values set here.
+ *
+ * Behavior: auto-detects local vs production by hostname, so going live needs
+ * no edits — a localhost origin uses local sCoRE + the dev-serve CDN mock
+ * (relative /aether & /nebula paths); any other origin (joinrabble.world) uses
+ * the hosted services below. Override any value by setting the corresponding
+ * window.RABBLE_*_URL before this script runs.
+ *
+ * Each member is independently flippable. As Aether and NeBuLA move to their
+ * own subdomains, update only the PROD_* constant for that member.
+ */
+(function () {
+  'use strict';
+
+  // ── Production endpoints — edit these as services move/rename ───────────────
+  var PROD_API_URL    = 'https://score.joinrabble.world';             // sCoRE (CF Worker → Render)
+  var PROD_AETHER_URL = 'https://aether.joinrabble.world/v0.0.0.1-rc.2/aether.min.css'; // Aether CDN — bump version on deploy
+  var PROD_NEBULA_URL = 'https://nebula.joinrabble.world/v0.0.0.1-rc.1/nebula.iife.js'; // NeBuLA CDN — bump version on deploy
+  // Three.js stays external (peer dep) — pinned to the same version WS-A's
+  // shared loader uses (RaBbLE-NeBuLA/src/utils/three-loader.js THREE_CDN).
+  // No World-owned mirror yet; both envs read the same jsDelivr pin.
+  var PROD_THREE_URL  = 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js';
+
+  // ── Local endpoints (harness/local.sh + dev-serve.sh CDN mock) ──────────────
+  var LOCAL_API_URL    = 'http://localhost:8000';
+  var LOCAL_AETHER_URL = '/aether/v0.0.0.0/aether.css';
+  var LOCAL_NEBULA_URL = '/nebula/v0.0.0.0/nebula.iife.js';
+  var LOCAL_THREE_URL  = 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js';
+
+  var host = window.location.hostname;
+  var isLocal =
+    host === 'localhost' || host === '127.0.0.1' ||
+    host === '0.0.0.0'   || host === '';
+
+  function set(name, localVal, prodVal) {
+    if (!window[name]) window[name] = isLocal ? localVal : prodVal;
+  }
+
+  set('RABBLE_API_URL',    LOCAL_API_URL,    PROD_API_URL);
+  set('RABBLE_AETHER_URL', LOCAL_AETHER_URL, PROD_AETHER_URL);
+  set('RABBLE_NEBULA_URL', LOCAL_NEBULA_URL, PROD_NEBULA_URL);
+  set('RABBLE_THREE_URL',  LOCAL_THREE_URL,  PROD_THREE_URL);
+  window.RABBLE_ENV = isLocal ? 'local' : 'production';
+
+  // ── Guest conversation (the curator's live voice) ───────────────────────────
+  // The entity always guides via scripted transmissions (RaBbLE-curator.js).
+  // When guest chat is enabled AND the backend answers, conversation upgrades to
+  // a real LLM via the anonymous /api/v1/chat endpoint; on any failure the
+  // curator degrades gracefully back to scripted — never a broken surface.
+  // Flip RABBLE_GUEST_CHAT=false to force scripted-only (e.g. cost/abuse pause).
+  set('RABBLE_GUEST_CHAT',      true, true);            // attempt live guest conversation
+  set('RABBLE_GUEST_CHAT_PATH', '/api/v1/chat', '/api/v1/chat'); // anonymous chat endpoint
+  set('RABBLE_GUEST_CHAT_TIER', 'fast', 'fast');        // model tier for guest dialogue
+
+  // Render free tier sleeps after inactivity — kick /health immediately so the
+  // backend is warming up while the visitor arrives, not during first chat.
+  // window.RABBLE_HEALTH is that one request as a Promise; it never rejects and
+  // resolves { ok, status, ms }. The face's boot holds its "sCoRE" step on it.
+  // Fires locally too (local sCoRE on :8000 answers fast or refuses fast).
+  // 50 s cap: longer than the entity's 45 s step timeout, so the entity decides.
+  if (!window.RABBLE_HEALTH) {
+    var t0 = Date.now();
+    var ctrl = ('AbortController' in window) ? new AbortController() : null;
+    var cap = ctrl ? setTimeout(function () { ctrl.abort(); }, 50000) : null;
+    window.RABBLE_HEALTH = fetch(window.RABBLE_API_URL + '/health', ctrl ? { signal: ctrl.signal } : {})
+      .then(function (res) { return { ok: res.ok, status: res.status, ms: Date.now() - t0 }; })
+      .catch(function () { return { ok: false, status: 0, ms: Date.now() - t0 }; })
+      .then(function (r) { if (cap) clearTimeout(cap); return r; });
+  }
+}());

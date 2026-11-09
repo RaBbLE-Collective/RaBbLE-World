@@ -1,0 +1,360 @@
+/*
+ * RaBbLE-unified.css — RC1 living surface: design tokens + base layout
+ * Aether tokens only — never raw hex. Source: RaBbLE-theme.css + VSCode Aether theme.
+ * Tinted-glass recipe: color-mix(in srgb, <surface> 80%, transparent) + blur(5–6px)
+ */
+
+/* ── Semantic role aliases (VSCode Aether structure → RC1 surface roles) ─── */
+:root {
+  /* Surfaces */
+  --rc-void:        var(--rabble-void,        #0a0010);
+  --rc-surface:     var(--rabble-surface,     #12132a);
+  --rc-raised:      var(--rabble-raised,      #1a1b2e);
+  --rc-border:      var(--rabble-border,      #2a2840);
+
+  /* Typography */
+  --rc-text:        var(--rabble-text,        #e8e6f0);
+  --rc-muted:       var(--rabble-muted,       #6b6880);
+
+  /* Accents (VSCode Aether role mapping) */
+  --rc-accent-m:    var(--rabble-magenta,     #ff2d78);  /* focus / active / CTA */
+  --rc-accent-c:    var(--rabble-cyan,        #00f5ff);  /* section headers / info */
+  --rc-accent-v:    var(--rabble-violet,      #bf5fff);  /* types / secondary accent */
+  --rc-accent-p:    var(--rabble-pink,        #ff79c6);  /* strings / warm highlight */
+  --rc-accent-g:    var(--rabble-green,       #50fa7b);  /* success / online */
+  --rc-accent-y:    var(--rabble-yellow,      #f1fa8c);  /* warning / caution */
+  --rc-accent-r:    var(--rabble-red,         #e05c6f);  /* error / danger */
+
+  /* Glass recipe */
+  --rc-glass-80:    color-mix(in srgb, var(--rc-raised) 80%, transparent);
+  --rc-glass-78:    color-mix(in srgb, var(--rc-surface) 78%, transparent);
+  --rc-blur:        blur(5px);
+  --rc-blur-light:  blur(3px);
+
+  /* Typography scale */
+  --rc-font-mono:   var(--rabble-font-mono,   'JetBrains Mono', 'Fira Code', monospace);
+  --rc-font-ui:     var(--rabble-font-ui,     'Inter', system-ui, sans-serif);
+  --rc-size-xs:     11px;
+  --rc-size-sm:     13px;
+  --rc-size-md:     15px;
+  --rc-size-lg:     18px;
+  --rc-size-xl:     24px;
+  --rc-size-2xl:    32px;
+
+  /* Spacing */
+  --rc-gap-xs:      4px;
+  --rc-gap-sm:      8px;
+  --rc-gap-md:      16px;
+  --rc-gap-lg:      24px;
+  --rc-gap-xl:      40px;
+
+  /* Transitions */
+  --rc-ease:        cubic-bezier(0.16, 1, 0.3, 1);
+  --rc-dur-fast:    150ms;
+  --rc-dur-mid:     300ms;
+  --rc-dur-slow:    500ms;
+
+  /* Z-layers */
+  --rc-z-floor:     0;
+  --rc-z-panels:    10;
+  --rc-z-entity:    20;
+  --rc-z-dock:      30;
+  --rc-z-rail:      40;
+  --rc-z-overlay:   50;
+}
+
+/* ── Reset + base ─────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--rc-void);
+  color: var(--rc-text);
+  font-family: var(--rc-font-ui);
+  font-size: var(--rc-size-md);
+  line-height: 1.5;
+  overflow: hidden; /* stage controls scroll */
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Stage layout ─────────────────────────────────────────────────────────── */
+#stage {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  /* entity stage left | panel/centerpiece host right */
+  grid-template-columns: 340px 1fr;
+  grid-template-rows: 1fr auto;
+  grid-template-areas:
+    "entity  main"
+    "dock    dock";
+}
+
+@media (max-width: 768px) {
+  #stage {
+    grid-template-columns: 1fr;
+    /* safe-area-inset-top accounts for iOS notch/dynamic island */
+    grid-template-rows: calc(220px + env(safe-area-inset-top, 0px)) 1fr auto;
+    grid-template-areas:
+      "entity"
+      "main"
+      "dock";
+  }
+}
+
+/* ── Entity stage (persistent left column) ────────────────────────────────── */
+#entity-stage {
+  grid-area: entity;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: var(--rc-z-entity);
+}
+
+/* Flowing divider line — magenta → violet → cyan down the right edge */
+#entity-stage::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: 1px;
+  background: linear-gradient(180deg,
+    var(--rc-accent-m),
+    var(--rc-accent-v) 50%,
+    var(--rc-accent-c));
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+#entity-stage rabble-entity {
+  width: 220px;
+  height: 220px;
+}
+
+@media (max-width: 768px) {
+  #entity-stage {
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+  /* Re-orient the flowing divider to the bottom edge on mobile */
+  #entity-stage::after {
+    top: auto;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: auto;
+    height: 1px;
+    background: linear-gradient(90deg,
+      var(--rc-accent-m),
+      var(--rc-accent-v) 50%,
+      var(--rc-accent-c));
+  }
+  #entity-stage rabble-entity { width: 140px; height: 140px; }
+}
+
+/* ── Panel + centerpiece hosts ────────────────────────────────────────────── */
+#panel-host {
+  grid-area: main;
+  position: relative;
+  overflow-y: auto;
+  padding: var(--rc-gap-lg);
+  z-index: var(--rc-z-panels);
+}
+
+#centerpiece-host {
+  position: absolute;
+  inset: 0;
+  z-index: var(--rc-z-floor);
+  pointer-events: none; /* floor handles its own events */
+}
+
+#centerpiece-host.active {
+  pointer-events: auto;
+}
+
+/* ── Progress rail ────────────────────────────────────────────────────────── */
+#progress-rail {
+  position: fixed;
+  top: 0;
+  left: 340px;
+  right: 0;
+  height: 2px;
+  background: var(--rc-border);
+  z-index: var(--rc-z-rail);
+  overflow: hidden;
+}
+
+#progress-rail .rail-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--rc-accent-m), var(--rc-accent-c));
+  transition: width var(--rc-dur-slow) var(--rc-ease);
+  width: 0%;
+}
+
+@media (max-width: 768px) {
+  #progress-rail { left: 0; top: 220px; }
+}
+
+/* ── Dock host ────────────────────────────────────────────────────────────── */
+#dock-host {
+  position: relative;
+  grid-area: dock;
+  z-index: var(--rc-z-dock);
+  background: var(--rc-glass-80);
+  backdrop-filter: var(--rc-blur);
+  -webkit-backdrop-filter: var(--rc-blur);
+  /* iOS home-indicator clearance */
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Flowing divider line across the top of the dock */
+#dock-host::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg,
+    transparent,
+    var(--rc-accent-m) 20%,
+    var(--rc-accent-v) 50%,
+    var(--rc-accent-c) 80%,
+    transparent);
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+/* ── Tinted-glass panel mixin (apply to .rc-panel) ───────────────────────── */
+/* Aether atmospheric treatment: no flat border — a conic gradient ring is
+ * drawn in RaBbLE-panels.css via ::before (mask-composite technique). Rounder
+ * radius + soft dual-accent glow give panels their liminal, floating quality. */
+.rc-panel {
+  position: relative;
+  background: var(--rc-glass-78);
+  backdrop-filter: var(--rc-blur);
+  -webkit-backdrop-filter: var(--rc-blur);
+  border-radius: 14px;
+  padding: var(--rc-gap-md);
+}
+
+/* ── Section header (cyan, VSCode Aether role) ────────────────────────────── */
+.rc-section-header {
+  position: relative;
+  font-family: var(--rc-font-mono);
+  font-size: var(--rc-size-sm);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--rc-accent-c);
+  margin: 0 0 var(--rc-gap-sm);
+  padding-bottom: 6px;
+  border-bottom: none;
+}
+
+/* Gradient bottom rule: magenta → violet → cyan → transparent */
+.rc-section-header::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg,
+    var(--rc-accent-m),
+    var(--rc-accent-v) 40%,
+    var(--rc-accent-c) 70%,
+    transparent);
+  opacity: 0.5;
+}
+
+/* ── Button primitives ────────────────────────────────────────────────────── */
+.rc-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rc-gap-xs);
+  padding: 6px 16px;
+  border-radius: 999px;
+  /* Kill the native <button> UA border/chrome — the ring is drawn via ::before */
+  border: none;
+  -webkit-appearance: none;
+  appearance: none;
+  background: color-mix(in srgb, var(--rc-accent-m) 12%, transparent);
+  color: var(--rc-accent-m);
+  font-family: var(--rc-font-mono);
+  font-size: var(--rc-size-sm);
+  cursor: pointer;
+  transition: background var(--rc-dur-fast) var(--rc-ease),
+              box-shadow var(--rc-dur-fast) var(--rc-ease),
+              color var(--rc-dur-fast) var(--rc-ease);
+}
+
+/* Flowing pill border ring comes from Aether .rabble-border-harmony
+ * (applied in RaBbLE-ui.js button factory + movements.js makeBtn/CTA).
+ * World defines only the pill shape, fill, and text colour. */
+
+.rc-btn:hover {
+  background: color-mix(in srgb, var(--rc-accent-m) 22%, transparent);
+  box-shadow:
+    0 0 18px color-mix(in srgb, var(--rc-accent-m) 22%, transparent),
+    0 0 18px color-mix(in srgb, var(--rc-accent-c) 12%, transparent);
+}
+
+.rc-btn.secondary {
+  background: transparent;
+  color: var(--rc-muted);
+}
+
+.rc-btn.secondary:hover {
+  color: var(--rc-text);
+  box-shadow: 0 0 16px color-mix(in srgb, var(--rc-accent-v) 16%, transparent);
+}
+
+/* ── Movement transition ──────────────────────────────────────────────────── */
+.movement-enter {
+  animation: movementFadeIn var(--rc-dur-mid) var(--rc-ease) both;
+}
+
+.movement-exit {
+  animation: movementFadeOut var(--rc-dur-fast) var(--rc-ease) both;
+}
+
+@keyframes movementFadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes movementFadeOut {
+  from { opacity: 1; transform: translateY(0); }
+  to   { opacity: 0; transform: translateY(-4px); }
+}
+
+/* Member detail pane pop-in */
+@keyframes memberDetailIn {
+  from { opacity: 0; transform: translateX(12px) scale(0.98); }
+  to   { opacity: 1; transform: translateX(0) scale(1); }
+}
+
+/* Staggered narration line reveal */
+@keyframes memberLineIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Scrollbar theming ────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--rc-border);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--rc-muted); }
+
+/* ── Boot state — hide stage until ready ─────────────────────────────────── */
+body.booting #stage { opacity: 0; }
+body.ready   #stage { opacity: 1; transition: opacity var(--rc-dur-slow) var(--rc-ease); }
