@@ -68,7 +68,7 @@ bash ../RaBbLE-Grimoire/spells/end-session.sh <feature-slug> "<note>"
 
 **ON:** HTML, CSS, JavaScript, PWA config, static pages, UI logic.
 
-**FOR:** World is the public face and intent-collection surface. Every page, button, and chat message is an opportunity for the system to understand the user. Pre-Episode-1, you're building surfaces where users reveal intent. Post-Episode-1, every surface becomes an observation point for behavioral learning.
+**FOR:** World is the public face and intent-collection surface. Every page, button, and chat message is an opportunity for the system to understand the user. Now: surfaces where users reveal intent, and the door through which a visitor becomes a user. Next, every surface becomes an observation point for behavioral learning.
 
 **WITH:** You are part of the RaBbLE-Collective — the public face of the organism, working for its presence in the world. You depend on Aether (CSS vars), NeBuLA (entity visuals), and sCoRE (chat API). Changes to your page layouts or API contracts notify those members. You work within the Collective, not as a standalone site.
 
