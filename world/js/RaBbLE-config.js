@@ -2,7 +2,7 @@
  *
  * THE FLIP POINT. One file decides where World talks to sCoRE and where it
  * pulls the Aether (CSS) and NeBuLA (entity) bundles from. Load this FIRST —
- * before RaBbLE-aether.js, RaBbLE-NeBuLA.js, and the page scripts, all of which
+ * before RaBbLE-aether.js, RaBbLE-nebula-loader.js, and the page scripts, all of which
  * read the window.RABBLE_*_URL values set here.
  *
  * Behavior: auto-detects local vs production by hostname, so going live needs
