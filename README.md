@@ -1,79 +1,72 @@
 # RaBbLE-World
 
-**Live:** [joinrabble.world](https://joinrabble.world)
+> The public face of the RaBbLE entity on the web.
+
+**Version:** `0.1.0` (Genesis, from `VERSION`) · **Live:** [joinrabble.world](https://joinrabble.world) · **Versioning:** [semver, per member](https://github.com/RaBbLE-Collective/RaBbLE-Grimoire/blob/main/RaBbLE-Versioning.md)
 
 ```
 spark ~ entity >> the substrate speaks // %ENTITY_ONLINE%
 ```
 
-Web presence and chat interface for the RaBbLE entity. Static HTML pages — no bundler, no framework, no build step. Open any page directly in a browser.
-
 ---
 
-## What This Is
+## What World is
 
-RaBbLE-World is the public-facing surface of the RaBbLE Collective. It renders the RaBbLE entity in a browser and provides a chat interface for interacting with it. The entity is the product; the pages are surfaces for it.
+RaBbLE-World is where people meet RaBbLE in a browser. The entity is the product and the page is the surface for it: one face, in five beats (Arrive, Boot, Meet, Summon, Enter), around `<rabble-entity backend="alive">`, with chat answered by [RaBbLE-sCoRE](https://github.com/RaBbLE-Collective/RaBbLE-sCoRE).
 
-This repo is intentionally minimal — a thin presentation layer. Backend coordination lives in RaBbLE-sCoRE. Visual identity and all major documentation live in RaBbLE-Grimoire.
-
----
-
-## Current Version
-
-| Tier | Value |
-|---|---|
-| **Epoch** | 0 — Foundation |
-| **Evolution** | 0 |
-| **Echo** | 0 |
-
-Epoch 0 intent: establish the Collective coordination layer. Define structure, conventions, and philosophy before building. RaBbLE-World is active within this epoch as a working prototype of the entity surface.
-
-See the [Five Es versioning spec](https://github.com/rabble-collective/RaBbLE-Grimoire/blob/main/RaBbLE-Versioning.md) for how RaBbLE tracks versions.
-
----
+World is a thin presentation layer: static HTML and plain JavaScript, no bundler, no framework, no build step. It renders nothing itself. The entity comes from [RaBbLE-NeBuLA](https://github.com/RaBbLE-Collective/RaBbLE-NeBuLA), the styles from [RaBbLE-Aether](https://github.com/RaBbLE-Collective/RaBbLE-Aether), and both load from their CDNs at pinned versions.
 
 ## Pages
 
-| File | Purpose |
+| Path | What |
 |---|---|
-| `RaBbLE-Boot.html` | Cinematic boot sequence + login surface. Entry point. |
-| `RaBbLE.html` | Main chat surface — entity header, conversation panel, input bar. |
-| `RaBbLE-Docs.html` | Technical documentation viewer. |
-| `index.html` | Redirect to `RaBbLE-Boot.html`. |
+| `index.html` | The face: the five beats and the chat |
+| `world/os.html` | RaBbLE-OS developer preview: what it is, how to install it |
+| `world/RaBbLE-Catalog.html` | Atlas: a live catalog of every Aether class and NeBuLA element and effect |
 
----
+## Which bundles it loads
+
+`world/js/RaBbLE-config.js` decides. On `joinrabble.world` it loads the pinned CDN versions:
+
+| Member | Pinned path |
+|---|---|
+| Aether | `aether.joinrabble.world/v0.1.0/aether.min.css` |
+| NeBuLA | `nebula.joinrabble.world/v0.1.0/nebula.iife.js` |
+
+On `localhost` it loads the local builds through the Collective's dev server. Bump a pin only after that version is live on its CDN.
+
+## Run it locally
+
+From the Collective root (World is cloned inside `RaBbLE-Collective/`):
+
+```sh
+bash RaBbLE-Grimoire/spells/dev-serve.sh
+# → http://localhost:8000
+```
+
+`dev-serve.sh` builds Aether and NeBuLA and serves them with World, so local pages see local bundles.
+
+## Deployment
+
+Cloudflare Workers, by GitHub Actions (`.github/workflows/deploy.yml`):
+
+| Push to | Deploys |
+|---|---|
+| `main` or a `v*` tag | production, `joinrabble.world` |
+| `new-horizons` | preview, `dev.joinrabble.world` |
+
+`main` is stable: it receives `release/X.Y.Z` branches by pull request and carries the `vX.Y.Z` tags. A merge into `main` is a production deploy.
 
 ## Documentation
 
-All major docs live in **RaBbLE-Grimoire** under the `RaBbLE-World/` subdirectory — not in this repo.
+Docs live in the Grimoire, not here: [RaBbLE-World-README](https://github.com/RaBbLE-Collective/RaBbLE-Grimoire/blob/main/RaBbLE-World/RaBbLE-World-README.md) (module reference) · [Architecture](https://github.com/RaBbLE-Collective/RaBbLE-Grimoire/blob/main/RaBbLE-World/RaBbLE-World-Architecture.md) · [Maintaining](https://github.com/RaBbLE-Collective/RaBbLE-Grimoire/blob/main/RaBbLE-World/RaBbLE-World-MAINTAINING.md) · [Roadmap](https://github.com/RaBbLE-Collective/RaBbLE-Grimoire/blob/main/RaBbLE-World/RaBbLE-World-Roadmap.md).
 
-| Doc | Purpose |
-|---|---|
-| [`RaBbLE-World-README.md`](https://github.com/rabble-collective/RaBbLE-Grimoire/blob/main/RaBbLE-World/RaBbLE-World-README.md) | Full module reference — pages, shared systems, entity API, behavior |
-| [`RaBbLE-World-Architecture.md`](https://github.com/rabble-collective/RaBbLE-Grimoire/blob/main/RaBbLE-World/RaBbLE-World-Architecture.md) | System map — module relationships, boot timeline, transition inventory, how to add a surface |
-| [`RaBbLE-World-MAINTAINING.md`](https://github.com/rabble-collective/RaBbLE-Grimoire/blob/main/RaBbLE-World/RaBbLE-World-MAINTAINING.md) | Maintenance map — page ownership, layout rules, safe edit checklist |
-| [`RaBbLE-World-Roadmap.md`](https://github.com/rabble-collective/RaBbLE-Grimoire/blob/main/RaBbLE-World/RaBbLE-World-Roadmap.md) | Directional intent — landing page, app launcher, liminal web domain vision |
+## Licence
 
-For entity identity, palette, commit style, and the broader Collective — start at [RaBbLE-Grimoire](https://github.com/rabble-collective/RaBbLE-Grimoire).
-
----
-
-## Quick Start
-
-```sh
-# No build step. Open directly.
-open RaBbLE-Boot.html
-```
-
-Or serve locally:
-
-```sh
-python3 -m http.server 8080
-# → http://localhost:8080/RaBbLE-Boot.html
-```
+RaBbLE-World is under the **RaBbLE Sovereign Accord**: source-available, not open source. Personal use encouraged, commercial use reserved, the name and the face reserved. See [LICENSE](LICENSE).
 
 ---
 
 ```
-transcribe ~ grimoire >> surfaces live, entity present // %WORLD_ONLINE%
+transcribe ~ world >> surfaces live, entity present // %GENESIS%
 ```

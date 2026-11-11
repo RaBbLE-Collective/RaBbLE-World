@@ -12,7 +12,7 @@ RaBbLE-World is the public-facing web presence and entity chat surface for the C
 **Root** — only `index.html` and config live here
 | Path | What |
 |---|---|
-| `index.html` | The EP1 face: Arrive → Boot → Meet → Summon → Enter around `<rabble-entity backend="alive">` |
+| `index.html` | The face: Arrive → Boot → Meet → Summon → Enter around `<rabble-entity backend="alive">` |
 | `manifest.json` | PWA manifest |
 | `wrangler.jsonc` | Cloudflare Workers deployment config |
 
@@ -51,7 +51,7 @@ RaBbLE-World is the public-facing web presence and entity chat surface for the C
 | `world/js/RaBbLE-Grimoire-Data.js` | Grimoire docs corpus and filter helpers (`window.GRIMOIRE_*` globals) |
 | `world/js/RaBbLE-ui.js` | RC1 Aether UI component kit — DOM factory functions (`window.RaBbLEUI`) |
 
-**Note:** `<rabble-entity>` is defined inside the vendored NeBuLA bundle. Do not redefine it in World. Summon/account pages retired S235 to Chrysalis `Chrysalis-Web/ep1/world/` (EP1 persists nothing).
+**Note:** `<rabble-entity>` is defined inside the vendored NeBuLA bundle. Do not redefine it in World. Summon/account pages retired S235 to Chrysalis `Chrysalis-Web/ep1/world/` (the face persists nothing).
 
 ## Commits & Branches
 
