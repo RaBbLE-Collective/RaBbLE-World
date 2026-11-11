@@ -2,7 +2,7 @@
  *
  * THE FLIP POINT. One file decides where World talks to sCoRE and where it
  * pulls the Aether (CSS) and NeBuLA (entity) bundles from. Load this FIRST —
- * before RaBbLE-aether.js, RaBbLE-NeBuLA.js, and the page scripts, all of which
+ * before RaBbLE-aether.js, RaBbLE-nebula-loader.js, and the page scripts, all of which
  * read the window.RABBLE_*_URL values set here.
  *
  * Behavior: auto-detects local vs production by hostname, so going live needs
@@ -19,8 +19,8 @@
 
   // ── Production endpoints — edit these as services move/rename ───────────────
   var PROD_API_URL    = 'https://score.joinrabble.world';             // sCoRE (CF Worker → Render)
-  var PROD_AETHER_URL = 'https://aether.joinrabble.world/v0.0.0.1-rc.2/aether.min.css'; // Aether CDN — bump version on deploy
-  var PROD_NEBULA_URL = 'https://nebula.joinrabble.world/v0.0.0.1-rc.1/nebula.iife.js'; // NeBuLA CDN — bump version on deploy
+  var PROD_AETHER_URL = 'https://aether.joinrabble.world/v0.1.0/aether.min.css'; // Aether CDN — bump version on deploy
+  var PROD_NEBULA_URL = 'https://nebula.joinrabble.world/v0.1.0/nebula.iife.js'; // NeBuLA CDN — bump version on deploy
   // Three.js stays external (peer dep) — pinned to the same version WS-A's
   // shared loader uses (RaBbLE-NeBuLA/src/utils/three-loader.js THREE_CDN).
   // No World-owned mirror yet; both envs read the same jsDelivr pin.

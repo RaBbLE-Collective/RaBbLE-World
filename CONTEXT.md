@@ -31,15 +31,13 @@ A static web presence: 5 live pages (landing/liminal, OS developer preview, acco
 
 Every live page loads, in order: `RaBbLE-config.js` (the flip point — sets `window.RABBLE_*_URL`) →
 `RaBbLE-aether.js` (real CDN loader — injects `<link>` to `aether.css`/`aether.min.css`, shows a
-failure banner on 404 or missing vars) → on 4 of 5 pages, `world/js/RaBbLE-NeBuLA.js`.
+failure banner on 404 or missing vars) → `RaBbLE-nebula-loader.js` (writes a parser-blocking
+`<script>` for `RABBLE_NEBULA_URL`, so `<rabble-entity>` is defined before page scripts run).
 
-**`world/js/RaBbLE-NeBuLA.js` is NOT a loader.** Since S190 it is the vendored, minified IIFE
-build output of the NeBuLA bundle itself (`var NeBuLA=(()=>{...})()`), copied into the repo and
-committed. There is no CDN fetch, no `<link>`/`<script src="https://...">` injection, and no
-failure banner for NeBuLA — if the file is stale, nothing detects it. `RaBbLE-config.js` still
-defines `RABBLE_NEBULA_URL` / `RABBLE_THREE_URL` for a CDN mode, but nothing in the live pages
-reads them. This contradiction is an open
-decision for Mark (see World's audit section) — not resolved by this doc pass.
+**NeBuLA comes from its CDN (S324, Mark's ruling).** Production loads the pinned release
+(`nebula.joinrabble.world/v0.1.0/nebula.iife.js`); localhost loads `RaBbLE-NeBuLA/dist` through
+`dev-serve.sh`. The vendored copy `world/js/RaBbLE-NeBuLA.js` (S190 to S323) is retired. If the CDN
+fails, the face still works without the entity (`RaBbLE-face.js` checks `entity.boot`).
 
 Per-page CSS is layout-only and loads after `RaBbLE-theme.css` (an Aether alias bridge). Three of
 five pages (`os.html`, `account.html`, `summon.html`) also load `RaBbLE-unified.css`, the legacy
@@ -56,7 +54,7 @@ five pages (`os.html`, `account.html`, `summon.html`) also load `RaBbLE-unified.
 | `world/RaBbLE-Catalog.html` | Atlas — live catalog of Aether classes + NeBuLA elements/effects (inline `<style>`, no dedicated page CSS) | — |
 | `world/js/RaBbLE-config.js` | Flip point — sCoRE/Aether/NeBuLA base URLs | all 5 pages |
 | `world/js/RaBbLE-aether.js` | Real Aether CDN loader + failure-banner monitor | all 5 pages |
-| `world/js/RaBbLE-NeBuLA.js` | **Vendored NeBuLA IIFE bundle** (not a loader — see above) | index, account, summon, catalog |
+| `world/js/RaBbLE-nebula-loader.js` | NeBuLA loader (CDN release in production, `dev-serve.sh` locally) | index, catalog |
 | `world/js/RaBbLE-pages.js` | Page registry (`window.RaBbLE_PAGES`) | account, summon, catalog |
 | `world/js/RaBbLE-curator.js` | Entity-as-curator engine (face conversation surface) | index only |
 | `world/js/RaBbLE-curator-transmissions.js` | Curator scripted voice / authored transmissions | index only |
@@ -89,7 +87,7 @@ five pages (`os.html`, `account.html`, `summon.html`) also load `RaBbLE-unified.
 | `.rc-*` retirement | **Not started** — 95 `--rc-*` tokens / 78 `.rc-` selectors still load-bearing on 3 live pages |
 | World JS/CSS orphan sweep (7 JS + 3 CSS files) | **Not started** — deferred cleanup, see audit SP-3 |
 | Production deploy | joinrabble.world — Cloudflare Workers, `wrangler.jsonc` serves full repo |
-| Chat surface wired to sCoRE intent endpoint | Pending (Episode 1 dependency) |
+| Chat surface wired to sCoRE intent endpoint | Pending (guest chat uses `/api/v1/chat` today) |
 
 ## Reading Order for a New Session
 

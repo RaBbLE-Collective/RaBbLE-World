@@ -12,7 +12,7 @@ RaBbLE-World is the public-facing web presence and entity chat surface for the C
 **Root** — only `index.html` and config live here
 | Path | What |
 |---|---|
-| `index.html` | The EP1 face: Arrive → Boot → Meet → Summon → Enter around `<rabble-entity backend="alive">` |
+| `index.html` | The face: Arrive → Boot → Meet → Summon → Enter around `<rabble-entity backend="alive">` |
 | `manifest.json` | PWA manifest |
 | `wrangler.jsonc` | Cloudflare Workers deployment config |
 
@@ -38,7 +38,7 @@ RaBbLE-World is the public-facing web presence and entity chat surface for the C
 |---|---|
 | `world/js/RaBbLE-config.js` | THE FLIP POINT — CDN + backend base URLs; load first on every page |
 | `world/js/RaBbLE-aether.js` | Aether loader + monitor — injects CSS bundle, shows failure banner |
-| `world/js/RaBbLE-NeBuLA.js` | Vendored NeBuLA bundle (`cp ../RaBbLE-NeBuLA/dist/nebula.iife.js` after a NeBuLA build) |
+| `world/js/RaBbLE-nebula-loader.js` | NeBuLA loader: writes the `<script>` for `RABBLE_NEBULA_URL` (CDN release in production, `dev-serve.sh` locally). No vendored copy since S324 |
 | `world/js/RaBbLE-pages.js` | Page registry (`window.RaBbLE_PAGES`) — add an entry here when adding a new page |
 | `world/js/RaBbLE-stage.js` | RC1 stage: movement state machine + persistent chrome (`window.RaBbLEStage`) |
 | `world/js/RaBbLE-movements.js` | RC1 visitor journey: five movements wired to the stage |
@@ -51,7 +51,7 @@ RaBbLE-World is the public-facing web presence and entity chat surface for the C
 | `world/js/RaBbLE-Grimoire-Data.js` | Grimoire docs corpus and filter helpers (`window.GRIMOIRE_*` globals) |
 | `world/js/RaBbLE-ui.js` | RC1 Aether UI component kit — DOM factory functions (`window.RaBbLEUI`) |
 
-**Note:** `<rabble-entity>` is defined inside the vendored NeBuLA bundle. Do not redefine it in World. Summon/account pages retired S235 to Chrysalis `Chrysalis-Web/ep1/world/` (EP1 persists nothing).
+**Note:** `<rabble-entity>` is defined inside the NeBuLA bundle (loaded from its CDN). Do not redefine it in World. Summon/account pages retired S235 to Chrysalis `Chrysalis-Web/ep1/world/` (the face persists nothing).
 
 ## Commits & Branches
 
@@ -68,7 +68,7 @@ bash ../RaBbLE-Grimoire/spells/end-session.sh <feature-slug> "<note>"
 
 **ON:** HTML, CSS, JavaScript, PWA config, static pages, UI logic.
 
-**FOR:** World is the public face and intent-collection surface. Every page, button, and chat message is an opportunity for the system to understand the user. Pre-Episode-1, you're building surfaces where users reveal intent. Post-Episode-1, every surface becomes an observation point for behavioral learning.
+**FOR:** World is the public face and intent-collection surface. Every page, button, and chat message is an opportunity for the system to understand the user. Now: surfaces where users reveal intent, and the door through which a visitor becomes a user. Next, every surface becomes an observation point for behavioral learning.
 
 **WITH:** You are part of the RaBbLE-Collective — the public face of the organism, working for its presence in the world. You depend on Aether (CSS vars), NeBuLA (entity visuals), and sCoRE (chat API). Changes to your page layouts or API contracts notify those members. You work within the Collective, not as a standalone site.
 
