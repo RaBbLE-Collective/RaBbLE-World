@@ -38,7 +38,7 @@ RaBbLE-World is the public-facing web presence and entity chat surface for the C
 |---|---|
 | `world/js/RaBbLE-config.js` | THE FLIP POINT — CDN + backend base URLs; load first on every page |
 | `world/js/RaBbLE-aether.js` | Aether loader + monitor — injects CSS bundle, shows failure banner |
-| `world/js/RaBbLE-NeBuLA.js` | Vendored NeBuLA bundle (`cp ../RaBbLE-NeBuLA/dist/nebula.iife.js` after a NeBuLA build) |
+| `world/js/RaBbLE-nebula-loader.js` | NeBuLA loader: writes the `<script>` for `RABBLE_NEBULA_URL` (CDN release in production, `dev-serve.sh` locally). No vendored copy since S324 |
 | `world/js/RaBbLE-pages.js` | Page registry (`window.RaBbLE_PAGES`) — add an entry here when adding a new page |
 | `world/js/RaBbLE-stage.js` | RC1 stage: movement state machine + persistent chrome (`window.RaBbLEStage`) |
 | `world/js/RaBbLE-movements.js` | RC1 visitor journey: five movements wired to the stage |
@@ -51,7 +51,7 @@ RaBbLE-World is the public-facing web presence and entity chat surface for the C
 | `world/js/RaBbLE-Grimoire-Data.js` | Grimoire docs corpus and filter helpers (`window.GRIMOIRE_*` globals) |
 | `world/js/RaBbLE-ui.js` | RC1 Aether UI component kit — DOM factory functions (`window.RaBbLEUI`) |
 
-**Note:** `<rabble-entity>` is defined inside the vendored NeBuLA bundle. Do not redefine it in World. Summon/account pages retired S235 to Chrysalis `Chrysalis-Web/ep1/world/` (the face persists nothing).
+**Note:** `<rabble-entity>` is defined inside the NeBuLA bundle (loaded from its CDN). Do not redefine it in World. Summon/account pages retired S235 to Chrysalis `Chrysalis-Web/ep1/world/` (the face persists nothing).
 
 ## Commits & Branches
 
