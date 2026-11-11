@@ -89,7 +89,7 @@ five pages (`os.html`, `account.html`, `summon.html`) also load `RaBbLE-unified.
 | `.rc-*` retirement | **Not started** — 95 `--rc-*` tokens / 78 `.rc-` selectors still load-bearing on 3 live pages |
 | World JS/CSS orphan sweep (7 JS + 3 CSS files) | **Not started** — deferred cleanup, see audit SP-3 |
 | Production deploy | joinrabble.world — Cloudflare Workers, `wrangler.jsonc` serves full repo |
-| Chat surface wired to sCoRE intent endpoint | Pending (Episode 1 dependency) |
+| Chat surface wired to sCoRE intent endpoint | Pending (guest chat uses `/api/v1/chat` today) |
 
 ## Reading Order for a New Session
 
