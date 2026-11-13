@@ -1,7 +1,14 @@
+// dev.joinrabble.world: World's new-horizons build, static assets only (no Worker code, so no
+// request counts against the Workers Free daily limit). Deployed by CI on push to new-horizons.
+// S333: owns the domain directly; the rabble-dev router Worker is retired. /chrysalis redirects
+// come from the static _redirects file, same as prod.
 {
   "name": "rabble-world-dev",
   "compatibility_date": "2026-05-06",
   "assets": {
     "directory": "."
-  }
+  },
+  "routes": [
+    { "pattern": "dev.joinrabble.world", "custom_domain": true }
+  ]
 }
