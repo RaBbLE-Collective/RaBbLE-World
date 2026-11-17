@@ -76,6 +76,17 @@
 
 <footer class="face-dock" aria-label="Conversation">
   <form class="face-ask" id="faceAsk" data-beat-panel="meet" autocomplete="off">
+    <!-- Guest prompt: shown in place of the conversation once a guest has had two turns (RaBbLE-face.js). -->
+    <!-- GENESIS-COPY: Mark, authored voice. -->
+    <section class="rabble-glass face-sheet face-gate" id="faceGate" aria-label="Sign in to keep talking" hidden>
+      <p class="rabble-mono-label face-sheet-title">◈ sign in to keep talking</p>
+      <p class="face-sheet-copy face-gate-copy" id="faceGateCopy">I can talk with a guest for two turns. Sign in and we go on. A new account needs an invite.</p>
+      <div class="face-gate-actions">
+        <a class="rabble-btn rabble-btn-pill rabble-btn-sm" href="/world/account">sign in</a>
+        <a class="rabble-btn rabble-btn-ghost rabble-btn-pill rabble-btn-sm" href="/world/account?tab=signup">create an account</a>
+      </div>
+    </section>
+    <!-- /GENESIS-COPY -->
     <div class="rabble-askbox">
       <div class="rabble-askbox-input">
         <input type="text" id="faceInput" placeholder="speak, and I will answer" aria-label="Speak to RaBbLE" enterkeyhint="send">

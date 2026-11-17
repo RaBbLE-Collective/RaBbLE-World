@@ -8,6 +8,8 @@
  * Boot steps are real work only: Aether CSS applied, NeBuLA element upgraded,
  * sCoRE /health (window.RABBLE_HEALTH from RaBbLE-config.js). The entity holds
  * its boot until they settle; after 45 s it fails pending steps and wakes anyway.
+ * A guest gets GUEST_TURNS turns, then the sign-in prompt (#faceGate) takes the conversation's place;
+ * a signed-in member (RaBbLE-session.js) is never prompted. The server's 429 shows the same prompt.
  * Summon is a static Pocket teaser: no runtime, nothing persisted.
  * Plan of record: RaBbLE-Grimoire/log/plans/EP1-Entity-Face-Plan.md (W2).
  */
@@ -268,13 +270,57 @@
     typeInto(addVoiceLine('entity', ''), FIRST_WORDS);
   }
 
+  /* ── Guest turns: counted per tab session; a member is never counted or prompted ── */
+  var GUEST_TURNS = 2;
+  var TURNS_KEY = 'rabble:guest-turns';
+  var memTurns = 0;               // kept in memory too, so a browser with storage off still stops at two
+  var limitHit = false;           // the server said "Guest limit reached"
+  var refreshGate = function () {};
+  function isMember() { return !!(window.RaBbLESession && window.RaBbLESession.token()); }
+  function guestTurns() {
+    try {
+      var n = parseInt(sessionStorage.getItem(TURNS_KEY), 10);
+      if (n > 0) return Math.max(n, memTurns);
+    } catch (e) { /* storage off: memory only */ }
+    return memTurns;
+  }
+  function countGuestTurn() {
+    memTurns = guestTurns() + 1;
+    try { sessionStorage.setItem(TURNS_KEY, String(memTurns)); } catch (e) { /* memory only */ }
+  }
+  function gated() { return !isMember() && (limitHit || guestTurns() >= GUEST_TURNS); }
+
+  // GENESIS-COPY: Mark, authored voice.
+  var GATE_COPY = 'I can talk with a guest for two turns. Sign in and we go on. A new account needs an invite.';
+  var GATE_COPY_LIMIT = 'The guest allowance is used up for now. Sign in and we go on. A new account needs an invite.';
+  // /GENESIS-COPY
+
   function initConversation() {
     var form = document.getElementById('faceAsk');
     var input = document.getElementById('faceInput');
     var send = document.getElementById('faceSend');
+    var gate = document.getElementById('faceGate');
     if (!form || !input || !send) return;
     var sending = false;
     var typingTimer = null;
+    var openPlaceholder = input.getAttribute('placeholder') || '';
+
+    // The prompt replaces the conversation: card up, typing off with the reason in the box.
+    refreshGate = function () {
+      var stop = gated();
+      if (gate) {
+        gate.hidden = !stop;
+        var copy = document.getElementById('faceGateCopy');
+        if (copy) copy.textContent = limitHit ? GATE_COPY_LIMIT : GATE_COPY;
+      }
+      input.disabled = stop;
+      send.disabled = stop || sending;
+      input.setAttribute('placeholder', stop ? 'sign in to keep talking' : openPlaceholder);
+      if (stop) { clearTimeout(typingTimer); if (document.activeElement === input) input.blur(); }
+      measureDock();
+      requestAnimationFrame(measureDock);   // the card changes the dock's height; the voice and entity follow
+    };
+    refreshGate();
 
     // typing → listening; a pause or an empty box lets it go
     input.addEventListener('input', function () {
@@ -289,6 +335,7 @@
     form.addEventListener('submit', function (e) {
       e.preventDefault();
       if (sending) return;
+      if (gated()) { refreshGate(); return; }
       var text = input.value.trim();
       if (!text) return;
       clearTimeout(typingTimer);
@@ -314,6 +361,12 @@
       }).then(function (result) {
         // a live stream that broke mid-reply falls back whole; show only the fallback
         if (replyEl && result && result.source === 'scripted') { replyEl.textContent = result.text; keepBottom(false); }
+        // the server spent the guest allowance: no reply, the prompt takes over
+        if (result && result.source === 'limit') {
+          limitHit = true;
+          if (replyEl && replyEl.parentNode) replyEl.parentNode.removeChild(replyEl);
+          replyEl = null;
+        } else if (!isMember()) countGuestTurn();
       }).catch(function () {
         if (replyEl) replyEl.textContent = 'the signal wavers. ask again.';
       }).then(function () {
@@ -329,7 +382,7 @@
         }
       }).then(function () {
         sending = false;
-        send.disabled = false;
+        refreshGate();                             // after a guest's second turn this raises the prompt
         lastInteraction = Date.now();
       });
     });
@@ -351,7 +404,7 @@
   /* ── Wiring ────────────────────────────────────────────────────────────── */
   function init() {
     initAccount();
-    window.addEventListener('pageshow', initAccount);   // back from the portal (bfcache) shows the new state
+    window.addEventListener('pageshow', function () { initAccount(); refreshGate(); });   // back from the portal (bfcache) shows the new state
     initPresence();
     initVoiceScroll();
     initConversation();

@@ -138,12 +138,16 @@
         headers: headers,
         body: JSON.stringify({ messages: msgs, model_tier: window.RABBLE_GUEST_CHAT_TIER || 'fast' }),
       });
-      if (!res.ok) throw new Error('guest chat ' + res.status);
+      if (!res.ok) {
+        var err = new Error('guest chat ' + res.status);
+        if (res.status === 429 && !token) err.guestLimit = true;   // the server's "Guest limit reached"
+        throw err;
+      }
       return readStream(res, onChunk);
     }
 
     /* ── The public conversation method ───────────────────────────────────── */
-    // Resolves { text, source: 'live'|'scripted' }. Streams live tokens via
+    // Resolves { text, source: 'live'|'scripted'|'limit' } ('limit' = guest allowance spent, no text). Streams live tokens via
     // onChunk; scripted replies arrive whole. Drives entity state via onState.
     function converse(text, cb) {
       cb = cb || {};
@@ -161,12 +165,15 @@
         : Promise.reject(new Error('live disabled'));
 
       return attempt.catch(function (err) {
+        // the guest allowance is spent: no scripted stand-in, the caller shows its sign-in prompt
+        if (err && err.guestLimit) return { text: '', source: 'limit' };
         // bench live for a while; degrade gracefully meanwhile
         if (useLive) { liveDownUntil = Date.now() + LIVE_RETRY_MS; if (window.console) console.warn('[curator] live down → scripted:', err.message); }
         var reply = scriptedReply(text);
         onChunk(reply); // deliver whole
         return { text: reply, source: 'scripted' };
       }).then(function (result) {
+        if (result.source === 'limit') { history.pop(); return result; }   // drop the unanswered turn
         history.push({ role: 'assistant', content: result.text });
         onState('speaking');
         window.setTimeout(function () { onState('idle'); }, 700);

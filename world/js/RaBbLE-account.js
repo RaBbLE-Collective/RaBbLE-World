@@ -561,7 +561,7 @@
     enter(saved);
   } else {
     if (saved) unstore();
-    view(invite ? 'signup' : 'signin');
+    view(invite || params.get('tab') === 'signup' ? 'signup' : 'signin');
     if (saved) say('signin-msg', 'Your session ended. Sign in again.', 'err');
   }
 })();
