@@ -19,6 +19,7 @@ Open <http://localhost:8000>. The script builds Aether and NeBuLA and serves the
 | Path | What |
 |---|---|
 | `index.html` | The face and the chat |
+| `world/account.html` | Member portal: sign up with an invite, sign in, profile and chat with RaBbLE |
 | `world/os.html` | RaBbLE-OS developer preview |
 | `world/RaBbLE-Catalog.html` | Live catalog of every Aether class and NeBuLA element |
 

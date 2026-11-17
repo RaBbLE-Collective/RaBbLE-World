@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <link rel="icon" type="image/x-icon" href="../icons/favicon.ico">
+  <title>RaBbLE · Account</title>
+  <script src="js/RaBbLE-config.js"></script>
+  <script src="js/RaBbLE-aether.js"></script>
+  <link rel="stylesheet" href="css/RaBbLE-account.css">
+</head>
+<body class="rabble-grid-bg">
+  <main class="rabble-container acct">
+    <p class="rabble-eyebrow">Account</p>
+    <h1 class="acct-title" id="title">Sign in</h1>
+
+    <section id="signin" class="rabble-card rabble-card-cyan acct-panel">
+      <div class="rabble-card-title">Sign in</div>
+      <form id="signin-form" class="rabble-card-body acct-form">
+        <label>Username or email
+          <input class="rabble-input" id="si-identifier" name="username" autocomplete="username" required>
+        </label>
+        <label>Password
+          <input class="rabble-input" id="si-password" name="password" type="password" autocomplete="current-password" required>
+        </label>
+        <button class="rabble-btn rabble-btn-cyan" type="submit">Sign in</button>
+        <p class="acct-msg" id="signin-msg" role="alert"></p>
+        <p class="acct-muted">New here? <button class="acct-link" id="to-signup" type="button">Sign up with an invite</button></p>
+      </form>
+    </section>
+
+    <section id="signup" class="rabble-card rabble-card-violet acct-panel acct-hidden">
+      <div class="rabble-card-title">Sign up</div>
+      <form id="signup-form" class="rabble-card-body acct-form">
+        <p class="acct-muted">Sign-up is by invite for now. Paste the code you were sent.</p>
+        <label>Invite code
+          <input class="rabble-input" id="su-invite" name="invite" autocomplete="off" autocapitalize="off" spellcheck="false" required>
+        </label>
+        <label>Username
+          <input class="rabble-input" id="su-username" name="username" autocomplete="username" required>
+        </label>
+        <label>Email
+          <input class="rabble-input" id="su-email" name="email" type="email" autocomplete="email" required>
+        </label>
+        <label>Password
+          <input class="rabble-input" id="su-password" name="password" type="password" autocomplete="new-password" required>
+        </label>
+        <button class="rabble-btn rabble-btn-cyan" type="submit">Create account</button>
+        <p class="acct-msg" id="signup-msg" role="alert"></p>
+        <p class="acct-muted">Already have an account? <button class="acct-link" id="to-signin" type="button">Sign in</button></p>
+      </form>
+    </section>
+
+    <section id="home" class="acct-hidden">
+      <div class="acct-bar">
+        <span id="greeting" class="acct-muted"></span>
+        <button class="rabble-btn rabble-btn-ghost rabble-btn-sm" id="signout" type="button">Sign out</button>
+      </div>
+
+      <div class="rabble-card acct-panel">
+        <div class="rabble-card-title">Your profile</div>
+        <dl class="rabble-card-body acct-profile">
+          <dt>Username</dt><dd id="p-username"></dd>
+          <dt>Tier</dt><dd id="p-tier"></dd>
+          <dt>Email verified</dt><dd id="p-verified"></dd>
+        </dl>
+      </div>
+
+      <div class="rabble-card rabble-card-violet acct-panel">
+        <div class="rabble-card-title">Talk to RaBbLE</div>
+        <div class="rabble-card-body acct-chat">
+          <div id="log" class="acct-log" role="log" aria-live="polite" aria-label="Conversation"></div>
+          <p class="acct-msg" id="chat-msg" role="alert"></p>
+          <form id="chat-form" class="acct-chat-form">
+            <label class="acct-sr" for="chat-input">Message</label>
+            <textarea class="rabble-input" id="chat-input" rows="2" maxlength="4000" placeholder="Say something" required></textarea>
+            <button class="rabble-btn rabble-btn-cyan" id="chat-send" type="submit">Send</button>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+  <script src="js/RaBbLE-account.js"></script>
+</body>
+</html>
