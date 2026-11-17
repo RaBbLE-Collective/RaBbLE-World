@@ -1,13 +1,16 @@
 /* RaBbLE-account.js: the member portal. Sign in, sign up with an invite, then a small home with
  * a profile card, My Pockets (pair a Pocket with a one-time device key) and a chat with RaBbLE. The access token lives in sessionStorage (gone when the
  * tab closes; the refresh cookie cannot cross sites). Never logged. Everything from the server is
- * written with textContent. Signs out on expiry and after 30 idle minutes. */
+ * written with textContent. Signs out on expiry and after 30 idle minutes (20 for admin accounts).
+ * Tabs: Home, Pockets, and for admin-tier accounts only Invites, whose code (RaBbLE-account-admin.js)
+ * is fetched on demand and never downloaded by ordinary members. */
 (function () {
   'use strict';
 
   var API = (window.RABBLE_API_URL || '').replace(/\/$/, '');
   var KEY = 'rabble.account';
   var IDLE_MS = 30 * 60 * 1000;
+  var ADMIN_IDLE_MS = 20 * 60 * 1000;
   var session = null;
   var idleTimer = null;
   var turns = [];      // chat turns, memory only
@@ -47,6 +50,9 @@
     turns = [];
     busy = false;
     resetPockets();
+    if (window.RaBbLEAccountAdmin) window.RaBbLEAccountAdmin.reset();
+    showAdminTab(false);
+    selectTab('home', false);
     $('log').textContent = '';
     $('chat-input').value = '';
     say('chat-msg', '');
@@ -57,7 +63,11 @@
 
   function touch() {
     clearTimeout(idleTimer);
-    if (session) idleTimer = setTimeout(function () { signOut('Signed out after 30 idle minutes.'); }, IDLE_MS);
+    if (!session) return;
+    var admin = session.tier === 'admin';
+    idleTimer = setTimeout(function () {
+      signOut('Signed out after ' + (admin ? 20 : 30) + ' idle minutes.');
+    }, admin ? ADMIN_IDLE_MS : IDLE_MS);
   }
 
   function enter(s) {
@@ -70,6 +80,92 @@
     view('home');
     touch();
     loadPockets();
+    var isAdmin = s.tier === 'admin';
+    showAdminTab(isAdmin);
+    selectTab(wantedTab(), false);
+    if (isAdmin) loadAdmin();
+  }
+
+  /* ---- tabs ---- */
+  var TABS = ['home', 'pockets', 'invites'];
+  var adminLoaded = false;
+
+  function tabAllowed(name) {
+    if (TABS.indexOf(name) < 0) return false;
+    return name !== 'invites' || !$('tab-invites').classList.contains('acct-hidden');
+  }
+  function wantedTab() {
+    var t = new URLSearchParams(window.location.search).get('tab');
+    return tabAllowed(t) ? t : 'home';
+  }
+  function showAdminTab(on) {
+    show('tab-invites', on);
+    if (!on) show('panel-invites', false);
+  }
+  function selectTab(name, focus) {
+    if (!tabAllowed(name)) name = 'home';
+    TABS.forEach(function (t) {
+      var on = t === name;
+      var tab = $('tab-' + t);
+      tab.setAttribute('aria-selected', on ? 'true' : 'false');
+      tab.tabIndex = on ? 0 : -1;
+      $('panel-' + t).classList.toggle('acct-hidden', !on);
+      if (on && focus) tab.focus();
+    });
+    if (session) {
+      try {
+        var q = new URLSearchParams(window.location.search);
+        q.set('tab', name);
+        window.history.replaceState(null, '', window.location.pathname + '?' + q.toString() + window.location.hash);
+      } catch (e) { /* ignore */ }
+    }
+    if (name === 'invites' && window.RaBbLEAccountAdmin) window.RaBbLEAccountAdmin.refresh();
+  }
+  function visibleTabs() {
+    return TABS.filter(function (t) { return !$('tab-' + t).classList.contains('acct-hidden'); });
+  }
+  $('home').querySelector('[role="tablist"]').addEventListener('click', function (e) {
+    var b = e.target.closest ? e.target.closest('[role="tab"]') : null;
+    if (b) selectTab(b.getAttribute('data-tab'), false);
+  });
+  $('home').querySelector('[role="tablist"]').addEventListener('keydown', function (e) {
+    var vis = visibleTabs();
+    var cur = vis.indexOf(document.activeElement && document.activeElement.getAttribute('data-tab'));
+    if (cur < 0) return;
+    var next = -1;
+    if (e.key === 'ArrowRight') next = (cur + 1) % vis.length;
+    else if (e.key === 'ArrowLeft') next = (cur - 1 + vis.length) % vis.length;
+    else if (e.key === 'Home') next = 0;
+    else if (e.key === 'End') next = vis.length - 1;
+    if (next < 0) return;
+    e.preventDefault();
+    selectTab(vis[next], true);
+  });
+
+  /* Admin code is fetched only once the sign-in response says tier === 'admin'. */
+  function adminInit() {
+    window.RaBbLEAccountAdmin.init({
+      api: API,
+      getToken: function () { return session ? session.token : null; },
+      onUnauthorized: function () { signOut('Your session ended. Sign in again.'); },
+      onForbidden: function () {
+        showAdminTab(false);
+        selectTab('home', false);
+        say('chat-msg', 'This account is not an admin.', 'err');
+      },
+      onActivity: touch,
+    });
+    if (!$('tab-invites').classList.contains('acct-hidden') && $('tab-invites').getAttribute('aria-selected') === 'true') window.RaBbLEAccountAdmin.refresh();
+  }
+  function loadAdmin() {
+    if (window.RaBbLEAccountAdmin) { adminInit(); return; }
+    if (adminLoaded) return;
+    adminLoaded = true;
+    var sc = document.createElement('script');
+    sc.src = 'js/RaBbLE-account-admin.js';
+    sc.onload = adminInit;
+    sc.onerror = function () { adminLoaded = false; say('chat-msg', 'Could not load the admin tools. Reload to try again.', 'err'); };
+    document.head.appendChild(sc);
   }
 
   /* Returns true if the session is usable; otherwise signs out. */

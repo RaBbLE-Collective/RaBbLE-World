@@ -47,3 +47,26 @@
 .acct-steps { margin: 0; padding-left: 1.2em; color: var(--rabble-muted); font-size: var(--rabble-fs-small); display: grid; gap: var(--rabble-space-2); }
 @media (min-width: 560px) { .acct-pk-form { grid-template-columns: 1fr auto; align-items: end; } }
 @media (min-width: 560px) { .acct-chat-form { grid-template-columns: 1fr auto; align-items: end; } }
+
+/* Tabs */
+.acct-tabs { display: flex; gap: var(--rabble-space-2); margin-bottom: var(--rabble-space-4); overflow-x: auto;
+  border-bottom: 1px solid var(--rabble-border); -webkit-overflow-scrolling: touch; }
+.acct-tab { flex: 0 0 auto; background: none; border: 0; border-bottom: 2px solid transparent; margin-bottom: -1px;
+  padding: var(--rabble-space-3) var(--rabble-space-4); font: inherit; color: var(--rabble-muted); cursor: pointer; white-space: nowrap; }
+.acct-tab:hover { color: var(--rabble-text); }
+.acct-tab[aria-selected="true"] { color: var(--rabble-cyan); border-bottom-color: var(--rabble-cyan); }
+.acct-tab.acct-hidden { display: none; }
+.acct-tab:focus-visible { outline: 2px solid var(--rabble-cyan); outline-offset: -2px; }
+[role="tabpanel"].acct-hidden { display: none; }
+
+/* Invites tab (admin only) */
+.acct-fresh { margin: 0 var(--rabble-space-5) var(--rabble-space-5); display: grid; gap: var(--rabble-space-3); }
+.acct-token { display: block; padding: var(--rabble-space-3); border: 1px solid var(--rabble-border);
+  border-radius: var(--rabble-radius-sm); color: var(--rabble-cyan); font-family: var(--rabble-font-mono, monospace);
+  font-size: var(--rabble-fs-small); overflow-wrap: anywhere; word-break: break-all; user-select: all; }
+.acct-inv-list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--rabble-space-3); }
+.acct-inv-list li { display: grid; gap: var(--rabble-space-2); padding: var(--rabble-space-3); border: 1px solid var(--rabble-border); border-radius: var(--rabble-radius-sm); }
+.acct-inv-row { display: flex; justify-content: space-between; align-items: center; gap: var(--rabble-space-3); flex-wrap: wrap; }
+.acct-inv-live { color: var(--rabble-green); }
+.acct-inv-used { color: var(--rabble-muted); }
+.acct-inv-expired { color: var(--rabble-yellow); }

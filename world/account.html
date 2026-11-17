@@ -57,6 +57,13 @@
         <button class="rabble-btn rabble-btn-ghost rabble-btn-sm" id="signout" type="button">Sign out</button>
       </div>
 
+      <div class="acct-tabs" role="tablist" aria-label="Account sections">
+        <button class="acct-tab" role="tab" type="button" id="tab-home" data-tab="home" aria-controls="panel-home" aria-selected="true" tabindex="0">Home</button>
+        <button class="acct-tab" role="tab" type="button" id="tab-pockets" data-tab="pockets" aria-controls="panel-pockets" aria-selected="false" tabindex="-1">Pockets</button>
+        <button class="acct-tab acct-hidden" role="tab" type="button" id="tab-invites" data-tab="invites" aria-controls="panel-invites" aria-selected="false" tabindex="-1">Invites</button>
+      </div>
+
+      <div role="tabpanel" id="panel-home" aria-labelledby="tab-home">
       <div class="rabble-card acct-panel">
         <div class="rabble-card-title">Your profile</div>
         <dl class="rabble-card-body acct-profile">
@@ -66,6 +73,21 @@
         </dl>
       </div>
 
+      <div class="rabble-card rabble-card-violet acct-panel">
+        <div class="rabble-card-title">Talk to RaBbLE</div>
+        <div class="rabble-card-body acct-chat">
+          <div id="log" class="acct-log" role="log" aria-live="polite" aria-label="Conversation"></div>
+          <p class="acct-msg" id="chat-msg" role="alert"></p>
+          <form id="chat-form" class="acct-chat-form">
+            <label class="acct-sr" for="chat-input">Message</label>
+            <textarea class="rabble-input" id="chat-input" rows="2" maxlength="4000" placeholder="Say something" required></textarea>
+            <button class="rabble-btn rabble-btn-cyan" id="chat-send" type="submit">Send</button>
+          </form>
+        </div>
+      </div>
+      </div>
+
+      <div role="tabpanel" id="panel-pockets" aria-labelledby="tab-pockets" class="acct-hidden">
       <div class="rabble-card rabble-card-green acct-panel" id="pockets">
         <div class="rabble-card-title">My Pockets</div>
         <div class="rabble-card-body acct-pockets">
@@ -96,16 +118,35 @@
         </div>
       </div>
 
-      <div class="rabble-card rabble-card-violet acct-panel">
-        <div class="rabble-card-title">Talk to RaBbLE</div>
-        <div class="rabble-card-body acct-chat">
-          <div id="log" class="acct-log" role="log" aria-live="polite" aria-label="Conversation"></div>
-          <p class="acct-msg" id="chat-msg" role="alert"></p>
-          <form id="chat-form" class="acct-chat-form">
-            <label class="acct-sr" for="chat-input">Message</label>
-            <textarea class="rabble-input" id="chat-input" rows="2" maxlength="4000" placeholder="Say something" required></textarea>
-            <button class="rabble-btn rabble-btn-cyan" id="chat-send" type="submit">Send</button>
+      </div>
+
+      <div role="tabpanel" id="panel-invites" aria-labelledby="tab-invites" class="acct-hidden">
+        <div class="rabble-card rabble-card-violet acct-panel">
+          <div class="rabble-card-title">Mint an invite</div>
+          <form id="mint-form" class="rabble-card-body acct-form">
+            <label>Who is it for (a note only you see)
+              <input class="rabble-input" id="note" maxlength="120" placeholder="e.g. Mark, personal">
+            </label>
+            <label>Good for (days)
+              <input class="rabble-input" id="days" type="number" min="1" max="30" value="7">
+            </label>
+            <button class="rabble-btn rabble-btn-cyan" type="submit">Mint invite</button>
+            <p class="acct-msg" id="mint-msg" role="status"></p>
           </form>
+          <div id="fresh" class="acct-hidden acct-fresh">
+            <p class="acct-muted">Copy it now. It is shown in full here and in the list below until it is used.</p>
+            <code id="fresh-token" class="acct-token"></code>
+            <button class="rabble-btn rabble-btn-ghost rabble-btn-sm" id="copy" type="button">Copy</button>
+          </div>
+        </div>
+
+        <div class="rabble-card acct-panel">
+          <div class="rabble-card-title">All invites</div>
+          <div class="rabble-card-body">
+            <p class="acct-muted" id="list-empty">None yet.</p>
+            <ul id="list" class="acct-inv-list"></ul>
+            <p class="acct-msg" id="inv-msg" role="alert"></p>
+          </div>
         </div>
       </div>
     </section>
