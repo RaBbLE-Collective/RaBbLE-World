@@ -25,4 +25,25 @@
 .acct-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .acct a:focus-visible, .acct button:focus-visible, .acct input:focus-visible, .acct textarea:focus-visible {
   outline: 2px solid var(--rabble-cyan); outline-offset: 2px; }
+.acct-pockets { display: grid; gap: var(--rabble-space-3); }
+.acct-pk-list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--rabble-space-2); }
+.acct-pk { display: flex; justify-content: space-between; align-items: center; gap: var(--rabble-space-3);
+  padding: var(--rabble-space-3); border: 1px solid var(--rabble-border); border-radius: var(--rabble-radius-sm); }
+.acct-pk.revoked { opacity: 0.6; }
+.acct-pk-info { display: grid; gap: var(--rabble-space-1); min-width: 0; }
+.acct-pk-info strong { color: var(--rabble-text); overflow-wrap: anywhere; }
+.acct-pk-status { font-size: var(--rabble-fs-small); }
+.acct-pk-status.on { color: var(--rabble-green); }
+.acct-pk-status.off { color: var(--rabble-red); }
+.acct-pk-form { display: grid; gap: var(--rabble-space-3); }
+.acct-key { display: grid; gap: var(--rabble-space-3); padding: var(--rabble-space-4);
+  border: 2px solid var(--rabble-cyan); border-radius: var(--rabble-radius-sm); }
+.acct-key.acct-hidden { display: none; }
+.acct-key-warn { margin: 0; color: var(--rabble-text); }
+.acct-key-text { display: block; padding: var(--rabble-space-3); border: 1px solid var(--rabble-border);
+  border-radius: var(--rabble-radius-sm); color: var(--rabble-text); font-family: monospace; font-size: var(--rabble-fs-small);
+  overflow-wrap: anywhere; word-break: break-all; user-select: all; }
+.acct-key-actions { display: flex; gap: var(--rabble-space-3); flex-wrap: wrap; }
+.acct-steps { margin: 0; padding-left: 1.2em; color: var(--rabble-muted); font-size: var(--rabble-fs-small); display: grid; gap: var(--rabble-space-2); }
+@media (min-width: 560px) { .acct-pk-form { grid-template-columns: 1fr auto; align-items: end; } }
 @media (min-width: 560px) { .acct-chat-form { grid-template-columns: 1fr auto; align-items: end; } }

@@ -66,6 +66,36 @@
         </dl>
       </div>
 
+      <div class="rabble-card rabble-card-green acct-panel" id="pockets">
+        <div class="rabble-card-title">My Pockets</div>
+        <div class="rabble-card-body acct-pockets">
+          <p class="acct-muted" id="pk-count">Loading your Pockets...</p>
+          <ul class="acct-pk-list" id="pk-list"></ul>
+
+          <div class="acct-key acct-hidden" id="pk-key-panel">
+            <p class="acct-key-warn"><strong>Copy this key now.</strong> It will not be shown again. Anyone with it can connect as your Pocket.</p>
+            <code class="acct-key-text" id="pk-key" tabindex="0"></code>
+            <div class="acct-key-actions">
+              <button class="rabble-btn rabble-btn-cyan rabble-btn-sm" id="pk-copy" type="button">Copy key</button>
+              <button class="rabble-btn rabble-btn-ghost rabble-btn-sm" id="pk-dismiss" type="button">Dismiss</button>
+            </div>
+            <p class="acct-muted" id="pk-copy-msg" role="status"></p>
+            <ol class="acct-steps">
+              <li>Connect the Pocket to your computer over USB, open the Pocket companion, and paste this key.</li>
+              <li>Using a serial terminal instead? Send this line:</li>
+            </ol>
+            <code class="acct-key-text" id="pk-line"></code>
+          </div>
+
+          <p class="acct-msg" id="pk-msg" role="alert"></p>
+          <form id="pk-form" class="acct-pk-form">
+            <label class="acct-sr" for="pk-label">Name for this Pocket</label>
+            <input class="rabble-input" id="pk-label" maxlength="40" placeholder="My Pocket" autocomplete="off">
+            <button class="rabble-btn rabble-btn-cyan" id="pk-add" type="submit">Add a Pocket</button>
+          </form>
+        </div>
+      </div>
+
       <div class="rabble-card rabble-card-violet acct-panel">
         <div class="rabble-card-title">Talk to RaBbLE</div>
         <div class="rabble-card-body acct-chat">

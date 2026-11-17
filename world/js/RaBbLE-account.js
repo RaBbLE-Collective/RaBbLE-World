@@ -1,5 +1,5 @@
 /* RaBbLE-account.js: the member portal. Sign in, sign up with an invite, then a small home with
- * a profile card and a chat with RaBbLE. The access token lives in sessionStorage (gone when the
+ * a profile card, My Pockets (pair a Pocket with a one-time device key) and a chat with RaBbLE. The access token lives in sessionStorage (gone when the
  * tab closes; the refresh cookie cannot cross sites). Never logged. Everything from the server is
  * written with textContent. Signs out on expiry and after 30 idle minutes. */
 (function () {
@@ -46,6 +46,7 @@
     clearTimeout(idleTimer);
     turns = [];
     busy = false;
+    resetPockets();
     $('log').textContent = '';
     $('chat-input').value = '';
     say('chat-msg', '');
@@ -68,6 +69,7 @@
     $('p-verified').textContent = s.email_verified ? 'Yes' : 'No';
     view('home');
     touch();
+    loadPockets();
   }
 
   /* Returns true if the session is usable; otherwise signs out. */
@@ -239,6 +241,197 @@
         done();
       });
     }).catch(function () { fail('Could not reach RaBbLE. Try again.'); });
+  });
+
+  /* ---- My Pockets: GET/POST /api/v1/devices, DELETE /api/v1/devices/{id}.
+   * A new key is held only in the DOM text of #pk-key until dismissed, sign-out or session end.
+   * It is never put in storage, a URL or the console. ---- */
+  var pockets = [];
+  var pocketLimit = 3;
+  var armedId = null;     // device id awaiting the second "Sure? Revoke" click
+  var armTimer = null;
+  var pkBusy = false;
+
+  function api(method, path, body) {
+    var headers = { Authorization: 'Bearer ' + session.token };
+    var opts = { method: method, headers: headers };
+    if (body) { headers['Content-Type'] = 'application/json'; opts.body = JSON.stringify(body); }
+    return fetch(API + path, opts);
+  }
+
+  function clearKey() {
+    $('pk-key').textContent = '';
+    $('pk-line').textContent = '';
+    $('pk-copy-msg').textContent = '';
+    show('pk-key-panel', false);
+  }
+
+  function resetPockets() {
+    clearKey();
+    pockets = [];
+    armedId = null;
+    clearTimeout(armTimer);
+    pkBusy = false;
+    $('pk-list').textContent = '';
+    $('pk-count').textContent = 'Loading your Pockets...';
+    $('pk-label').value = '';
+    $('pk-add').disabled = false;
+    say('pk-msg', '');
+  }
+
+  function ago(iso) {
+    if (!iso) return 'not connected yet';
+    var t = Date.parse(iso);
+    if (isNaN(t)) t = Date.parse(iso + 'Z');
+    if (isNaN(t)) return 'not connected yet';
+    var s = Math.max(0, Math.round((Date.now() - t) / 1000));
+    if (s < 60) return 'last seen just now';
+    var m = Math.round(s / 60);
+    if (m < 60) return 'last seen ' + m + (m === 1 ? ' minute' : ' minutes') + ' ago';
+    var hr = Math.round(m / 60);
+    if (hr < 24) return 'last seen ' + hr + (hr === 1 ? ' hour' : ' hours') + ' ago';
+    var d = Math.round(hr / 24);
+    return 'last seen ' + d + (d === 1 ? ' day' : ' days') + ' ago';
+  }
+
+  function renderPockets() {
+    var active = pockets.filter(function (d) { return !d.revoked; }).length;
+    $('pk-count').textContent = active + ' of ' + pocketLimit + ' Pockets';
+    var ul = $('pk-list');
+    ul.textContent = '';
+    if (!pockets.length) {
+      var li0 = document.createElement('li');
+      li0.className = 'acct-muted';
+      li0.textContent = 'No Pockets yet. Add one below.';
+      ul.appendChild(li0);
+    }
+    pockets.forEach(function (d) {
+      var li = document.createElement('li');
+      li.className = 'acct-pk' + (d.revoked ? ' revoked' : '');
+      var info = document.createElement('div');
+      info.className = 'acct-pk-info';
+      var name = document.createElement('strong');
+      name.textContent = d.label;
+      var status = document.createElement('span');
+      status.className = 'acct-pk-status ' + (d.revoked ? 'off' : 'on');
+      status.textContent = d.revoked ? 'Revoked' : 'Paired';
+      var seen = document.createElement('span');
+      seen.className = 'acct-muted';
+      seen.textContent = ago(d.last_seen);
+      info.appendChild(name); info.appendChild(status); info.appendChild(seen);
+      li.appendChild(info);
+      if (!d.revoked) {
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'rabble-btn rabble-btn-ghost rabble-btn-sm';
+        b.setAttribute('data-revoke', d.id);
+        b.textContent = armedId === d.id ? 'Sure? Revoke' : 'Revoke';
+        li.appendChild(b);
+      }
+      ul.appendChild(li);
+    });
+  }
+
+  function pkFail(r, d, what) {
+    if (r.status === 401) { signOut('Your session ended. Sign in again.'); return; }
+    var m;
+    if (r.status === 409) m = typeof d.detail === 'string' ? d.detail : 'You have reached your Pocket limit. Revoke one to add another.';
+    else if (r.status === 429) m = 'Too many new Pockets this hour. Try again later.';
+    else if (r.status === 403) m = 'Pairing a Pocket is for members only.';
+    else if (r.status === 422) m = 'Give your Pocket a name of 1 to 40 characters.';
+    else if (r.status === 503) m = 'RaBbLE is busy right now. Try again in a moment.';
+    else if (r.status === 404) m = 'That Pocket was not found. The list has been refreshed.';
+    else m = what + ' did not work. Try again.';
+    say('pk-msg', m, 'err');
+  }
+
+  function loadPockets() {
+    if (!session) return Promise.resolve();
+    var tok = session.token;
+    return api('GET', '/api/v1/devices').then(function (r) {
+      return json(r).then(function (d) {
+        if (!session || session.token !== tok) return;
+        if (r.status === 200 && Array.isArray(d.devices)) {
+          pockets = d.devices;
+          if (Number(d.limit) > 0) pocketLimit = Number(d.limit);
+          renderPockets();
+        } else {
+          $('pk-count').textContent = 'Your Pockets';
+          pkFail(r, d, 'Loading your Pockets');
+        }
+      });
+    }).catch(function () {
+      $('pk-count').textContent = 'Your Pockets';
+      say('pk-msg', 'Could not reach RaBbLE. Try again.', 'err');
+    });
+  }
+
+  $('pk-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (pkBusy || !live()) return;
+    var label = $('pk-label').value.trim();
+    if (!label) { say('pk-msg', 'Give your Pocket a name first.', 'err'); $('pk-label').focus(); return; }
+    pkBusy = true;
+    $('pk-add').disabled = true;
+    say('pk-msg', '');
+    clearKey();
+    api('POST', '/api/v1/devices', { label: label }).then(function (r) {
+      return json(r).then(function (d) {
+        if (r.status === 201 && typeof d.key === 'string') {
+          $('pk-key').textContent = d.key;
+          $('pk-line').textContent = '>beam.token=' + d.key;
+          show('pk-key-panel', true);
+          $('pk-label').value = '';
+          say('pk-msg', 'Pocket added.', 'ok');
+          return loadPockets();
+        }
+        pkFail(r, d, 'Adding the Pocket');
+      });
+    }).catch(function () { say('pk-msg', 'Could not reach RaBbLE. Try again.', 'err'); })
+      .then(function () { pkBusy = false; if (session) $('pk-add').disabled = false; });
+  });
+
+  $('pk-list').addEventListener('click', function (e) {
+    var b = e.target.closest ? e.target.closest('button[data-revoke]') : null;
+    if (!b || pkBusy || !live()) return;
+    var id = b.getAttribute('data-revoke');
+    if (armedId !== id) {
+      armedId = id;
+      clearTimeout(armTimer);
+      armTimer = setTimeout(function () { armedId = null; renderPockets(); }, 6000);
+      renderPockets();
+      return;
+    }
+    armedId = null;
+    clearTimeout(armTimer);
+    pkBusy = true;
+    say('pk-msg', '');
+    api('DELETE', '/api/v1/devices/' + encodeURIComponent(id)).then(function (r) {
+      return json(r).then(function (d) {
+        if (r.status === 200) say('pk-msg', 'Pocket revoked. Its key no longer works.', 'ok');
+        else pkFail(r, d, 'Revoking the Pocket');
+        return loadPockets();
+      });
+    }).catch(function () { say('pk-msg', 'Could not reach RaBbLE. Try again.', 'err'); })
+      .then(function () { pkBusy = false; });
+  });
+
+  $('pk-dismiss').addEventListener('click', function () { clearKey(); });
+
+  $('pk-copy').addEventListener('click', function () {
+    var text = $('pk-key').textContent;
+    function fallback() {
+      var range = document.createRange();
+      range.selectNodeContents($('pk-key'));
+      var sel = window.getSelection();
+      sel.removeAllRanges(); sel.addRange(range);
+      $('pk-copy-msg').textContent = 'Copy blocked. The key is selected: press Ctrl+C (or Cmd+C).';
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () {
+        $('pk-copy-msg').textContent = 'Copied.';
+      }, fallback);
+    } else fallback();
   });
 
   ['click', 'keydown', 'touchstart'].forEach(function (ev) {
