@@ -60,6 +60,8 @@
       <div class="acct-tabs" role="tablist" aria-label="Account sections">
         <button class="acct-tab" role="tab" type="button" id="tab-home" data-tab="home" aria-controls="panel-home" aria-selected="true" tabindex="0">Home</button>
         <button class="acct-tab" role="tab" type="button" id="tab-pockets" data-tab="pockets" aria-controls="panel-pockets" aria-selected="false" tabindex="-1">Pockets</button>
+        <button class="acct-tab" role="tab" type="button" id="tab-captures" data-tab="captures" aria-controls="panel-captures" aria-selected="false" tabindex="-1">Captures</button>
+        <button class="acct-tab" role="tab" type="button" id="tab-conversations" data-tab="conversations" aria-controls="panel-conversations" aria-selected="false" tabindex="-1">Conversations</button>
         <button class="acct-tab acct-hidden" role="tab" type="button" id="tab-invites" data-tab="invites" aria-controls="panel-invites" aria-selected="false" tabindex="-1">Invites</button>
       </div>
 
@@ -120,6 +122,60 @@
 
       </div>
 
+      <div role="tabpanel" id="panel-captures" aria-labelledby="tab-captures" class="acct-hidden">
+        <div class="rabble-card rabble-card-cyan acct-panel">
+          <div class="rabble-card-title">Captures</div>
+          <div class="rabble-card-body acct-data">
+            <div id="cp-listview" class="acct-data">
+              <p class="acct-muted" id="cp-status" role="status"></p>
+              <ul class="acct-item-list" id="cp-list"></ul>
+              <p class="acct-msg" id="cp-msg" role="status"></p>
+              <button class="rabble-btn rabble-btn-ghost rabble-btn-sm acct-hidden" id="cp-more" type="button">Load more</button>
+            </div>
+            <div id="cp-detail" class="acct-data acct-hidden">
+              <div class="acct-key-actions">
+                <button class="rabble-btn rabble-btn-ghost rabble-btn-sm" id="cp-back" type="button">Back to list</button>
+              </div>
+              <h2 class="acct-d-title" id="cp-d-title"></h2>
+              <p class="acct-muted" id="cp-d-meta"></p>
+              <pre class="acct-md" id="cp-d-body" tabindex="0"></pre>
+              <div class="acct-key-actions">
+                <button class="rabble-btn rabble-btn-cyan rabble-btn-sm" id="cp-copy" type="button">Copy</button>
+                <button class="rabble-btn rabble-btn-cyan rabble-btn-sm" id="cp-dl" type="button">Download .md</button>
+                <button class="rabble-btn rabble-btn-ghost rabble-btn-sm" id="cp-del" type="button">Delete</button>
+              </div>
+              <p class="acct-msg" id="cp-d-msg" role="status"></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div role="tabpanel" id="panel-conversations" aria-labelledby="tab-conversations" class="acct-hidden">
+        <div class="rabble-card rabble-card-violet acct-panel">
+          <div class="rabble-card-title">Conversations</div>
+          <div class="rabble-card-body acct-data">
+            <div id="cv-listview" class="acct-data">
+              <p class="acct-muted" id="cv-status" role="status"></p>
+              <ul class="acct-item-list" id="cv-list"></ul>
+              <p class="acct-msg" id="cv-msg" role="status"></p>
+              <button class="rabble-btn rabble-btn-ghost rabble-btn-sm acct-hidden" id="cv-more" type="button">Load more</button>
+            </div>
+            <div id="cv-detail" class="acct-data acct-hidden">
+              <div class="acct-key-actions">
+                <button class="rabble-btn rabble-btn-ghost rabble-btn-sm" id="cv-back" type="button">Back to list</button>
+              </div>
+              <h2 class="acct-d-title" id="cv-d-title"></h2>
+              <p class="acct-muted" id="cv-d-meta"></p>
+              <div class="acct-log acct-thread" id="cv-d-body" role="log" aria-label="Transcript"></div>
+              <div class="acct-key-actions">
+                <button class="rabble-btn rabble-btn-ghost rabble-btn-sm" id="cv-del" type="button">Delete</button>
+              </div>
+              <p class="acct-msg" id="cv-d-msg" role="status"></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div role="tabpanel" id="panel-invites" aria-labelledby="tab-invites" class="acct-hidden">
         <div class="rabble-card rabble-card-violet acct-panel">
           <div class="rabble-card-title">Mint an invite</div>
@@ -151,6 +207,7 @@
       </div>
     </section>
   </main>
+  <script src="js/RaBbLE-account-captures.js"></script>
   <script src="js/RaBbLE-account.js"></script>
 </body>
 </html>

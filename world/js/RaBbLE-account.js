@@ -2,7 +2,7 @@
  * a profile card, My Pockets (pair a Pocket with a one-time device key) and a chat with RaBbLE. The access token lives in sessionStorage (gone when the
  * tab closes; the refresh cookie cannot cross sites). Never logged. Everything from the server is
  * written with textContent. Signs out on expiry and after 30 idle minutes (20 for admin accounts).
- * Tabs: Home, Pockets, and for admin-tier accounts only Invites, whose code (RaBbLE-account-admin.js)
+ * Tabs: Home, Pockets, Captures, Conversations (RaBbLE-account-captures.js), and for admin-tier accounts only Invites, whose code (RaBbLE-account-admin.js)
  * is fetched on demand and never downloaded by ordinary members. */
 (function () {
   'use strict';
@@ -50,6 +50,7 @@
     turns = [];
     busy = false;
     resetPockets();
+    if (window.RaBbLEAccountData) window.RaBbLEAccountData.reset();
     if (window.RaBbLEAccountAdmin) window.RaBbLEAccountAdmin.reset();
     showAdminTab(false);
     selectTab('home', false);
@@ -87,7 +88,7 @@
   }
 
   /* ---- tabs ---- */
-  var TABS = ['home', 'pockets', 'invites'];
+  var TABS = ['home', 'pockets', 'captures', 'conversations', 'invites'];
   var adminLoaded = false;
 
   function tabAllowed(name) {
@@ -120,6 +121,10 @@
       } catch (e) { /* ignore */ }
     }
     if (name === 'invites' && window.RaBbLEAccountAdmin) window.RaBbLEAccountAdmin.refresh();
+    if ((name === 'captures' || name === 'conversations') && session) {
+      dataInit();
+      window.RaBbLEAccountData.refresh(name === 'captures' ? 'notes' : 'conversations');
+    }
   }
   function visibleTabs() {
     return TABS.filter(function (t) { return !$('tab-' + t).classList.contains('acct-hidden'); });
@@ -141,6 +146,16 @@
     e.preventDefault();
     selectTab(vis[next], true);
   });
+
+  /* Captures and Conversations: code in RaBbLE-account-captures.js, same session hooks as the admin tab. */
+  function dataInit() {
+    window.RaBbLEAccountData.init({
+      api: API,
+      getToken: function () { return session ? session.token : null; },
+      onUnauthorized: function () { signOut('Your session ended. Sign in again.'); },
+      onActivity: touch,
+    });
+  }
 
   /* Admin code is fetched only once the sign-in response says tier === 'admin'. */
   function adminInit() {
