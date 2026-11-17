@@ -91,6 +91,18 @@
   function entityState(state) { call('setState', state); label(state === 'idle' ? 'resonant' : state); }
   function entityMood(mood, opts) { call('setMood', mood, opts || {}); if (mood !== 'idle') label(mood); }
 
+  /* ── Account control: who is signed in, from the portal's session (RaBbLE-session.js) ── */
+  function initAccount() {
+    var link = document.getElementById('faceAccount');
+    if (!link) return;
+    var S = window.RaBbLESession;
+    var name = S ? S.username() : '';
+    link.textContent = name || 'sign in';
+    link.classList.toggle('is-member', !!name);
+    if (name) link.setAttribute('aria-label', 'signed in as ' + name + ', open your account');
+    else link.removeAttribute('aria-label');
+  }
+
   /* ── Presence chip: real sCoRE health ping, degrades offline ───────────── */
   function initPresence() {
     var dot = document.getElementById('presenceDot');
@@ -338,6 +350,8 @@
 
   /* ── Wiring ────────────────────────────────────────────────────────────── */
   function init() {
+    initAccount();
+    window.addEventListener('pageshow', initAccount);   // back from the portal (bfcache) shows the new state
     initPresence();
     initVoiceScroll();
     initConversation();

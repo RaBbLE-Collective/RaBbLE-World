@@ -68,6 +68,22 @@ body[data-beat="enter"]  [data-beat-panel~="enter"] {
 }
 body[data-beat="boot"] .face-statusbar { opacity: 0; pointer-events: none; }
 .face-dim { color: var(--text-dim); }
+/* Account control: "sign in", or the member's name, top right beside the presence pill */
+.face-account {
+  color: var(--text-dim);
+  text-decoration: none;
+  white-space: nowrap;
+  max-width: 14ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color .3s ease;
+}
+.face-account:hover,
+.face-account:focus-visible,
+.face-account.is-member { color: var(--cyan); }
+.face-account.is-member { text-transform: none; }   /* a username keeps its own case */
+.face-account:focus-visible { outline: 1px solid var(--cyan); outline-offset: 4px; }
+body[data-beat="arrive"] .face-account { pointer-events: auto; }  /* the bar ignores taps on Arrive so any tap wakes; this link still works */
 body[data-beat="arrive"] .face-statusbar { pointer-events: none; }  /* a tap anywhere wakes */
 
 /* ── Beat 1 · Arrive ── */
@@ -249,6 +265,7 @@ body.face .rabble-askbox-input input { font-size: max(16px, 1rem) !important; }
 
 @media (max-width: 560px) {
   .face-hide-narrow { display: none; }
+  .face-statusbar { grid-template-columns: 1fr auto; }   /* two zones left: brand, then account + presence pinned right */
   .face-voice-line { font-size: .9rem; }
 }
 

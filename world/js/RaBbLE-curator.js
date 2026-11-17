@@ -128,9 +128,14 @@
     async function liveConverse(text, onChunk) {
       var msgs = history.concat([{ role: 'user', content: text }])
         .filter(function (m) { return m.role !== 'system'; });
+      // A signed-in member sends their bearer token so usage is attributed to the account.
+      // A guest sends none. The session is shared with the portal: RaBbLE-session.js.
+      var token = window.RaBbLESession ? window.RaBbLESession.token() : null;
+      var headers = { 'Content-Type': 'application/json' };
+      if (token) headers.Authorization = 'Bearer ' + token;
       var res = await fetch(apiUrl(window.RABBLE_GUEST_CHAT_PATH || '/api/v1/chat'), {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: headers,
         body: JSON.stringify({ messages: msgs, model_tier: window.RABBLE_GUEST_CHAT_TIER || 'fast' }),
       });
       if (!res.ok) throw new Error('guest chat ' + res.status);

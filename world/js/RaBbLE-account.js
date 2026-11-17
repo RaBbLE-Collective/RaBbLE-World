@@ -8,7 +8,6 @@
   'use strict';
 
   var API = (window.RABBLE_API_URL || '').replace(/\/$/, '');
-  var KEY = 'rabble.account';
   var IDLE_MS = 30 * 60 * 1000;
   var ADMIN_IDLE_MS = 20 * 60 * 1000;
   var session = null;
@@ -25,15 +24,11 @@
     el.classList.toggle('ok', kind === 'ok');
   }
 
-  function store(s) { try { sessionStorage.setItem(KEY, JSON.stringify(s)); } catch (e) { /* in-memory only */ } }
-  function unstore() { try { sessionStorage.removeItem(KEY); } catch (e) { /* nothing */ } }
-  function load() {
-    try {
-      var s = JSON.parse(sessionStorage.getItem(KEY) || 'null');
-      if (s && typeof s.token === 'string' && typeof s.expires_at === 'number') return s;
-    } catch (e) { /* fall through */ }
-    return null;
-  }
+  /* The session store is shared with the face: see RaBbLE-session.js. */
+  var SESS = window.RaBbLESession;
+  function store(s) { SESS.save(s); }
+  function unstore() { SESS.clear(); }
+  function load() { return SESS.read(); }
   function expired() { return !session || Date.now() >= session.expires_at; }
 
   function view(name) {
