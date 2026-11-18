@@ -19,6 +19,7 @@
 
   // ── Production endpoints — edit these as services move/rename ───────────────
   var PROD_API_URL    = 'https://score.joinrabble.world';             // sCoRE (CF Worker → Render)
+  var PROD_POCKET_URL = 'https://pocket.joinrabble.world';            // the Pocket workbench (pair, flash, manage Pockets)
   var PROD_AETHER_URL = 'https://aether.joinrabble.world/v0.1.0/aether.min.css'; // Aether CDN, Genesis release — bump version on deploy
   var PROD_NEBULA_URL = 'https://nebula.joinrabble.world/v0.1.0/nebula.iife.js'; // NeBuLA CDN, Genesis release (rc.1 has no alive stage: host collapses to height 0) — bump version on deploy
   // Three.js stays external (peer dep) — pinned to the same version WS-A's
@@ -27,7 +28,10 @@
   var PROD_THREE_URL  = 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js';
 
   // ── Local endpoints (harness/local.sh + dev-serve.sh CDN mock) ──────────────
-  var LOCAL_API_URL    = 'http://localhost:8000';
+  // Same origin: dev-cdn.js proxies /api/* and /health to sCoRE (hosted by default, DEV_API_UPSTREAM to change),
+  // so local pages need no CORS change on sCoRE. Opened from another static server, set window.RABBLE_API_URL.
+  var LOCAL_API_URL    = window.location.origin;
+  var LOCAL_POCKET_URL = 'http://localhost:8799';   // the Pocket workbench: cd RaBbLE-Pocket/companion-app/web && wrangler dev --port 8799 --local
   var LOCAL_AETHER_URL = '/aether/v0.0.0.0/aether.css';
   var LOCAL_NEBULA_URL = '/nebula/v0.0.0.0/nebula.iife.js';
   var LOCAL_THREE_URL  = 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js';
@@ -42,6 +46,7 @@
   }
 
   set('RABBLE_API_URL',    LOCAL_API_URL,    PROD_API_URL);
+  set('RABBLE_POCKET_URL', LOCAL_POCKET_URL, PROD_POCKET_URL);
   set('RABBLE_AETHER_URL', LOCAL_AETHER_URL, PROD_AETHER_URL);
   set('RABBLE_NEBULA_URL', LOCAL_NEBULA_URL, PROD_NEBULA_URL);
   set('RABBLE_THREE_URL',  LOCAL_THREE_URL,  PROD_THREE_URL);

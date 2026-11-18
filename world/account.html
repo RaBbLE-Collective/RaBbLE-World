@@ -7,6 +7,7 @@
   <title>RaBbLE · Account</title>
   <script src="js/RaBbLE-config.js"></script>
   <script src="js/RaBbLE-aether.js"></script>
+  <script src="js/RaBbLE-nebula-loader.js"></script>
   <script src="js/RaBbLE-session.js"></script>
   <link rel="stylesheet" href="css/RaBbLE-account.css">
 </head>
@@ -67,18 +68,17 @@
       </div>
 
       <div role="tabpanel" id="panel-home" aria-labelledby="tab-home">
-      <div class="rabble-card acct-panel">
-        <div class="rabble-card-title">Your profile</div>
-        <dl class="rabble-card-body acct-profile">
-          <dt>Username</dt><dd id="p-username"></dd>
-          <dt>Tier</dt><dd id="p-tier"></dd>
-          <dt>Email verified</dt><dd id="p-verified"></dd>
-        </dl>
+      <div class="acct-entity" aria-hidden="true">
+        <rabble-entity id="acctEntity" backend="alive" autonomous="true" dimension="2d" portal-a="cyan" portal-b="magenta"></rabble-entity>
       </div>
 
       <div class="rabble-card rabble-card-violet acct-panel">
         <div class="rabble-card-title">Talk to RaBbLE</div>
         <div class="rabble-card-body acct-chat">
+          <div class="acct-bar">
+            <span class="acct-muted" id="chat-where" role="status">Saved to your account. A Pocket can carry on from here.</span>
+            <button class="rabble-btn rabble-btn-ghost rabble-btn-sm" id="chat-new" type="button">New chat</button>
+          </div>
           <div id="log" class="acct-log" role="log" aria-live="polite" aria-label="Conversation"></div>
           <p class="acct-msg" id="chat-msg" role="alert"></p>
           <form id="chat-form" class="acct-chat-form">
@@ -87,6 +87,15 @@
             <button class="rabble-btn rabble-btn-cyan" id="chat-send" type="submit">Send</button>
           </form>
         </div>
+      </div>
+
+      <div class="rabble-card acct-panel">
+        <div class="rabble-card-title">Your profile</div>
+        <dl class="rabble-card-body acct-profile">
+          <dt>Username</dt><dd id="p-username"></dd>
+          <dt>Tier</dt><dd id="p-tier"></dd>
+          <dt>Email verified</dt><dd id="p-verified"></dd>
+        </dl>
       </div>
       </div>
 
@@ -97,29 +106,11 @@
           <p class="acct-muted" id="pk-count">Loading your Pockets...</p>
           <ul class="acct-pk-list" id="pk-list"></ul>
 
-          <div class="acct-key acct-hidden" id="pk-key-panel">
-            <p class="acct-key-warn"><strong>Copy this key now.</strong> It will not be shown again. Anyone with it can connect as your Pocket.</p>
-            <code class="acct-key-text" id="pk-key" tabindex="0"></code>
-            <div class="acct-key-actions">
-              <button class="rabble-btn rabble-btn-cyan rabble-btn-sm acct-hidden" id="pk-usb" type="button">Send to my Pocket over USB</button>
-              <button class="rabble-btn rabble-btn-ghost rabble-btn-sm" id="pk-copy" type="button">Copy key</button>
-              <button class="rabble-btn rabble-btn-ghost rabble-btn-sm" id="pk-dismiss" type="button">Dismiss</button>
-            </div>
-            <p class="acct-muted" id="pk-copy-msg" role="status"></p>
-            <p class="acct-muted" id="pk-usb-msg" role="status"></p>
-            <ol class="acct-steps">
-              <li>Connect the Pocket to your computer over USB and press Send to my Pocket over USB (Chrome or Edge). Otherwise copy the key and paste it into the Pocket companion.</li>
-              <li>Using a serial terminal instead? Send this line:</li>
-            </ol>
-            <code class="acct-key-text" id="pk-line"></code>
-          </div>
-
           <p class="acct-msg" id="pk-msg" role="alert"></p>
-          <form id="pk-form" class="acct-pk-form">
-            <label class="acct-sr" for="pk-label">Name for this Pocket</label>
-            <input class="rabble-input" id="pk-label" maxlength="40" placeholder="My Pocket" autocomplete="off">
-            <button class="rabble-btn rabble-btn-cyan" id="pk-add" type="submit">Add a Pocket</button>
-          </form>
+          <div class="acct-key-actions">
+            <button class="rabble-btn rabble-btn-cyan" id="pk-workbench" type="button">Set up or manage my Pockets</button>
+          </div>
+          <p class="acct-muted">Opens the Pocket workbench in a new tab, already signed in as you: flash, pair, and set up a Pocket there. Revoking one stays here.</p>
         </div>
       </div>
 
@@ -171,6 +162,7 @@
               <p class="acct-muted" id="cv-d-meta"></p>
               <div class="acct-log acct-thread" id="cv-d-body" role="log" aria-label="Transcript"></div>
               <div class="acct-key-actions">
+                <button class="rabble-btn rabble-btn-cyan rabble-btn-sm" id="cv-continue" type="button">Continue here</button>
                 <button class="rabble-btn rabble-btn-ghost rabble-btn-sm" id="cv-del" type="button">Delete</button>
               </div>
               <p class="acct-msg" id="cv-d-msg" role="status"></p>
@@ -193,9 +185,9 @@
             <p class="acct-msg" id="mint-msg" role="status"></p>
           </form>
           <div id="fresh" class="acct-hidden acct-fresh">
-            <p class="acct-muted">Copy it now. It is shown in full here and in the list below until it is used.</p>
+            <p class="acct-muted">Send this link. It opens sign-up with the code filled in. It stays in the list below until it is used.</p>
             <code id="fresh-token" class="acct-token"></code>
-            <button class="rabble-btn rabble-btn-ghost rabble-btn-sm" id="copy" type="button">Copy</button>
+            <button class="rabble-btn rabble-btn-ghost rabble-btn-sm" id="copy" type="button">Copy link</button>
           </div>
         </div>
 
@@ -210,7 +202,6 @@
       </div>
     </section>
   </main>
-  <script src="js/RaBbLE-pocket-serial.js"></script>
   <script src="js/RaBbLE-account-captures.js"></script>
   <script src="js/RaBbLE-account.js"></script>
 </body>

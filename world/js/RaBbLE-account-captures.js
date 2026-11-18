@@ -3,7 +3,8 @@
  * each with ?limit & ?before, plus /{id} to read and DELETE /{id}). Same auth and error pattern as the
  * Pockets tab in RaBbLE-account.js: bearer token from the portal session, 401 signs the member out.
  * Everything from the server is written with textContent. Note bodies are shown as preformatted text,
- * never as HTML. Exposes window.RaBbLEAccountData { init, refresh, reset }. */
+ * never as HTML. A conversation shows where it was said (Pocket, web, blended) and can be continued on the web
+ * (cfg.onContinue, handled by the portal's chat). Exposes window.RaBbLEAccountData { init, refresh, reset }. */
 (function () {
   'use strict';
 
@@ -61,6 +62,10 @@
     if (isNaN(t)) return String(iso);
     return new Date(t).toLocaleString();
   }
+  /* Where a conversation was said: Pocket only, web only, or blended (turns from more than one surface). */
+  function originText(o) {
+    return { pocket: 'Pocket only', web: 'Web only', tui: 'Terminal only', desktop: 'Desktop only', blended: 'Blended' }[o] || '';
+  }
   function el(tag, cls, text) {
     var n = document.createElement(tag);
     if (cls) n.className = cls;
@@ -87,6 +92,8 @@
         var n = Number(it.turns) || 0;
         head.appendChild(el('strong', null, when(it.started_at) || 'Conversation'));
         head.appendChild(el('span', 'acct-badge', n + (n === 1 ? ' turn' : ' turns')));
+        if (originText(it.origin)) head.appendChild(el('span', 'acct-badge', originText(it.origin)));
+        if (!it.ended_at) head.appendChild(el('span', 'acct-badge', 'open'));
         b.appendChild(head);
         if (it.device) b.appendChild(el('span', 'acct-muted', it.device));
       }
@@ -161,6 +168,7 @@
     $(K.p + '-d-body').textContent = '';
     say(K.p + '-d-msg', '');
     $(K.p + '-del').disabled = true;
+    if (kind === 'conversations') $('cv-continue').disabled = true;
     if ($(K.p + '-copy')) { $(K.p + '-copy').disabled = true; $(K.p + '-dl').disabled = true; }
     open[kind] = { id: id, data: null };
     var gen = state[kind].gen;
@@ -187,6 +195,7 @@
   function renderDetail(kind, d) {
     var K = KINDS[kind];
     $(K.p + '-del').disabled = false;
+    if (kind === 'conversations') $('cv-continue').disabled = false;
     if (kind === 'notes') {
       $(K.p + '-d-title').textContent = d.title || 'Untitled';
       $(K.p + '-d-meta').textContent = [d.source === 'voice' ? 'voice' : 'text', when(d.created), d.device].filter(Boolean).join(' · ');
@@ -196,13 +205,13 @@
     } else {
       $(K.p + '-d-title').textContent = when(d.started_at) || 'Conversation';
       var turns = Array.isArray(d.turns) ? d.turns : [];
-      $(K.p + '-d-meta').textContent = [d.device, turns.length + (turns.length === 1 ? ' turn' : ' turns'),
+      $(K.p + '-d-meta').textContent = [originText(d.origin), d.device, turns.length + (turns.length === 1 ? ' turn' : ' turns'),
         d.ended_at ? 'ended ' + when(d.ended_at) : ''].filter(Boolean).join(' · ');
       var log = $(K.p + '-d-body');
       log.textContent = '';
       turns.forEach(function (t) {
         var p = el('p', 'acct-turn ' + (t.role === 'user' ? 'you' : 'rabble'));
-        p.appendChild(el('strong', null, t.role === 'user' ? 'You: ' : 'RaBbLE: '));
+        p.appendChild(el('strong', null, (t.role === 'user' ? 'You' : 'RaBbLE') + (t.surface && d.origin === 'blended' ? ' (' + t.surface + ')' : '') + ': '));
         p.appendChild(el('span', null, typeof t.text === 'string' ? t.text : ''));
         log.appendChild(p);
       });
@@ -291,6 +300,10 @@
       $(K.p + '-more').addEventListener('click', function () { cfg.onActivity(); load(kind, true); });
       $(K.p + '-back').addEventListener('click', function () { closeDetail(kind); });
       $(K.p + '-del').addEventListener('click', function () { cfg.onActivity(); del(kind); });
+    });
+    $('cv-continue').addEventListener('click', function () {
+      var o = open.conversations;
+      if (o && o.data && cfg.onContinue) { cfg.onActivity(); cfg.onContinue(o.data); }
     });
     $('cp-copy').addEventListener('click', copyMd);
     $('cp-dl').addEventListener('click', downloadMd);

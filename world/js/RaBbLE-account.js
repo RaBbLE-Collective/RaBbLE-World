@@ -1,5 +1,6 @@
 /* RaBbLE-account.js: the member portal. Sign in, sign up with an invite, then a small home with
- * a profile card, My Pockets (pair a Pocket with a one-time device key) and a chat with RaBbLE. The access token lives in sessionStorage (gone when the
+ * the entity with a chat box whose conversations are saved to the account (and can be carried on by a Pocket, or the
+ * reverse), a profile card, and My Pockets (list, revoke, and a button that opens the Pocket workbench signed in). The access token lives in sessionStorage (gone when the
  * tab closes; the refresh cookie cannot cross sites). Never logged. Everything from the server is
  * written with textContent. Signs out on expiry and after 30 idle minutes (20 for admin accounts).
  * Tabs: Home, Pockets, Captures, Conversations (RaBbLE-account-captures.js), and for admin-tier accounts only Invites, whose code (RaBbLE-account-admin.js)
@@ -14,6 +15,7 @@
   var idleTimer = null;
   var turns = [];      // chat turns, memory only
   var busy = false;
+  var convoId = null;  // the saved conversation this chat writes to (members only), made on the first message
 
   function $(id) { return document.getElementById(id); }
   function show(id, on) { $(id).classList.toggle('acct-hidden', !on); }
@@ -43,6 +45,7 @@
     unstore();
     clearTimeout(idleTimer);
     turns = [];
+    convoId = null;
     busy = false;
     resetPockets();
     if (window.RaBbLEAccountData) window.RaBbLEAccountData.reset();
@@ -52,6 +55,7 @@
     $('log').textContent = '';
     $('chat-input').value = '';
     say('chat-msg', '');
+    where('');
     $('si-password').value = '';
     view('signin');
     say('signin-msg', message || '', message ? 'err' : '');
@@ -76,6 +80,8 @@
     view('home');
     touch();
     loadPockets();
+    startEntity();
+    loadOpenConversation();
     var isAdmin = s.tier === 'admin';
     showAdminTab(isAdmin);
     selectTab(wantedTab(), false);
@@ -149,6 +155,7 @@
       getToken: function () { return session ? session.token : null; },
       onUnauthorized: function () { signOut('Your session ended. Sign in again.'); },
       onActivity: touch,
+      onContinue: continueHere,
     });
   }
 
@@ -310,6 +317,77 @@
     return pump();
   }
 
+  /* ---- saved conversations: /api/v1/pocket/conversations. A member has one open conversation; a Pocket's next
+   * turn lands in it, and a message sent here lands in it too. Failing to save never stops the chat. ---- */
+  function where(text) { $('chat-where').textContent = text || 'Saved to your account. A Pocket can carry on from here.'; }
+
+  function showTurns(list) {
+    $('log').textContent = '';
+    list.forEach(function (t) { addTurn(t.role === 'user' ? 'you' : 'rabble', t.text); });
+  }
+
+  /* Pick up the conversation that is still open, whichever surface began it. */
+  function loadOpenConversation() {
+    var tok = session && session.token;
+    if (!tok) return;
+    api('GET', '/api/v1/pocket/conversations?limit=1').then(function (r) {
+      return json(r).then(function (d) {
+        if (!session || session.token !== tok || convoId || turns.length) return;
+        var c = r.status === 200 && d.conversations && d.conversations[0];
+        if (!c || c.ended_at) return;
+        return api('GET', '/api/v1/pocket/conversations/' + encodeURIComponent(c.id)).then(function (r2) {
+          return json(r2).then(function (full) {
+            if (!session || session.token !== tok || convoId || turns.length || r2.status !== 200) return;
+            adopt(full);
+            where('Carrying on from ' + ({ pocket: 'your Pocket', web: 'an earlier web chat' }[full.origin] || 'an earlier conversation') + '.');
+          });
+        });
+      });
+    }).catch(function () { /* the chat just starts fresh */ });
+  }
+
+  function adopt(c) {
+    convoId = c.id;
+    var list = Array.isArray(c.turns) ? c.turns : [];
+    turns = list.map(function (t) { return { role: t.role, content: t.text }; });
+    showTurns(list);
+  }
+
+  /* "Continue here" in the Conversations tab. */
+  function continueHere(c) {
+    if (!live() || busy) return;
+    api('POST', '/api/v1/pocket/conversations/' + encodeURIComponent(c.id) + '/resume').then(function (r) {
+      if (r.status === 401) { signOut('Your session ended. Sign in again.'); return; }
+      if (r.status !== 200) { say('cv-d-msg', 'Could not continue that conversation. Try again.', 'err'); return; }
+      adopt(c);
+      where('Continuing a conversation. A Pocket will carry on from here too.');
+      selectTab('home', false);
+    }).catch(function () { say('cv-d-msg', 'Could not reach RaBbLE. Try again.', 'err'); });
+  }
+
+  $('chat-new').addEventListener('click', function () {
+    if (busy || !session) return;
+    convoId = null;
+    turns = [];
+    $('log').textContent = '';
+    say('chat-msg', '');
+    where('');
+    $('chat-input').focus();
+  });
+
+  /* Resolves to the conversation id, or null when it could not be made (the chat then goes unsaved). */
+  function ensureConversation() {
+    if (convoId) return Promise.resolve(convoId);
+    return post('/api/v1/pocket/conversations?surface=web', {}, true).then(function (r) {
+      return json(r).then(function (d) {
+        if (r.status === 201 && d.id) { convoId = d.id; return convoId; }
+        if (r.status === 401) { signOut('Your session ended. Sign in again.'); }
+        return null;
+      });
+    }).catch(function () { return null; });
+  }
+
+  /* ---- chat: POST /api/v1/chat {messages, model_tier, conversation_id}, SSE lines "data: <json string>" ending "data: [DONE]" ---- */
   $('chat-form').addEventListener('submit', function (e) {
     e.preventDefault();
     if (busy || !live()) return;
@@ -324,34 +402,62 @@
     var msgs = turns.concat([{ role: 'user', content: text }]);
     var body = addTurn('rabble', '...');
     var full = '';
-    function done() { busy = false; $('chat-send').disabled = false; }
+    entity('setMood', 'process');
+    function done() { busy = false; $('chat-send').disabled = false; entity('setState', 'idle'); }
     function fail(message) {
       if (!full) body.parentNode.remove();
       say('chat-msg', message, 'err');
       done();
     }
-    post('/api/v1/chat', { messages: msgs, model_tier: 'fast' }, true).then(function (res) {
-      if (res.status === 401) { done(); signOut('Your session ended. Sign in again.'); return; }
-      if (res.status === 429) { fail('Slow down a little, then try again.'); return; }
-      if (!res.ok || !res.body) { fail('RaBbLE could not answer right now. Try again in a moment.'); return; }
-      return readStream(res, function (piece) {
-        full += piece;
-        body.textContent = full;
-        $('log').scrollTop = $('log').scrollHeight;
-      }).then(function () {
-        if (!full.trim()) { fail('RaBbLE sent no reply. Try again.'); return; }
-        if (full.indexOf('[RaBbLE: all providers unreachable') === 0) {
-          full = ''; fail('RaBbLE cannot answer right now. Try again later.'); return;
-        }
-        turns = msgs.concat([{ role: 'assistant', content: full }]);
-        done();
+    ensureConversation().then(function (cid) {
+      if (!session) return;
+      if (!cid) where('Not saved: could not reach your conversations.');
+      var req = { messages: msgs, model_tier: 'fast' };
+      if (cid) req.conversation_id = cid;
+      return post('/api/v1/chat', req, true).then(function (res) {
+        if (res.status === 401) { done(); signOut('Your session ended. Sign in again.'); return; }
+        if (res.status === 404 && cid) { convoId = null; fail('That conversation is gone. Press New chat.'); return; }
+        if (res.status === 429) { fail('Slow down a little, then try again.'); return; }
+        if (!res.ok || !res.body) { fail('RaBbLE could not answer right now. Try again in a moment.'); return; }
+        var first = true;
+        return readStream(res, function (piece) {
+          if (first) { first = false; entity('setMood', 'idle'); entity('setState', 'speaking'); }
+          full += piece;
+          body.textContent = full;
+          $('log').scrollTop = $('log').scrollHeight;
+        }).then(function () {
+          if (!full.trim()) { fail('RaBbLE sent no reply. Try again.'); return; }
+          if (full.indexOf('[RaBbLE: all providers unreachable') === 0) {
+            full = ''; fail('RaBbLE cannot answer right now. Try again later.'); return;
+          }
+          turns = msgs.concat([{ role: 'assistant', content: full }]);
+          done();
+        });
       });
     }).catch(function () { fail('Could not reach RaBbLE. Try again.'); });
   });
 
+  /* ---- the entity on Home: NeBuLA <rabble-entity>, as on the face. It is not load-bearing: if NeBuLA did not load,
+   * the banner stays hidden and the chat works the same. ---- */
+  var entityBooted = false;
+  function entity(method) {
+    var el = document.getElementById('acctEntity');
+    if (!el || typeof el[method] !== 'function') return;
+    try { el[method].apply(el, Array.prototype.slice.call(arguments, 1)); } catch (e) { /* ignore */ }
+  }
+  function startEntity() {
+    var el = document.getElementById('acctEntity');
+    if (entityBooted || !el || typeof el.boot !== 'function') return;
+    entityBooted = true;
+    try {
+      el.boot({ steps: [{ id: 'nebula', label: 'NeBuLA renderer' }] });
+      entity('completeStep', 'nebula');
+      entity('skip');
+    } catch (e) { /* ignore */ }
+  }
+
   /* ---- My Pockets: GET/POST /api/v1/devices, DELETE /api/v1/devices/{id}.
-   * A new key is held only in the DOM text of #pk-key until dismissed, sign-out or session end.
-   * It is never put in storage, a URL or the console. ---- */
+   * Keys are minted in the workbench, never here. ---- */
   var pockets = [];
   var pocketLimit = 3;
   var armedId = null;     // device id awaiting the second "Sure? Revoke" click
@@ -365,25 +471,13 @@
     return fetch(API + path, opts);
   }
 
-  function clearKey() {
-    $('pk-key').textContent = '';
-    $('pk-line').textContent = '';
-    $('pk-copy-msg').textContent = '';
-    $('pk-usb-msg').textContent = '';
-    $('pk-usb').disabled = false;
-    show('pk-key-panel', false);
-  }
-
   function resetPockets() {
-    clearKey();
     pockets = [];
     armedId = null;
     clearTimeout(armTimer);
     pkBusy = false;
     $('pk-list').textContent = '';
     $('pk-count').textContent = 'Loading your Pockets...';
-    $('pk-label').value = '';
-    $('pk-add').disabled = false;
     say('pk-msg', '');
   }
 
@@ -410,7 +504,7 @@
     if (!pockets.length) {
       var li0 = document.createElement('li');
       li0.className = 'acct-muted';
-      li0.textContent = 'No Pockets yet. Add one below.';
+      li0.textContent = 'No Pockets yet. Set one up in the workbench.';
       ul.appendChild(li0);
     }
     pockets.forEach(function (d) {
@@ -445,9 +539,8 @@
     if (r.status === 401) { signOut('Your session ended. Sign in again.'); return; }
     var m;
     if (r.status === 409) m = typeof d.detail === 'string' ? d.detail : 'You have reached your Pocket limit. Revoke one to add another.';
-    else if (r.status === 429) m = 'Too many new Pockets this hour. Try again later.';
-    else if (r.status === 403) m = 'Pairing a Pocket is for members only.';
-    else if (r.status === 422) m = 'Give your Pocket a name of 1 to 40 characters.';
+    else if (r.status === 429) m = 'Too many requests. Try again later.';
+    else if (r.status === 403) m = 'Pockets are for members only.';
     else if (r.status === 503) m = 'RaBbLE is busy right now. Try again in a moment.';
     else if (r.status === 404) m = 'That Pocket was not found. The list has been refreshed.';
     else m = what + ' did not work. Try again.';
@@ -475,32 +568,6 @@
     });
   }
 
-  $('pk-form').addEventListener('submit', function (e) {
-    e.preventDefault();
-    if (pkBusy || !live()) return;
-    var label = $('pk-label').value.trim();
-    if (!label) { say('pk-msg', 'Give your Pocket a name first.', 'err'); $('pk-label').focus(); return; }
-    pkBusy = true;
-    $('pk-add').disabled = true;
-    say('pk-msg', '');
-    clearKey();
-    api('POST', '/api/v1/devices', { label: label }).then(function (r) {
-      return json(r).then(function (d) {
-        if (r.status === 201 && typeof d.key === 'string') {
-          $('pk-key').textContent = d.key;
-          $('pk-line').textContent = '>beam.token=' + d.key;
-          show('pk-key-panel', true);
-          show('pk-usb', !!(window.RaBbLEPocketSerial && window.RaBbLEPocketSerial.supported()));
-          $('pk-label').value = '';
-          say('pk-msg', 'Pocket added.', 'ok');
-          return loadPockets();
-        }
-        pkFail(r, d, 'Adding the Pocket');
-      });
-    }).catch(function () { say('pk-msg', 'Could not reach RaBbLE. Try again.', 'err'); })
-      .then(function () { pkBusy = false; if (session) $('pk-add').disabled = false; });
-  });
-
   $('pk-list').addEventListener('click', function (e) {
     var b = e.target.closest ? e.target.closest('button[data-revoke]') : null;
     if (!b || pkBusy || !live()) return;
@@ -526,42 +593,14 @@
       .then(function () { pkBusy = false; });
   });
 
-  $('pk-usb').addEventListener('click', function () {
-    var key = $('pk-key').textContent;
-    if (!key || !window.RaBbLEPocketSerial) return;
-    var btn = $('pk-usb');
-    btn.disabled = true;
-    $('pk-usb-msg').classList.remove('err', 'ok');
-    window.RaBbLEPocketSerial.send(key, {
-      onStep: function (t) { $('pk-usb-msg').textContent = t; },
-      confirmReplace: function () {
-        return window.confirm('This Pocket already holds a key. Replace it with the new one? The old key stops working for this Pocket.');
-      },
-    }).then(function () {
-      clearKey();   // the key has done its job: do not keep it on screen
-      say('pk-msg', 'Your Pocket has its key. New captures go to your account.', 'ok');
-    }, function (e) {
-      say('pk-usb-msg', e && e.code ? e.message : 'Could not send the key. Copy it instead.', 'err');
-      btn.disabled = false;
-    });
-  });
-
-  $('pk-dismiss').addEventListener('click', function () { clearKey(); });
-
-  $('pk-copy').addEventListener('click', function () {
-    var text = $('pk-key').textContent;
-    function fallback() {
-      var range = document.createRange();
-      range.selectNodeContents($('pk-key'));
-      var sel = window.getSelection();
-      sel.removeAllRanges(); sel.addRange(range);
-      $('pk-copy-msg').textContent = 'Copy blocked. The key is selected: press Ctrl+C (or Cmd+C).';
-    }
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(text).then(function () {
-        $('pk-copy-msg').textContent = 'Copied.';
-      }, fallback);
-    } else fallback();
+  /* The workbench takes the session in the URL fragment (never sent to a server), seals it in its own cookie
+   * and strips the fragment at once. Contract: HANDOFF-S350 B, Pocket companion portal.js takeHandoff. */
+  $('pk-workbench').addEventListener('click', function () {
+    if (!live()) return;
+    var base = (window.RABBLE_POCKET_URL || '').replace(/\/$/, '');
+    if (!base) { say('pk-msg', 'The Pocket workbench is not configured.', 'err'); return; }
+    window.open(base + '/#token=' + encodeURIComponent(session.token) + '&name=' + encodeURIComponent(session.username || ''),
+      '_blank', 'noopener');
   });
 
   ['click', 'keydown', 'touchstart'].forEach(function (ev) {

@@ -93,3 +93,9 @@
 .acct-thread .acct-turn.you { justify-self: end; }
 .acct-thread .acct-turn.rabble { justify-self: start; }
 .acct-data.acct-hidden { display: none; }
+
+/* The entity on Home: a banner above the chat. Hidden (no space) when NeBuLA did not load. */
+.acct-entity { position: relative; height: 220px; margin-bottom: var(--rabble-space-5); overflow: hidden;
+  border: 1px solid var(--rabble-border); border-radius: var(--rabble-radius-sm); }
+.acct-entity rabble-entity { position: absolute; inset: 0; display: block; }
+:root[data-nebula="failed"] .acct-entity { display: none; }

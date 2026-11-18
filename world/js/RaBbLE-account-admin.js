@@ -15,6 +15,11 @@
     el.classList.toggle('ok', kind === 'ok');
   }
 
+  /* An invite is shared as a link: the portal reads ?invite=CODE and opens sign-up with the code filled in. */
+  function inviteLink(token) {
+    return window.location.origin + window.location.pathname + '?invite=' + encodeURIComponent(token);
+  }
+
   function call(method, path, body) {
     var token = opts && opts.getToken();
     if (!token) return Promise.reject(new Error('no session'));
@@ -70,7 +75,7 @@
       }
       var code = document.createElement('code');
       code.className = 'acct-token';
-      code.textContent = i.token;
+      code.textContent = i.state === 'live' ? inviteLink(i.token) : i.token;
       var meta = document.createElement('span');
       meta.className = 'acct-muted';
       meta.textContent = i.state === 'used' ? 'used' : 'expires ' + String(i.expires_at).slice(0, 10);
@@ -97,7 +102,7 @@
       say('mint-msg', 'Minting...');
       call('POST', '/api/v1/admin/invites', { note: $('note').value.trim(), expires_days: days }).then(function (r) {
         if (r.status === 201 && typeof r.data.token === 'string') {
-          $('fresh-token').textContent = r.data.token;
+          $('fresh-token').textContent = inviteLink(r.data.token);
           show('fresh', true);
           $('note').value = '';
           say('mint-msg', 'Invite minted.', 'ok');
@@ -113,7 +118,7 @@
         range.selectNodeContents($('fresh-token'));
         var sel = window.getSelection();
         sel.removeAllRanges(); sel.addRange(range);
-        say('mint-msg', 'Copy blocked. The invite is selected: press Ctrl+C (or Cmd+C).');
+        say('mint-msg', 'Copy blocked. The link is selected: press Ctrl+C (or Cmd+C).');
       }
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(text).then(function () { say('mint-msg', 'Copied.', 'ok'); }, fallback);

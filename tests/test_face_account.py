@@ -41,7 +41,7 @@ def open_face(browser, width=1280, height=800, session=None, chat="ok", seed_tur
             return route.fulfill(status=200, content_type="text/event-stream", headers=CORS,
                                  body='data: "A reply for you."\n\ndata: [DONE]\n\n')
         return route.fulfill(status=404, content_type="application/json", headers=CORS, body="{}")
-    page.route(re.compile(r"http://localhost:8000/.*"), api)
+    page.route(re.compile(r".*/(api/v1|health)(/.*)?$"), api)
     page.route(re.compile(r"https://score\.joinrabble\.world/.*"), api)
     page.route(re.compile(r".*/nebula/.*"), lambda r: r.abort())
     if session is not None:
