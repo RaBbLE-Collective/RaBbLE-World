@@ -369,6 +369,8 @@
     $('pk-key').textContent = '';
     $('pk-line').textContent = '';
     $('pk-copy-msg').textContent = '';
+    $('pk-usb-msg').textContent = '';
+    $('pk-usb').disabled = false;
     show('pk-key-panel', false);
   }
 
@@ -425,6 +427,7 @@
       seen.className = 'acct-muted';
       seen.textContent = ago(d.last_seen);
       info.appendChild(name); info.appendChild(status); info.appendChild(seen);
+      if (d.fw) { var fw = document.createElement('span'); fw.className = 'acct-muted'; fw.textContent = 'firmware ' + d.fw; info.appendChild(fw); }
       li.appendChild(info);
       if (!d.revoked) {
         var b = document.createElement('button');
@@ -487,6 +490,7 @@
           $('pk-key').textContent = d.key;
           $('pk-line').textContent = '>beam.token=' + d.key;
           show('pk-key-panel', true);
+          show('pk-usb', !!(window.RaBbLEPocketSerial && window.RaBbLEPocketSerial.supported()));
           $('pk-label').value = '';
           say('pk-msg', 'Pocket added.', 'ok');
           return loadPockets();
@@ -520,6 +524,26 @@
       });
     }).catch(function () { say('pk-msg', 'Could not reach RaBbLE. Try again.', 'err'); })
       .then(function () { pkBusy = false; });
+  });
+
+  $('pk-usb').addEventListener('click', function () {
+    var key = $('pk-key').textContent;
+    if (!key || !window.RaBbLEPocketSerial) return;
+    var btn = $('pk-usb');
+    btn.disabled = true;
+    $('pk-usb-msg').classList.remove('err', 'ok');
+    window.RaBbLEPocketSerial.send(key, {
+      onStep: function (t) { $('pk-usb-msg').textContent = t; },
+      confirmReplace: function () {
+        return window.confirm('This Pocket already holds a key. Replace it with the new one? The old key stops working for this Pocket.');
+      },
+    }).then(function () {
+      clearKey();   // the key has done its job: do not keep it on screen
+      say('pk-msg', 'Your Pocket has its key. New captures go to your account.', 'ok');
+    }, function (e) {
+      say('pk-usb-msg', e && e.code ? e.message : 'Could not send the key. Copy it instead.', 'err');
+      btn.disabled = false;
+    });
   });
 
   $('pk-dismiss').addEventListener('click', function () { clearKey(); });

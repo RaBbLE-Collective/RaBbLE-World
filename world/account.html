@@ -101,12 +101,14 @@
             <p class="acct-key-warn"><strong>Copy this key now.</strong> It will not be shown again. Anyone with it can connect as your Pocket.</p>
             <code class="acct-key-text" id="pk-key" tabindex="0"></code>
             <div class="acct-key-actions">
-              <button class="rabble-btn rabble-btn-cyan rabble-btn-sm" id="pk-copy" type="button">Copy key</button>
+              <button class="rabble-btn rabble-btn-cyan rabble-btn-sm acct-hidden" id="pk-usb" type="button">Send to my Pocket over USB</button>
+              <button class="rabble-btn rabble-btn-ghost rabble-btn-sm" id="pk-copy" type="button">Copy key</button>
               <button class="rabble-btn rabble-btn-ghost rabble-btn-sm" id="pk-dismiss" type="button">Dismiss</button>
             </div>
             <p class="acct-muted" id="pk-copy-msg" role="status"></p>
+            <p class="acct-muted" id="pk-usb-msg" role="status"></p>
             <ol class="acct-steps">
-              <li>Connect the Pocket to your computer over USB, open the Pocket companion, and paste this key.</li>
+              <li>Connect the Pocket to your computer over USB and press Send to my Pocket over USB (Chrome or Edge). Otherwise copy the key and paste it into the Pocket companion.</li>
               <li>Using a serial terminal instead? Send this line:</li>
             </ol>
             <code class="acct-key-text" id="pk-line"></code>
@@ -208,6 +210,7 @@
       </div>
     </section>
   </main>
+  <script src="js/RaBbLE-pocket-serial.js"></script>
   <script src="js/RaBbLE-account-captures.js"></script>
   <script src="js/RaBbLE-account.js"></script>
 </body>
